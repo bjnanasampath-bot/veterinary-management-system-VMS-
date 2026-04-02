@@ -15,13 +15,10 @@ export default function Register() {
       toast.success('Account created! Please login.')
       navigate('/login')
     } catch (err) {
-      if (err.response?.data) {
-        const data = err.response.data;
-        const errors = data.errors || data;
-        const msg = errors.email?.[0] || errors.password?.[0] || data.message || data.detail || 'Registration failed';
-        toast.error(msg);
-      } else {
-        toast.error('Registration failed');
+      // Axios interceptor already shows toast for server errors.
+      // Only show toast for non-HTTP errors (network issues etc).
+      if (!err.response) {
+        toast.error('Network error. Please check your connection.')
       }
     }
   }
@@ -50,7 +47,11 @@ export default function Register() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input {...register('email', { required: true })} type="email" className="input-field" placeholder="john@vetcare.com" />
+              <input {...register('email', {
+                required: 'Email is required',
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address (e.g. name@gmail.com)' }
+              })} type="email" className="input-field" placeholder="john@vetcare.com" />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>

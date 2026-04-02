@@ -29,7 +29,10 @@ api.interceptors.response.use(
         window.location.href = '/login'
       }
     }
-    const msg = error.response?.data?.message || 'Something went wrong'
+    const resData = error.response?.data || {}
+    const fieldErrors = resData.errors || {}
+    const firstFieldError = Object.values(fieldErrors).flat()[0]
+    const msg = firstFieldError || resData.message || resData.detail || 'Something went wrong'
     toast.error(msg)
     return Promise.reject(error)
   }
