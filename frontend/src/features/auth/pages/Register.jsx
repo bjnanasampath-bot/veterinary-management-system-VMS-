@@ -15,7 +15,14 @@ export default function Register() {
       toast.success('Account created! Please login.')
       navigate('/login')
     } catch (err) {
-      toast.error('Registration failed')
+      if (err.response?.data) {
+        const data = err.response.data;
+        const errors = data.errors || data;
+        const msg = errors.email?.[0] || errors.password?.[0] || data.message || data.detail || 'Registration failed';
+        toast.error(msg);
+      } else {
+        toast.error('Registration failed');
+      }
     }
   }
 
