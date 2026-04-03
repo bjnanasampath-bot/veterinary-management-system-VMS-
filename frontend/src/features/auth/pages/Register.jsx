@@ -6,11 +6,22 @@ import { PawPrint, Eye, EyeOff, Lock } from 'lucide-react'
 import { authApi } from '../../../api'
 import toast from 'react-hot-toast'
 
+import GoogleAuthButton from '../components/GoogleAuthButton'
+
 export default function Register() {
   const navigate = useNavigate()
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm()
+
+  const handleGoogleSuccess = (data) => {
+    if (data.is_new) {
+      setValue('first_name', data.first_name)
+      setValue('last_name', data.last_name)
+      setValue('email', data.email)
+      toast.info('Details filled from Google. Please choose a role and password.')
+    }
+  }
 
   const onSubmit = async (data) => {
     try {
@@ -35,6 +46,10 @@ export default function Register() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
           <p className="text-gray-500 text-sm">VetCare Management System</p>
+        </div>
+
+        <div className="mb-6 pb-6 border-b border-gray-100">
+          <GoogleAuthButton onSuccess={handleGoogleSuccess} text="signup_with" />
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

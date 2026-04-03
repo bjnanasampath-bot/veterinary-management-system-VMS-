@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 from common.responses import success_response, error_response
 from .models import User
 from .serializers import (
@@ -68,6 +70,53 @@ class ChangePasswordView(APIView):
             request.user.save()
             return success_response(message="Password changed successfully")
         return error_response(errors=serializer.errors)
+
+
+class GoogleAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return error_response(message="Token is required")
+
+        try:
+            # Specify the CLIENT_ID of the app that accesses the backend:
+            # idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
+            # For now, we verify without CLIENT_ID for development or get it from settings
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
+
+            email = idinfo.get('email')
+            first_name = idinfo.get('given_name', '')
+            last_name = idinfo.get('family_name', '')
+
+            try:
+                user = User.objects.get(email=email)
+                # Existing user -> Login
+                refresh = RefreshToken.for_user(user)
+                return success_response(
+                    data={
+                        'access': str(refresh.access_token),
+                        'refresh': str(refresh),
+                        'user': UserSerializer(user).data,
+                        'is_new': False
+                    },
+                    message="Login successful"
+                )
+            except User.DoesNotExist:
+                # New user -> Return info for pre-filling
+                return success_response(
+                    data={
+                        'email': email,
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'is_new': True
+                    },
+                    message="Google account verified. Please complete registration."
+                )
+
+        except ValueError:
+            return error_response(message="Invalid Google token")
 
 
 class UserListView(generics.ListAPIView):

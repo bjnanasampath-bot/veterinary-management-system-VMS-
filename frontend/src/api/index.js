@@ -4,6 +4,7 @@ export const authApi = {
   login: (data) => api.post('/auth/login/', data),
   register: (data) => api.post('/auth/register/', data),
   logout: (data) => api.post('/auth/logout/', data),
+  googleAuth: (data) => api.post('/auth/google-auth/', data),
   getProfile: () => api.get('/auth/profile/'),
   updateProfile: (data) => api.put('/auth/profile/', data),
   changePassword: (data) => api.post('/auth/change-password/', data),

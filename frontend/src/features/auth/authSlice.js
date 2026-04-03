@@ -11,6 +11,15 @@ export const login = createAsyncThunk('auth/login', async (data, { rejectWithVal
   }
 })
 
+export const googleLogin = createAsyncThunk('auth/googleLogin', async (token, { rejectWithValue }) => {
+  try {
+    const res = await authApi.googleAuth({ token })
+    return res.data
+  } catch (err) {
+    return rejectWithValue(err.response?.data)
+  }
+})
+
 export const logout = createAsyncThunk('auth/logout', async (_, { getState }) => {
   const refresh = localStorage.getItem('refresh_token')
   try { await authApi.logout({ refresh_token: refresh }) } catch {}
@@ -45,6 +54,28 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload?.message || 'Login failed'
+        toast.error(state.error)
+      })
+      .addCase(googleLogin.pending, (state) => { state.loading = true; state.error = null })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload.data.is_new) {
+          // New user -> Just return profile for pre-fill
+          return
+        }
+        // Existing user -> Login
+        const { access, refresh, user } = action.payload.data
+        state.isAuthenticated = true
+        state.user = user
+        state.token = access
+        localStorage.setItem('access_token', access)
+        localStorage.setItem('refresh_token', refresh)
+        localStorage.setItem('user', JSON.stringify(user))
+        toast.success('Google Login successful!')
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload?.message || 'Google Auth failed'
         toast.error(state.error)
       })
       .addCase(logout.fulfilled, (state) => {
