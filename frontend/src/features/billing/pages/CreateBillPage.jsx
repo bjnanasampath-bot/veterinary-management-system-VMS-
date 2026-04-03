@@ -28,11 +28,24 @@ export default function CreateBillPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await billingApi.create({ ...data, subtotal, discount_amount: discountAmt, tax_amount: taxAmt, total_amount: total })
+      const payload = {
+        ...data,
+        due_date: data.due_date || null,
+        subtotal,
+        discount_amount: discountAmt,
+        tax_amount: taxAmt,
+        total_amount: total
+      }
+      await billingApi.create(payload)
       toast.success('Bill created!')
       navigate('/billing')
-    } catch { toast.error('Failed to create bill') }
-    finally { setLoading(false) }
+    } catch (error) {
+      console.error('Failed to create bill:', error)
+      const errorMsg = error.response?.data?.message || error.response?.data?.detail || 'Failed to create bill'
+      toast.error(errorMsg)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
