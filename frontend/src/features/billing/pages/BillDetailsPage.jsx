@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { billingApi } from '../../../api'
 import { Loader } from '../../../components/common'
-import { ArrowLeft, Printer } from 'lucide-react'
+import { ArrowLeft, Printer, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const STATUS_COLORS = { paid: 'bg-green-100 text-green-700', pending: 'bg-yellow-100 text-yellow-700', partial: 'bg-blue-100 text-blue-700', cancelled: 'bg-red-100 text-red-700' }
@@ -15,6 +15,7 @@ export default function BillDetailsPage() {
   const [payAmount, setPayAmount] = useState('')
   const [payMethod, setPayMethod] = useState('cash')
   const [paying, setPaying] = useState(false)
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     billingApi.getById(id).then(r => setBill(r.data?.data || r.data)).finally(() => setLoading(false))
@@ -28,16 +29,31 @@ export default function BillDetailsPage() {
       setBill(res.data?.data || res.data)
       toast.success('Payment recorded!')
       setPayAmount('')
-    } catch { toast.error('Payment failed') }
-    finally { setPaying(false) }
+    } catch {
+      toast.error('Payment failed')
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  const handleSendEmail = async () => {
+    setSending(true)
+    try {
+      await billingApi.sendEmail(id)
+      toast.success('Bill sent to client email!')
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send email')
+    } finally {
+      setSending(false)
+    }
   }
 
   if (loading) return <Loader />
   if (!bill) return <div className="card text-center py-16 text-gray-400">Bill not found</div>
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5">
-      <div className="flex items-center gap-3">
+    <div className="max-w-3xl mx-auto space-y-5 pb-10">
+      <div className="flex items-center gap-3 no-print">
         <button onClick={() => navigate('/billing')} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg"><ArrowLeft size={18} /></button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">Bill #{bill.bill_number}</h1>
@@ -45,6 +61,27 @@ export default function BillDetailsPage() {
         </div>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[bill.status] || 'bg-gray-100 text-gray-600'}`}>{bill.status}</span>
         <button onClick={() => window.print()} className="btn-secondary flex items-center gap-2 text-sm"><Printer size={15} /> Print</button>
+        <button onClick={handleSendEmail} disabled={sending} className="btn-primary flex items-center gap-2 text-sm">
+          <Send size={15} /> {sending ? 'Sending...' : 'Send to Client'}
+        </button>
+      </div>
+
+      <div className="hidden print:block print-header text-center">
+        <h1 className="text-3xl font-bold text-primary-700">VetCare</h1>
+        <p className="text-gray-500">Veterinary Management System</p>
+        <div className="mt-4 flex justify-between text-left text-sm">
+          <div>
+            <p className="font-bold">From:</p>
+            <p>VetCare Clinic</p>
+            <p>123 Pet Lane, City</p>
+            <p>Phone: +91 98765 43210</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold">Invoice:</p>
+            <p>#{bill.bill_number}</p>
+            <p>Date: {new Date(bill.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -77,7 +114,7 @@ export default function BillDetailsPage() {
       </div>
 
       {bill.status !== 'paid' && bill.status !== 'cancelled' && (
-        <div className="card">
+        <div className="card no-print">
           <h2 className="font-semibold text-gray-800 mb-4">Record Payment</h2>
           <div className="flex gap-3 items-end">
             <div className="flex-1">
@@ -97,6 +134,11 @@ export default function BillDetailsPage() {
           </div>
         </div>
       )}
+
+      <div className="hidden print:block print-footer mt-10">
+        <p>Thank you for trusting VetCare with your pet's health!</p>
+        <p className="mt-2">This is a system generated invoice.</p>
+      </div>
     </div>
   )
 }

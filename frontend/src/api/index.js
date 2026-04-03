@@ -70,6 +70,7 @@ export const billingApi = {
   update: (id, data) => api.put(`/billing/${id}/`, data),
   delete: (id) => api.delete(`/billing/${id}/`),
   makePayment: (id, data) => api.post(`/billing/${id}/payment/`, data),
+  sendEmail: (id) => api.post(`/billing/${id}/send-email/`),
 }
 
 export const reportApi = {

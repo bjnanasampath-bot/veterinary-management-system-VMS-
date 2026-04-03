@@ -1,6 +1,7 @@
 from rest_framework import generics, filters, status
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.mail import send_mail
 from common.responses import success_response, error_response
 from .models import Bill, BillItem
 from .serializers import BillSerializer, BillListSerializer, BillItemSerializer
@@ -53,3 +54,54 @@ class BillPaymentView(APIView):
             return success_response(data=BillSerializer(bill).data, message="Payment recorded")
         except Bill.DoesNotExist:
             return error_response(message="Bill not found", status_code=404)
+
+
+class BillSendEmailView(APIView):
+    def post(self, request, pk):
+        try:
+            bill = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items').get(pk=pk)
+            owner = bill.pet.owner
+            
+            # Simple text email content
+            subject = f"Invoice from VetCare - #{bill.bill_number}"
+            item_list = "\n".join([f"- {i.description}: ₹{i.total_price} (Qty: {i.quantity})" for i in bill.items.all()])
+            
+            message = f"""
+Dear {owner.full_name},
+
+Please find the invoice details for {bill.pet.name} below:
+
+Bill Number: {bill.bill_number}
+Date: {bill.created_at.strftime('%Y-%m-%d')}
+Status: {bill.status.upper()}
+
+Items:
+{item_list}
+
+Subtotal: ₹{bill.subtotal}
+Discount: -₹{bill.discount_amount}
+Tax: +₹{bill.tax_amount}
+Total Amount: ₹{bill.total_amount}
+
+Paid: ₹{bill.paid_amount}
+Due: ₹{bill.due_amount}
+
+Payment Method: {bill.payment_method or 'N/A'}
+Due Date: {bill.due_date if bill.due_date else 'N/A'}
+
+Thank you for choosing VetCare!
+"""
+            
+            send_mail(
+                subject,
+                message,
+                'no-reply@vetcare.com',
+                [owner.email],
+                fail_silently=False,
+            )
+            
+            return success_response(message=f"Bill sent to {owner.email}")
+        except Bill.DoesNotExist:
+            return error_response(message="Bill not found", status_code=404)
+        except Exception as e:
+            return error_response(message=str(e), status_code=500)

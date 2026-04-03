@@ -32,3 +32,17 @@
   .badge-info    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800; }
   .badge-gray    { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800; }
 }
+
+@media print {
+  body { background-color: white !important; }
+  .no-print { display: none !important; }
+  aside, nav, header, footer { display: none !important; }
+  main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+  .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+  .btn-primary, .btn-secondary, .btn-danger { display: none !important; }
+  .max-w-3xl { max-width: 100% !important; }
+  
+  /* Invoice specific styling */
+  .print-header { display: block !important; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; }
+  .print-footer { display: block !important; margin-top: 3rem; text-align: center; font-size: 0.75rem; color: #64748b; }
+}
