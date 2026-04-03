@@ -1,3 +1,4 @@
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, PawPrint, Users, UserCog, CalendarDays,
@@ -5,17 +6,20 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/appointments', icon: CalendarDays, label: 'Appointments' },
-  { to: '/pets', icon: PawPrint, label: 'Pets' },
-  { to: '/owners', icon: Users, label: 'Owners' },
-  { to: '/doctors', icon: Stethoscope, label: 'Doctors' },
-  { to: '/vaccinations', icon: Syringe, label: 'Vaccinations' },
-  { to: '/billing', icon: Receipt, label: 'Billing' },
-  { to: '/reports', icon: BarChart2, label: 'Reports' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'doctor', 'receptionist', 'client'] },
+  { to: '/appointments', icon: CalendarDays, label: 'Appointments', roles: ['admin', 'doctor', 'receptionist', 'client'] },
+  { to: '/pets', icon: PawPrint, label: 'Pets', roles: ['admin', 'doctor', 'receptionist', 'client'] },
+  { to: '/owners', icon: Users, label: 'Owners', roles: ['admin', 'receptionist'] },
+  { to: '/doctors', icon: Stethoscope, label: 'Doctors', roles: ['admin', 'receptionist'] },
+  { to: '/vaccinations', icon: Syringe, label: 'Vaccinations', roles: ['admin', 'doctor', 'receptionist'] },
+  { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin', 'receptionist'] },
+  { to: '/reports', icon: BarChart2, label: 'Reports', roles: ['admin'] },
 ]
 
 export default function Sidebar({ open, onClose }) {
+  const { user } = useSelector(s => s.auth)
+  const filteredNavItems = navItems.filter(item => item.roles.includes(user.role))
+
   return (
     <>
       {/* Overlay mobile */}
@@ -41,7 +45,7 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {filteredNavItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}

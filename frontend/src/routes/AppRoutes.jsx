@@ -34,9 +34,11 @@ import BillDetailsPage from '../features/billing/pages/BillDetailsPage'
 
 import ReportsDashboard from '../features/reports/pages/ReportsDashboard'
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useSelector(s => s.auth)
-  return isAuthenticated ? children : <Navigate to="/login" replace />
+function ProtectedRoute({ children, allowedRoles }) {
+  const { isAuthenticated, user } = useSelector(s => s.auth)
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (allowedRoles && !allowedRoles.includes(user?.role)) return <Navigate to="/dashboard" replace />
+  return children
 }
 
 export default function AppRoutes() {
@@ -51,32 +53,35 @@ export default function AppRoutes() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
 
+        {/* Common for all roles but tailored inside */}
         <Route path="/pets" element={<PetListPage />} />
-        <Route path="/pets/add" element={<AddPetPage />} />
         <Route path="/pets/:id" element={<PetDetailsPage />} />
-        <Route path="/pets/:id/edit" element={<EditPetPage />} />
-
-        <Route path="/owners" element={<OwnerListPage />} />
-        <Route path="/owners/add" element={<AddOwnerPage />} />
-        <Route path="/owners/:id" element={<OwnerDetailsPage />} />
-        <Route path="/owners/:id/edit" element={<EditOwnerPage />} />
-
-        <Route path="/doctors" element={<DoctorListPage />} />
-        <Route path="/doctors/add" element={<AddDoctorPage />} />
-        <Route path="/doctors/:id/edit" element={<EditDoctorPage />} />
-
         <Route path="/appointments" element={<AppointmentListPage />} />
-        <Route path="/appointments/create" element={<CreateAppointmentPage />} />
         <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
 
-        <Route path="/vaccinations" element={<VaccinationListPage />} />
-        <Route path="/vaccinations/add" element={<AddVaccinationPage />} />
+        {/* Restricted access */}
+        <Route path="/pets/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><AddPetPage /></ProtectedRoute>} />
+        <Route path="/pets/:id/edit" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><EditPetPage /></ProtectedRoute>} />
 
-        <Route path="/billing" element={<BillListPage />} />
-        <Route path="/billing/create" element={<CreateBillPage />} />
-        <Route path="/billing/:id" element={<BillDetailsPage />} />
+        <Route path="/owners" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><OwnerListPage /></ProtectedRoute>} />
+        <Route path="/owners/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><AddOwnerPage /></ProtectedRoute>} />
+        <Route path="/owners/:id" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><OwnerDetailsPage /></ProtectedRoute>} />
+        <Route path="/owners/:id/edit" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><EditOwnerPage /></ProtectedRoute>} />
 
-        <Route path="/reports" element={<ReportsDashboard />} />
+        <Route path="/doctors" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><DoctorListPage /></ProtectedRoute>} />
+        <Route path="/doctors/add" element={<ProtectedRoute allowedRoles={['admin']}><AddDoctorPage /></ProtectedRoute>} />
+        <Route path="/doctors/:id/edit" element={<ProtectedRoute allowedRoles={['admin']}><EditDoctorPage /></ProtectedRoute>} />
+
+        <Route path="/appointments/create" element={<CreateAppointmentPage />} />
+
+        <Route path="/vaccinations" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><VaccinationListPage /></ProtectedRoute>} />
+        <Route path="/vaccinations/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><AddVaccinationPage /></ProtectedRoute>} />
+
+        <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><BillListPage /></ProtectedRoute>} />
+        <Route path="/billing/create" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><CreateBillPage /></ProtectedRoute>} />
+        <Route path="/billing/:id" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'client']}><BillDetailsPage /></ProtectedRoute>} />
+
+        <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']}><ReportsDashboard /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

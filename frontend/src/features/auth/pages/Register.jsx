@@ -56,6 +56,7 @@ export default function Register() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select {...register('role')} className="input-field">
+              <option value="client">Client (Pet Owner)</option>
               <option value="receptionist">Receptionist</option>
               <option value="doctor">Doctor</option>
               <option value="admin">Admin</option>

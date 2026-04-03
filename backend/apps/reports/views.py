@@ -14,20 +14,45 @@ class DashboardStatsView(APIView):
         from apps.appointments.models import Appointment
         from apps.billing.models import Bill
 
+        user = request.user
+        role = user.role
         today = date.today()
         month_start = today.replace(day=1)
 
+        # Base queries based on role
+        if role == 'doctor':
+            try:
+                doctor_profile = user.doctor_profile
+                pets_q = Pet.objects.filter(appointments__doctor=doctor_profile).distinct()
+                appts_q = Appointment.objects.filter(doctor=doctor_profile)
+                bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
+            except:
+                return success_response(data={}, message="Doctor profile not found")
+        elif role == 'client':
+            try:
+                owner_profile = user.owner_profile
+                pets_q = Pet.objects.filter(owner=owner_profile)
+                appts_q = Appointment.objects.filter(pet__owner=owner_profile)
+                bills_q = Bill.objects.filter(pet__owner=owner_profile)
+            except:
+                return success_response(data={}, message="Client profile not found")
+        else:
+            # Admin and Receptionist see all
+            pets_q = Pet.objects.all()
+            appts_q = Appointment.objects.all()
+            bills_q = Bill.objects.all()
+
         data = {
-            'total_pets': Pet.objects.filter(is_active=True).count(),
-            'total_owners': Owner.objects.filter(is_active=True).count(),
-            'total_doctors': Doctor.objects.filter(is_active=True).count(),
-            'today_appointments': Appointment.objects.filter(appointment_date=today).count(),
-            'pending_appointments': Appointment.objects.filter(status__in=['scheduled', 'confirmed']).count(),
-            'monthly_revenue': float(Bill.objects.filter(
+            'total_pets': pets_q.filter(is_active=True).count(),
+            'total_owners': Owner.objects.filter(is_active=True).count() if role != 'client' else 1,
+            'total_doctors': Doctor.objects.filter(is_active=True).count() if role != 'doctor' else 1,
+            'today_appointments': appts_q.filter(appointment_date=today).count(),
+            'pending_appointments': appts_q.filter(status__in=['scheduled', 'confirmed']).count(),
+            'monthly_revenue': float(bills_q.filter(
                 created_at__gte=month_start, status='paid'
-            ).aggregate(total=Sum('total_amount'))['total'] or 0),
-            'pending_bills': Bill.objects.filter(status__in=['pending', 'partial']).count(),
-            'total_revenue': float(Bill.objects.filter(status='paid').aggregate(total=Sum('total_amount'))['total'] or 0),
+            ).aggregate(total=Sum('total_amount'))['total'] or 0) if role != 'client' else 0,
+            'pending_bills': bills_q.filter(status__in=['pending', 'partial']).count(),
+            'total_revenue': float(bills_q.filter(status='paid').aggregate(total=Sum('total_amount'))['total'] or 0) if role != 'client' else 0,
         }
         return success_response(data=data)
 

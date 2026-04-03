@@ -39,7 +39,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        from apps.owners.models import Owner
+        user = User.objects.create_user(**validated_data)
+        if user.role == 'client':
+            Owner.objects.create(
+                user=user,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=user.email,
+                phone=user.phone or '0000000000'
+            )
+        return user
 
 
 class ChangePasswordSerializer(serializers.Serializer):
