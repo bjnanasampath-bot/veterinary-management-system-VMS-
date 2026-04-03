@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { login } from '../authSlice'
-import { PawPrint, Mail, Lock } from 'lucide-react'
+import { PawPrint, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
   const dispatch = useDispatch()
+  const [showPassword, setShowPassword] = useState(false)
   const { loading } = useSelector(s => s.auth)
   const { register, handleSubmit, formState: { errors } } = useForm()
 
@@ -43,10 +45,17 @@ export default function Login() {
               <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 {...register('password', { required: 'Password is required' })}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
-                className="input-field pl-9"
+                className="input-field pl-9 pr-10"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>

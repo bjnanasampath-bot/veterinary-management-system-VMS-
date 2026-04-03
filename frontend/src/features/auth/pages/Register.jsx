@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { PawPrint } from 'lucide-react'
+import { PawPrint, Eye, EyeOff, Lock } from 'lucide-react'
 import { authApi } from '../../../api'
 import toast from 'react-hot-toast'
 
 export default function Register() {
   const navigate = useNavigate()
+  const [showPass, setShowPass] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm()
 
   const onSubmit = async (data) => {
@@ -64,11 +67,41 @@ export default function Register() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input {...register('password', { required: true, minLength: 8 })} type="password" className="input-field" placeholder="Min 8 characters" />
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                {...register('password', { required: true, minLength: 8 })}
+                type={showPass ? 'text' : 'password'}
+                className="input-field pl-9 pr-10"
+                placeholder="Min 8 characters"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowPass(!showPass)}
+              >
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input {...register('confirm_password', { required: true, validate: v => v === watch('password') || 'Passwords do not match' })} type="password" className="input-field" placeholder="Repeat password" />
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                {...register('confirm_password', { required: true, validate: v => v === watch('password') || 'Passwords do not match' })}
+                type={showConfirm ? 'text' : 'password'}
+                className="input-field pl-9 pr-10"
+                placeholder="Repeat password"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowConfirm(!showConfirm)}
+              >
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password.message}</p>}
           </div>
           <button type="submit" disabled={isSubmitting} className="btn-primary w-full py-2.5">
