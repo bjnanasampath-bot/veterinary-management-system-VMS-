@@ -15,7 +15,14 @@ export default function AppointmentListPage() {
     <GenericListPage
       title="Appointments" subtitle="Manage all appointments"
       addPath="/appointments/create"
-      fetchFn={appointmentApi.getAll}
+      fetchFn={async (p) => {
+        const res = await appointmentApi.getAll(p)
+        const dataList = res.data?.results || res.data?.data || []
+        dataList.forEach(r => {
+          r._viewPath = `/appointments/${r.id}`
+        })
+        return res
+      }}
       deleteFn={(id) => appointmentApi.updateStatus(id, 'cancelled')}
       searchPlaceholder="Search by pet name, doctor..."
       columns={[
