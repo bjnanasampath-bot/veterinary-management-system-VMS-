@@ -23,19 +23,34 @@ class DashboardStatsView(APIView):
         if role == 'doctor':
             try:
                 doctor_profile = user.doctor_profile
-                pets_q = Pet.objects.filter(appointments__doctor=doctor_profile).distinct()
-                appts_q = Appointment.objects.filter(doctor=doctor_profile)
-                bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
             except:
-                return success_response(data={}, message="Doctor profile not found")
+                from apps.doctors.models import Doctor
+                doctor_profile = Doctor.objects.create(
+                    user=user,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    phone=user.phone or '0000000000',
+                    license_number=f"DOC-{user.id}"
+                )
+            pets_q = Pet.objects.filter(appointments__doctor=doctor_profile).distinct()
+            appts_q = Appointment.objects.filter(doctor=doctor_profile)
+            bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
         elif role == 'client':
             try:
                 owner_profile = user.owner_profile
-                pets_q = Pet.objects.filter(owner=owner_profile)
-                appts_q = Appointment.objects.filter(pet__owner=owner_profile)
-                bills_q = Bill.objects.filter(pet__owner=owner_profile)
             except:
-                return success_response(data={}, message="Client profile not found")
+                from apps.owners.models import Owner
+                owner_profile = Owner.objects.create(
+                    user=user,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    phone=user.phone or '0000000000'
+                )
+            pets_q = Pet.objects.filter(owner=owner_profile)
+            appts_q = Appointment.objects.filter(pet__owner=owner_profile)
+            bills_q = Bill.objects.filter(pet__owner=owner_profile)
         else:
             # Admin and Receptionist see all
             pets_q = Pet.objects.all()

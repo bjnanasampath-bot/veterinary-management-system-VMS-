@@ -16,6 +16,11 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
         qs = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
         if self.request.user.role == 'client':
             return qs.filter(pet__owner__user=self.request.user)
+        elif self.request.user.role == 'doctor':
+            try:
+                return qs.filter(doctor=self.request.user.doctor_profile)
+            except:
+                return qs.none()
         return qs
 
     def get_serializer_class(self):
@@ -36,6 +41,11 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
         qs = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
         if self.request.user.role == 'client':
             return qs.filter(pet__owner__user=self.request.user)
+        elif self.request.user.role == 'doctor':
+            try:
+                return qs.filter(doctor=self.request.user.doctor_profile)
+            except:
+                return qs.none()
         return qs
 
     def destroy(self, request, *args, **kwargs):
@@ -51,6 +61,8 @@ class AppointmentStatusUpdateView(APIView):
             qs = Appointment.objects.all()
             if request.user.role == 'client':
                 qs = qs.filter(pet__owner__user=request.user)
+            elif request.user.role == 'doctor':
+                qs = qs.filter(doctor=request.user.doctor_profile)
             appt = qs.get(pk=pk)
             new_status = request.data.get('status')
             if new_status not in dict(Appointment.STATUS_CHOICES):
@@ -69,4 +81,9 @@ class TodayAppointmentsView(APIView):
         qs = Appointment.objects.filter(appointment_date=today).select_related('pet', 'doctor')
         if request.user.role == 'client':
             qs = qs.filter(pet__owner__user=request.user)
+        elif request.user.role == 'doctor':
+            try:
+                qs = qs.filter(doctor=request.user.doctor_profile)
+            except:
+                qs = qs.none()
         return success_response(data=AppointmentSerializer(qs, many=True).data)
