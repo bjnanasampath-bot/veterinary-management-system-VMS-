@@ -6,7 +6,15 @@ export default function DoctorListPage() {
     <GenericListPage
       title="Doctors" subtitle="Manage veterinary doctors"
       addPath="/doctors/add"
-      fetchFn={doctorApi.getAll}
+      fetchFn={async (p) => {
+        const res = await doctorApi.getAll(p)
+        const dataList = res.data?.results || res.data?.data || []
+        dataList.forEach(r => {
+          r._editPath = `/doctors/${r.id}/edit`
+          r._deleteName = r.full_name
+        })
+        return res
+      }}
       deleteFn={doctorApi.delete}
       searchPlaceholder="Search doctors by name, specialization..."
       columns={[

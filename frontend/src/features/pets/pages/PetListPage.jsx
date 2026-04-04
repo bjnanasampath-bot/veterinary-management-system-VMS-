@@ -7,7 +7,16 @@ export default function PetListPage() {
     <GenericListPage
       title="Pets" subtitle="Manage all registered pets"
       addPath="/pets/add"
-      fetchFn={petApi.getAll}
+      fetchFn={async (p) => {
+        const res = await petApi.getAll(p)
+        const dataList = res.data?.results || res.data?.data || []
+        dataList.forEach(r => {
+          r._viewPath = `/pets/${r.id}`
+          r._editPath = `/pets/${r.id}/edit`
+          r._deleteName = r.name
+        })
+        return res
+      }}
       deleteFn={petApi.delete}
       searchPlaceholder="Search pets by name, breed..."
       columns={[

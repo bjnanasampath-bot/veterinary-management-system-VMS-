@@ -6,7 +6,16 @@ export default function OwnerListPage() {
     <GenericListPage
       title="Owners" subtitle="Manage pet owners"
       addPath="/owners/add"
-      fetchFn={ownerApi.getAll}
+      fetchFn={async (p) => {
+        const res = await ownerApi.getAll(p)
+        const dataList = res.data?.results || res.data?.data || []
+        dataList.forEach(r => {
+          r._viewPath = `/owners/${r.id}`
+          r._editPath = `/owners/${r.id}/edit`
+          r._deleteName = r.full_name
+        })
+        return res
+      }}
       deleteFn={ownerApi.delete}
       searchPlaceholder="Search owners by name, email, phone..."
       columns={[
