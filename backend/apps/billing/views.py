@@ -8,11 +8,16 @@ from .serializers import BillSerializer, BillListSerializer, BillItemSerializer
 
 
 class BillListCreateView(generics.ListCreateAPIView):
-    queryset = Bill.objects.select_related('pet', 'pet__owner').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'payment_method']
     search_fields = ['bill_number', 'pet__name', 'pet__owner__first_name']
     ordering_fields = ['created_at', 'total_amount']
+
+    def get_queryset(self):
+        qs = Bill.objects.select_related('pet', 'pet__owner').all()
+        if self.request.user.role == 'client':
+            return qs.filter(pet__owner__user=self.request.user)
+        return qs
 
     def get_serializer_class(self):
         return BillListSerializer if self.request.method == 'GET' else BillSerializer
@@ -26,8 +31,13 @@ class BillListCreateView(generics.ListCreateAPIView):
 
 
 class BillDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items').all()
     serializer_class = BillSerializer
+
+    def get_queryset(self):
+        qs = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items').all()
+        if self.request.user.role == 'client':
+            return qs.filter(pet__owner__user=self.request.user)
+        return qs
 
     def destroy(self, request, *args, **kwargs):
         bill = self.get_object()
@@ -39,7 +49,10 @@ class BillDetailView(generics.RetrieveUpdateDestroyAPIView):
 class BillPaymentView(APIView):
     def post(self, request, pk):
         try:
-            bill = Bill.objects.get(pk=pk)
+            qs = Bill.objects.all()
+            if request.user.role == 'client':
+                qs = qs.filter(pet__owner__user=request.user)
+            bill = qs.get(pk=pk)
             paid_amount = request.data.get('paid_amount', 0)
             payment_method = request.data.get('payment_method', 'cash')
             from datetime import datetime
@@ -59,7 +72,10 @@ class BillPaymentView(APIView):
 class BillSendEmailView(APIView):
     def post(self, request, pk):
         try:
-            bill = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items').get(pk=pk)
+            qs = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items')
+            if request.user.role == 'client':
+                qs = qs.filter(pet__owner__user=request.user)
+            bill = qs.get(pk=pk)
             owner = bill.pet.owner
             
             # Simple text email content

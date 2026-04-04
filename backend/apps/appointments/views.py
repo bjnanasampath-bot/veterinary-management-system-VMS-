@@ -7,11 +7,16 @@ from .serializers import AppointmentSerializer, AppointmentDetailSerializer
 
 
 class AppointmentListCreateView(generics.ListCreateAPIView):
-    queryset = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'appointment_type', 'doctor', 'appointment_date']
     search_fields = ['pet__name', 'doctor__first_name', 'pet__owner__first_name']
     ordering_fields = ['appointment_date', 'created_at']
+
+    def get_queryset(self):
+        qs = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
+        if self.request.user.role == 'client':
+            return qs.filter(pet__owner__user=self.request.user)
+        return qs
 
     def get_serializer_class(self):
         return AppointmentSerializer
@@ -25,8 +30,13 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
 
 
 class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
     serializer_class = AppointmentDetailSerializer
+
+    def get_queryset(self):
+        qs = Appointment.objects.select_related('pet', 'doctor', 'pet__owner').all()
+        if self.request.user.role == 'client':
+            return qs.filter(pet__owner__user=self.request.user)
+        return qs
 
     def destroy(self, request, *args, **kwargs):
         appt = self.get_object()
@@ -38,7 +48,10 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
 class AppointmentStatusUpdateView(APIView):
     def patch(self, request, pk):
         try:
-            appt = Appointment.objects.get(pk=pk)
+            qs = Appointment.objects.all()
+            if request.user.role == 'client':
+                qs = qs.filter(pet__owner__user=request.user)
+            appt = qs.get(pk=pk)
             new_status = request.data.get('status')
             if new_status not in dict(Appointment.STATUS_CHOICES):
                 return error_response(message="Invalid status")
@@ -53,5 +66,7 @@ class TodayAppointmentsView(APIView):
     def get(self, request):
         from datetime import date
         today = date.today()
-        appointments = Appointment.objects.filter(appointment_date=today).select_related('pet', 'doctor')
-        return success_response(data=AppointmentSerializer(appointments, many=True).data)
+        qs = Appointment.objects.filter(appointment_date=today).select_related('pet', 'doctor')
+        if request.user.role == 'client':
+            qs = qs.filter(pet__owner__user=request.user)
+        return success_response(data=AppointmentSerializer(qs, many=True).data)

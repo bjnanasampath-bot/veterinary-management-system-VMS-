@@ -7,10 +7,15 @@ from .serializers import OwnerSerializer, OwnerListSerializer
 
 
 class OwnerListCreateView(generics.ListCreateAPIView):
-    queryset = Owner.objects.filter(is_active=True)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['first_name', 'last_name', 'email', 'phone']
     ordering_fields = ['first_name', 'created_at']
+
+    def get_queryset(self):
+        qs = Owner.objects.filter(is_active=True)
+        if self.request.user.role == 'client':
+            return qs.filter(user=self.request.user)
+        return qs
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -26,8 +31,13 @@ class OwnerListCreateView(generics.ListCreateAPIView):
 
 
 class OwnerDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Owner.objects.filter(is_active=True)
     serializer_class = OwnerSerializer
+
+    def get_queryset(self):
+        qs = Owner.objects.filter(is_active=True)
+        if self.request.user.role == 'client':
+            return qs.filter(user=self.request.user)
+        return qs
 
     def destroy(self, request, *args, **kwargs):
         owner = self.get_object()
@@ -39,7 +49,11 @@ class OwnerDetailView(generics.RetrieveUpdateDestroyAPIView):
 class OwnerPetsView(APIView):
     def get(self, request, pk):
         try:
-            owner = Owner.objects.get(pk=pk, is_active=True)
+            qs = Owner.objects.filter(is_active=True)
+            if request.user.role == 'client':
+                qs = qs.filter(user=request.user)
+            owner = qs.get(pk=pk)
+            
             from apps.pets.serializers import PetSerializer
             pets = owner.pets.filter(is_active=True)
             return success_response(data=PetSerializer(pets, many=True).data)

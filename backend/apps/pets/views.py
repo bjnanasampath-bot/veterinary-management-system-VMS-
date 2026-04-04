@@ -6,11 +6,16 @@ from .serializers import PetSerializer, PetListSerializer, PetDetailSerializer
 
 
 class PetListCreateView(generics.ListCreateAPIView):
-    queryset = Pet.objects.filter(is_active=True).select_related('owner')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['species', 'gender', 'owner']
     search_fields = ['name', 'breed', 'microchip_id', 'owner__first_name', 'owner__last_name']
     ordering_fields = ['name', 'created_at']
+
+    def get_queryset(self):
+        qs = Pet.objects.filter(is_active=True).select_related('owner')
+        if self.request.user.role == 'client':
+            return qs.filter(owner__user=self.request.user)
+        return qs
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -26,8 +31,13 @@ class PetListCreateView(generics.ListCreateAPIView):
 
 
 class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Pet.objects.filter(is_active=True).select_related('owner')
     serializer_class = PetDetailSerializer
+
+    def get_queryset(self):
+        qs = Pet.objects.filter(is_active=True).select_related('owner')
+        if self.request.user.role == 'client':
+            return qs.filter(owner__user=self.request.user)
+        return qs
 
     def destroy(self, request, *args, **kwargs):
         pet = self.get_object()
@@ -37,7 +47,11 @@ class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PetMedicalHistoryView(generics.RetrieveAPIView):
-    queryset = Pet.objects.filter(is_active=True)
+    def get_queryset(self):
+        qs = Pet.objects.filter(is_active=True)
+        if self.request.user.role == 'client':
+            return qs.filter(owner__user=self.request.user)
+        return qs
 
     def retrieve(self, request, *args, **kwargs):
         pet = self.get_object()
