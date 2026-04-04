@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { labTestApi } from '../../../api'
 import toast from 'react-hot-toast'
-import Select from 'react-select'
 
 export default function AddLabTest() {
   const navigate = useNavigate();
