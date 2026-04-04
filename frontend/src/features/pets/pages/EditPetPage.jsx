@@ -29,10 +29,18 @@ export default function EditPetPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await petApi.update(id, data)
+      const payload = { ...data };
+      if (!payload.date_of_birth) payload.date_of_birth = null;
+      if (!payload.weight) payload.weight = null;
+      if (!payload.microchip_id) payload.microchip_id = null;
+      
+      await petApi.update(id, payload)
       toast.success('Pet updated!')
       navigate('/pets')
-    } catch { toast.error('Failed to update') }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update')
+    }
     finally { setLoading(false) }
   }
 
