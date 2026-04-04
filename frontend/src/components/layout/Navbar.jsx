@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { Menu, Bell, LogOut, User, Home } from 'lucide-react'
+import { Menu, Bell, LogOut, User, Home, ArrowLeft } from 'lucide-react'
 import { logout } from '../../features/auth/authSlice'
 import { useNavigate } from 'react-router-dom'
 
@@ -19,9 +19,14 @@ export default function Navbar({ onMenuClick }) {
         <Menu size={22} />
       </button>
 
-      <div className="hidden lg:block">
-        <p className="text-sm text-gray-500">Welcome back,</p>
-        <p className="font-semibold text-gray-900">{user?.first_name} {user?.last_name}</p>
+      <div className="hidden lg:flex items-center gap-4">
+        <button onClick={() => navigate(-1)} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-100 shadow-sm" title="Go Back">
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <p className="text-sm text-gray-500">Welcome back,</p>
+          <p className="font-semibold text-gray-900">{user?.first_name} {user?.last_name}</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
