@@ -36,6 +36,12 @@ import BillDetailsPage from '../features/billing/pages/BillDetailsPage'
 
 import ReportsDashboard from '../features/reports/pages/ReportsDashboard'
 
+import PharmacyListPage from '../features/pharmacy/pages/PharmacyListPage'
+import AddPharmacyItem from '../features/pharmacy/pages/AddPharmacyItem'
+import PrescriptionListPage from '../features/prescriptions/pages/PrescriptionListPage'
+import LabTestListPage from '../features/lab_tests/pages/LabTestListPage'
+import SurgeryListPage from '../features/surgeries/pages/SurgeryListPage'
+
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useSelector(s => s.auth)
   if (!isAuthenticated) return <Navigate to="/login" replace />
@@ -86,6 +92,14 @@ export default function AppRoutes() {
         <Route path="/billing/:id" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'client']}><BillDetailsPage /></ProtectedRoute>} />
 
         <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']}><ReportsDashboard /></ProtectedRoute>} />
+
+        <Route path="/pharmacy" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PharmacyListPage /></ProtectedRoute>} />
+        <Route path="/pharmacy/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPharmacyItem /></ProtectedRoute>} />
+        
+        <Route path="/prescriptions" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PrescriptionListPage /></ProtectedRoute>} />
+        
+        <Route path="/lab-tests" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><LabTestListPage /></ProtectedRoute>} />
+        <Route path="/surgeries" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><SurgeryListPage /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

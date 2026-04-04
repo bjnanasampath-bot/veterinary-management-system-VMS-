@@ -80,3 +80,35 @@ export const reportApi = {
   getAppointmentReport: (params) => api.get('/reports/appointments/', { params }),
   getPetSpeciesReport: () => api.get('/reports/pets/species/'),
 }
+
+export const labTestApi = {
+  getAll: (params) => api.get('/treatments/lab-tests/', { params }),
+  getById: (id) => api.get(`/treatments/lab-tests/${id}/`),
+  create: (data) => api.post('/treatments/lab-tests/', data),
+  update: (id, data) => api.put(`/treatments/lab-tests/${id}/`, data),
+  delete: (id) => api.delete(`/treatments/lab-tests/${id}/`),
+}
+
+export const surgeryApi = {
+  getAll: (params) => api.get('/treatments/surgeries/', { params }),
+  getById: (id) => api.get(`/treatments/surgeries/${id}/`),
+  create: (data) => api.post('/treatments/surgeries/', data),
+  update: (id, data) => api.put(`/treatments/surgeries/${id}/`, data),
+  delete: (id) => api.delete(`/treatments/surgeries/${id}/`),
+}
+
+export const pharmacyApi = {
+  getAll: (params) => api.get('/pharmacy/items/', { params }),
+  getById: (id) => api.get(`/pharmacy/items/${id}/`),
+  create: (data) => api.post('/pharmacy/items/', data),
+  update: (id, data) => api.put(`/pharmacy/items/${id}/`, data),
+  delete: (id) => api.delete(`/pharmacy/items/${id}/`),
+}
+
+export const prescriptionApi = {
+  getAll: (params) => api.get('/pharmacy/prescriptions/', { params }),
+  getById: (id) => api.get(`/pharmacy/prescriptions/${id}/`),
+  create: (data) => api.post('/pharmacy/prescriptions/', data),
+  update: (id, data) => api.put(`/pharmacy/prescriptions/${id}/`, data),
+  delete: (id) => api.delete(`/pharmacy/prescriptions/${id}/`),
+}

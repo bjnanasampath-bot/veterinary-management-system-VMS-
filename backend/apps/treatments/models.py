@@ -26,3 +26,46 @@ class Treatment(BaseModel):
 
     def __str__(self):
         return f"{self.pet.name} - {self.treatment_name} ({self.treatment_date})"
+
+
+class LabTest(BaseModel):
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='lab_tests')
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='lab_tests')
+    test_name = models.CharField(max_length=200)
+    test_date = models.DateField()
+    results = models.TextField(blank=True)
+    status = models.CharField(max_length=50, choices=[
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ], default='pending')
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = 'lab_tests'
+        ordering = ['-test_date']
+
+    def __str__(self):
+        return f"{self.test_name} for {self.pet.name}"
+
+
+class Surgery(BaseModel):
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='surgeries')
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='surgeries')
+    surgery_name = models.CharField(max_length=200)
+    surgery_date = models.DateField()
+    pre_op_notes = models.TextField(blank=True)
+    post_op_notes = models.TextField(blank=True)
+    status = models.CharField(max_length=50, choices=[
+        ('scheduled', 'Scheduled'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ], default='scheduled')
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        db_table = 'surgeries'
+        ordering = ['-surgery_date']
+
+    def __str__(self):
+        return f"{self.surgery_name} for {self.pet.name}"
