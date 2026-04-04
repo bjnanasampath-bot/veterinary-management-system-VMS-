@@ -18,10 +18,19 @@ export default function AddPetPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await petApi.create(data)
+      const payload = { ...data };
+      // Django validation fails if empty strings are sent for these types
+      if (!payload.date_of_birth) payload.date_of_birth = null;
+      if (!payload.weight) payload.weight = null;
+      if (!payload.microchip_id) payload.microchip_id = null;
+      
+      await petApi.create(payload)
       toast.success('Pet added successfully!')
       navigate('/pets')
-    } catch { toast.error('Failed to add pet') }
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add pet. Please check your inputs.')
+    }
     finally { setLoading(false) }
   }
 
