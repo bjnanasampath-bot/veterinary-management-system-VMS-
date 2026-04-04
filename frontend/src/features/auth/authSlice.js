@@ -54,7 +54,6 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload?.message || 'Login failed'
-        toast.error(state.error)
       })
       .addCase(googleLogin.pending, (state) => { state.loading = true; state.error = null })
       .addCase(googleLogin.fulfilled, (state, action) => {
@@ -76,7 +75,6 @@ const authSlice = createSlice({
       .addCase(googleLogin.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload?.message || 'Google Auth failed'
-        toast.error(state.error)
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null
