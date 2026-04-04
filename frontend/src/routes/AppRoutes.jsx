@@ -64,8 +64,8 @@ export default function AppRoutes() {
         <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
 
         {/* Restricted access */}
-        <Route path="/pets/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><AddPetPage /></ProtectedRoute>} />
-        <Route path="/pets/:id/edit" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor']}><EditPetPage /></ProtectedRoute>} />
+        <Route path="/pets/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor', 'client']}><AddPetPage /></ProtectedRoute>} />
+        <Route path="/pets/:id/edit" element={<ProtectedRoute allowedRoles={['admin', 'receptionist', 'doctor', 'client']}><EditPetPage /></ProtectedRoute>} />
 
         <Route path="/owners" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><OwnerListPage /></ProtectedRoute>} />
         <Route path="/owners/add" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><AddOwnerPage /></ProtectedRoute>} />
