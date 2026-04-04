@@ -97,22 +97,22 @@ export default function LandingPage() {
           <p>Comprehensive veterinary solutions for your pets.</p>
         </div>
         <div className="services-grid">
-          <div className="service-item">
+          <div className="service-item" onClick={handleGetStarted}>
              <div className="service-icon">🩺</div>
              <h4>Routine Checkups</h4>
              <p className="service-desc">Comprehensive physical exams to ensure your pet's overall health and early detection of issues.</p>
           </div>
-          <div className="service-item">
+          <div className="service-item" onClick={handleGetStarted}>
              <div className="service-icon">💉</div>
              <h4>Vaccinations</h4>
              <p className="service-desc">Essential immunizations tailored to your pet's lifestyle to protect against common diseases.</p>
           </div>
-          <div className="service-item">
+          <div className="service-item" onClick={handleGetStarted}>
              <div className="service-icon">🦴</div>
              <h4>Orthopedics</h4>
              <p className="service-desc">Specialized care for bones and joints, including advanced diagnostics and surgical solutions.</p>
           </div>
-          <div className="service-item">
+          <div className="service-item" onClick={handleGetStarted}>
              <div className="service-icon">🦷</div>
              <h4>Dental Care</h4>
              <p className="service-desc">Complete oral health services including professional cleanings and preventative care.</p>
