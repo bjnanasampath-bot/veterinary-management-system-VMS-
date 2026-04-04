@@ -34,13 +34,17 @@ import BillListPage from '../features/billing/pages/BillListPage'
 import CreateBillPage from '../features/billing/pages/CreateBillPage'
 import BillDetailsPage from '../features/billing/pages/BillDetailsPage'
 
-import ReportsDashboard from '../features/reports/pages/ReportsDashboard'
-
 import PharmacyListPage from '../features/pharmacy/pages/PharmacyListPage'
 import AddPharmacyItem from '../features/pharmacy/pages/AddPharmacyItem'
+
 import PrescriptionListPage from '../features/prescriptions/pages/PrescriptionListPage'
+import AddPrescription from '../features/prescriptions/pages/AddPrescription'
+
 import LabTestListPage from '../features/lab_tests/pages/LabTestListPage'
+import AddLabTest from '../features/lab_tests/pages/AddLabTest'
+
 import SurgeryListPage from '../features/surgeries/pages/SurgeryListPage'
+import AddSurgery from '../features/surgeries/pages/AddSurgery'
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useSelector(s => s.auth)
@@ -97,9 +101,13 @@ export default function AppRoutes() {
         <Route path="/pharmacy/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPharmacyItem /></ProtectedRoute>} />
         
         <Route path="/prescriptions" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PrescriptionListPage /></ProtectedRoute>} />
+        <Route path="/prescriptions/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPrescription /></ProtectedRoute>} />
         
         <Route path="/lab-tests" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><LabTestListPage /></ProtectedRoute>} />
+        <Route path="/lab-tests/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddLabTest /></ProtectedRoute>} />
+        
         <Route path="/surgeries" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><SurgeryListPage /></ProtectedRoute>} />
+        <Route path="/surgeries/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddSurgery /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
