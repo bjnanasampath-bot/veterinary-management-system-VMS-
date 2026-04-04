@@ -34,6 +34,8 @@ import BillListPage from '../features/billing/pages/BillListPage'
 import CreateBillPage from '../features/billing/pages/CreateBillPage'
 import BillDetailsPage from '../features/billing/pages/BillDetailsPage'
 
+import ReportsDashboard from '../features/reports/pages/ReportsDashboard'
+
 import PharmacyListPage from '../features/pharmacy/pages/PharmacyListPage'
 import AddPharmacyItem from '../features/pharmacy/pages/AddPharmacyItem'
 
