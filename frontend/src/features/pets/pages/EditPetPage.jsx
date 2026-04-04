@@ -21,7 +21,7 @@ export default function EditPetPage() {
       ownerApi.getAll({ page_size: 100 })
     ]).then(([petRes, ownersRes]) => {
       const pet = petRes.data?.data || petRes.data
-      reset(pet)
+      reset({ ...pet, owner: pet.owner?.id || pet.owner })
       setOwners(ownersRes.data?.results || ownersRes.data?.data || [])
     }).finally(() => setFetching(false))
   }, [id])
@@ -33,6 +33,12 @@ export default function EditPetPage() {
       if (!payload.date_of_birth) payload.date_of_birth = null;
       if (!payload.weight) payload.weight = null;
       if (!payload.microchip_id) payload.microchip_id = null;
+      
+      // Map owner to owner_id for PetDetailSerializer
+      if (payload.owner) {
+        payload.owner_id = payload.owner;
+        delete payload.owner;
+      }
       
       await petApi.update(id, payload)
       toast.success('Pet updated!')
