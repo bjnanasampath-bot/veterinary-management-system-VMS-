@@ -25,14 +25,19 @@ class DashboardStatsView(APIView):
                 doctor_profile = user.doctor_profile
             except:
                 from apps.doctors.models import Doctor
-                doctor_profile = Doctor.objects.create(
-                    user=user,
-                    first_name=user.first_name,
-                    last_name=user.last_name,
+                doctor_profile, created = Doctor.objects.get_or_create(
                     email=user.email,
-                    phone=user.phone or '0000000000',
-                    license_number=f"DOC-{user.id}"
+                    defaults={
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'phone': user.phone or '0000000000',
+                        'license_number': f"DOC-{user.id}",
+                        'user': user
+                    }
                 )
+                if not created and not doctor_profile.user:
+                    doctor_profile.user = user
+                    doctor_profile.save()
             pets_q = Pet.objects.filter(appointments__doctor=doctor_profile).distinct()
             appts_q = Appointment.objects.filter(doctor=doctor_profile)
             bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
@@ -41,13 +46,18 @@ class DashboardStatsView(APIView):
                 owner_profile = user.owner_profile
             except:
                 from apps.owners.models import Owner
-                owner_profile = Owner.objects.create(
-                    user=user,
-                    first_name=user.first_name,
-                    last_name=user.last_name,
+                owner_profile, created = Owner.objects.get_or_create(
                     email=user.email,
-                    phone=user.phone or '0000000000'
+                    defaults={
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'phone': user.phone or '0000000000',
+                        'user': user
+                    }
                 )
+                if not created and not owner_profile.user:
+                    owner_profile.user = user
+                    owner_profile.save()
             pets_q = Pet.objects.filter(owner=owner_profile)
             appts_q = Appointment.objects.filter(pet__owner=owner_profile)
             bills_q = Bill.objects.filter(pet__owner=owner_profile)

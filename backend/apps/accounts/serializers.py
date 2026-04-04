@@ -43,22 +43,32 @@ class RegisterSerializer(serializers.ModelSerializer):
         from apps.doctors.models import Doctor
         user = User.objects.create_user(**validated_data)
         if user.role == 'client':
-            Owner.objects.create(
-                user=user,
-                first_name=user.first_name,
-                last_name=user.last_name,
+            owner, created = Owner.objects.get_or_create(
                 email=user.email,
-                phone=user.phone or '0000000000'
+                defaults={
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'phone': user.phone or '0000000000',
+                    'user': user
+                }
             )
+            if not created and not owner.user:
+                owner.user = user
+                owner.save()
         elif user.role == 'doctor':
-            Doctor.objects.create(
-                user=user,
-                first_name=user.first_name,
-                last_name=user.last_name,
+            doctor, created = Doctor.objects.get_or_create(
                 email=user.email,
-                phone=user.phone or '0000000000',
-                license_number=f"DOC-{user.id}" # Auto generated fallback
+                defaults={
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'phone': user.phone or '0000000000',
+                    'license_number': f"DOC-{user.id}",
+                    'user': user
+                }
             )
+            if not created and not doctor.user:
+                doctor.user = user
+                doctor.save()
         return user
 
 
