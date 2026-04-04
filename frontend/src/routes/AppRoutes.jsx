@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import AuthLayout from '../components/layout/AuthLayout'
+import LandingPage from '../features/landing/pages/LandingPage'
 
 import Login from '../features/auth/pages/Login'
 import Register from '../features/auth/pages/Register'
@@ -44,13 +45,14 @@ function ProtectedRoute({ children, allowedRoles }) {
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
+      
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
 
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Common for all roles but tailored inside */}
