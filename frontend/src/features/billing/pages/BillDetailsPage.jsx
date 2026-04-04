@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { billingApi } from '../../../api'
 import { Loader } from '../../../components/common'
 import { ArrowLeft, Printer, Send, Download } from 'lucide-react'
@@ -17,10 +17,22 @@ export default function BillDetailsPage() {
   const [payMethod, setPayMethod] = useState('cash')
   const [paying, setPaying] = useState(false)
   const [sending, setSending] = useState(false)
+  const [searchParams] = useSearchParams()
+  const [hasAutoDownloaded, setHasAutoDownloaded] = useState(false)
+  const isAutoDownload = searchParams.get('download') === 'true'
 
   useEffect(() => {
     billingApi.getById(id).then(r => setBill(r.data?.data || r.data)).finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (bill && !loading && isAutoDownload && !hasAutoDownloaded) {
+      setTimeout(() => {
+        handleDownloadPDF()
+      }, 500)
+      setHasAutoDownloaded(true)
+    }
+  }, [bill, loading, isAutoDownload, hasAutoDownloaded])
 
   const handlePayment = async () => {
     if (!payAmount || Number(payAmount) <= 0) return toast.error('Enter valid amount')

@@ -1,5 +1,7 @@
 import GenericListPage from '../../../components/common/GenericListPage'
 import { billingApi } from '../../../api'
+import { Download } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const statusColors = {
   paid: 'bg-green-100 text-green-700',
@@ -26,6 +28,11 @@ export default function BillListPage() {
         { key: 'due_amount', label: 'Due', render: r => <span className={r.due_amount > 0 ? 'text-red-500' : 'text-gray-400'}>₹{r.due_amount}</span> },
         { key: 'status', label: 'Status', render: r => (
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-gray-100'}`}>{r.status}</span>
+        )},
+        { key: 'download', label: 'Invoice', render: r => (
+          <Link to={`/billing/${r.id}?download=true`} className="p-1.5 inline-flex items-center justify-center text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded" title="Download PDF">
+            <Download size={16} />
+          </Link>
         )},
       ]}
     />
