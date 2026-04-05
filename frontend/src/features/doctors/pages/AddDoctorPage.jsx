@@ -13,7 +13,15 @@ export default function AddDoctorPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await doctorApi.create(data)
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo' && data[key]?.[0]) {
+          formData.append('photo', data[key][0])
+        } else if (data[key] !== undefined && data[key] !== '') {
+          formData.append(key, data[key])
+        }
+      })
+      await doctorApi.create(formData)
       toast.success('Doctor added!')
       navigate('/doctors')
     } catch { toast.error('Failed to add doctor') }
@@ -23,6 +31,9 @@ export default function AddDoctorPage() {
   return (
     <FormPage title="Add Doctor" subtitle="Register a new veterinary doctor" backPath="/doctors" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Doctor Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="First Name" required>
           <input {...register('first_name', { required: true })} className="input-field" placeholder="Ravi" />
         </FormField>

@@ -38,36 +38,54 @@ export default function OwnerDetailsPage() {
         )}
       </div>
 
-      <div className="card">
-        <h2 className="font-semibold text-gray-800 mb-4">Contact Information</h2>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2 text-gray-700"><Phone size={15} className="text-gray-400" />{owner.phone}</div>
-          {owner.alternate_phone && <div className="flex items-center gap-2 text-gray-700"><Phone size={15} className="text-gray-400" />{owner.alternate_phone}</div>}
-          <div className="flex items-center gap-2 text-gray-700"><Mail size={15} className="text-gray-400" />{owner.email}</div>
-          <div className="flex items-center gap-2 text-gray-700"><MapPin size={15} className="text-gray-400" />{owner.address}, {owner.city} - {owner.pincode}</div>
-        </div>
-        {owner.notes && <div className="mt-3 pt-3 border-t border-gray-100"><p className="text-xs text-gray-400 mb-1">Notes</p><p className="text-sm text-gray-600">{owner.notes}</p></div>}
-      </div>
-
-      <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-800">Pets ({pets.length})</h2>
-          <Link to="/pets/add" className="text-sm text-primary-600 hover:underline">+ Add Pet</Link>
-        </div>
-        {pets.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-8">No pets registered</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {pets.map(p => (
-              <Link key={p.id} to={`/pets/${p.id}`} className="border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                <p className="font-medium text-gray-900">{p.name}</p>
-                <p className="text-xs text-gray-400 capitalize">{p.species} • {p.breed || 'Mixed'} • {p.age}</p>
-                <p className="text-xs text-gray-500 capitalize mt-1">{p.gender}</p>
-              </Link>
-            ))}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="card h-fit">
+          <div className="relative w-full aspect-square mb-4 bg-primary-50 rounded-2xl overflow-hidden shadow-sm">
+            {owner.photo ? (
+              <img src={owner.photo} alt={owner.full_name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <User size={64} className="text-primary-500" />
+              </div>
+            )}
           </div>
-        )}
+          <h2 className="font-semibold text-gray-800 mb-4">Contact Information</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center gap-2 text-gray-700"><Phone size={15} className="text-gray-400" />{owner.phone}</div>
+            {owner.alternate_phone && <div className="flex items-center gap-2 text-gray-700"><Phone size={15} className="text-gray-400" />{owner.alternate_phone}</div>}
+            <div className="flex items-center gap-2 text-gray-700"><Mail size={15} className="text-gray-400" />{owner.email}</div>
+            <div className="flex items-start gap-2 text-gray-700"><MapPin size={15} className="text-gray-400 mt-0.5" /><span>{owner.address}, {owner.city} - {owner.pincode}</span></div>
+          </div>
+          {owner.notes && <div className="mt-3 pt-3 border-t border-gray-100"><p className="text-xs text-gray-400 mb-1">Notes</p><p className="text-sm text-gray-600 italic">{owner.notes}</p></div>}
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-gray-800">Pets ({pets.length})</h2>
+              <Link to="/pets/add" className="text-sm text-primary-600 hover:underline font-medium">+ Add Pet</Link>
+            </div>
+            {pets.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-8">No pets registered</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {pets.map(p => (
+                  <Link key={p.id} to={`/pets/${p.id}`} className="flex items-center gap-3 border border-gray-100 rounded-xl p-3 hover:bg-gray-50 transition-all hover:border-primary-100">
+                    <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100">
+                      {p.photo ? <img src={p.photo} className="w-full h-full object-cover" /> : <div className="text-gray-300">🐾</div>}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">{p.name}</p>
+                      <p className="text-xs text-gray-400 capitalize">{p.species} • {p.breed || 'Mixed'} • {p.age}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
 }
+

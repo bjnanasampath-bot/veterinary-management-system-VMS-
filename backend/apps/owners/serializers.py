@@ -20,7 +20,7 @@ class OwnerListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Owner
-        fields = ['id', 'full_name', 'email', 'phone', 'city', 'pet_count', 'created_at']
+        fields = ['id', 'full_name', 'email', 'phone', 'city', 'photo', 'pet_count', 'created_at']
 
     def get_pet_count(self, obj):
         return obj.pets.filter(is_active=True).count()

@@ -22,6 +22,7 @@ import AddOwnerPage from '../features/owners/pages/AddOwnerPage'
 import EditOwnerPage from '../features/owners/pages/EditOwnerPage'
 
 import DoctorListPage from '../features/doctors/pages/DoctorListPage'
+import DoctorDetailsPage from '../features/doctors/pages/DoctorDetailsPage'
 import AddDoctorPage from '../features/doctors/pages/AddDoctorPage'
 import EditDoctorPage from '../features/doctors/pages/EditDoctorPage'
 
@@ -90,6 +91,7 @@ export default function AppRoutes() {
 
         <Route path="/doctors" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><DoctorListPage /></ProtectedRoute>} />
         <Route path="/doctors/add" element={<ProtectedRoute allowedRoles={['admin']}><AddDoctorPage /></ProtectedRoute>} />
+        <Route path="/doctors/:id" element={<ProtectedRoute allowedRoles={['admin', 'receptionist']}><DoctorDetailsPage /></ProtectedRoute>} />
         <Route path="/doctors/:id/edit" element={<ProtectedRoute allowedRoles={['admin']}><EditDoctorPage /></ProtectedRoute>} />
 
         <Route path="/appointments/create" element={<CreateAppointmentPage />} />

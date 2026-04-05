@@ -18,13 +18,16 @@ export default function AddPetPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      const payload = { ...data };
-      // Django validation fails if empty strings are sent for these types
-      if (!payload.date_of_birth) payload.date_of_birth = null;
-      if (!payload.weight) payload.weight = null;
-      if (!payload.microchip_id) payload.microchip_id = null;
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo' && data[key]?.[0]) {
+          formData.append('photo', data[key][0])
+        } else if (data[key] !== undefined && data[key] !== '') {
+          formData.append(key, data[key])
+        }
+      })
       
-      await petApi.create(payload)
+      await petApi.create(formData)
       toast.success('Pet added successfully!')
       navigate('/pets')
     } catch (err) {
@@ -37,6 +40,9 @@ export default function AddPetPage() {
   return (
     <FormPage title="Add New Pet" subtitle="Register a new pet" backPath="/pets" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Pet Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="Pet Name" required error={errors.name?.message}>
           <input {...register('name', { required: 'Name is required' })} className="input-field" placeholder="Buddy" />
         </FormField>

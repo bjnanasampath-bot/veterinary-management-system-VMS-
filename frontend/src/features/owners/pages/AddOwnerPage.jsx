@@ -14,7 +14,15 @@ export default function AddOwnerPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await ownerApi.create(data)
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo' && data[key]?.[0]) {
+          formData.append('photo', data[key][0])
+        } else if (data[key] !== undefined && data[key] !== '') {
+          formData.append(key, data[key])
+        }
+      })
+      await ownerApi.create(formData)
       toast.success('Owner added!')
       navigate('/owners')
     } catch { toast.error('Failed to add owner') }
@@ -24,6 +32,9 @@ export default function AddOwnerPage() {
   return (
     <FormPage title="Add Owner" subtitle="Register a new pet owner" backPath="/owners" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Owner Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="First Name" required error={errors.first_name?.message}>
           <input {...register('first_name', { required: true })} className="input-field" placeholder="John" />
         </FormField>

@@ -14,6 +14,7 @@ class Owner(BaseModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     pincode = models.CharField(max_length=10)
+    photo = models.ImageField(upload_to='owners/', blank=True, null=True)
     notes = models.TextField(blank=True)
 
     class Meta:

@@ -37,10 +37,16 @@ export default function PetDetailsPage() {
 
       <div className="grid lg:grid-cols-3 gap-5">
         <div className="card">
-          <div className="flex items-center justify-center w-20 h-20 bg-primary-50 rounded-2xl mx-auto mb-4">
-            <PawPrint size={36} className="text-primary-500" />
+          <div className="relative w-full aspect-square mb-4 bg-primary-50 rounded-2xl overflow-hidden shadow-sm">
+            {pet.photo ? (
+              <img src={pet.photo} alt={pet.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <PawPrint size={48} className="text-primary-500" />
+              </div>
+            )}
           </div>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3 text-sm">
             {[['Owner', pet?.owner?.full_name], ['Gender', pet?.gender], ['DOB', pet?.date_of_birth], ['Weight', pet?.weight ? `${pet.weight} kg` : '—'], ['Color', pet?.color || '—'], ['Blood Group', pet?.blood_group], ['Microchip', pet?.microchip_id || '—'], ['Neutered', pet?.is_neutered ? 'Yes' : 'No']].map(([k, v]) => (
               <div key={k} className="flex justify-between">
                 <span className="text-gray-400">{k}</span>

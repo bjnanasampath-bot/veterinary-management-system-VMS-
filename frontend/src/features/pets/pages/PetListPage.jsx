@@ -20,7 +20,20 @@ export default function PetListPage() {
       deleteFn={petApi.delete}
       searchPlaceholder="Search pets by name, breed..."
       columns={[
-        { key: 'name', label: 'Name', render: r => <span className="font-medium">{r.name}</span> },
+        { 
+          key: 'photo', 
+          label: 'Photo', 
+          render: r => (
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
+              {r.photo ? (
+                <img src={r.photo} alt={r.name} className="w-full h-full object-cover" />
+              ) : (
+                <PawPrint size={18} className="text-gray-400" />
+              )}
+            </div>
+          ) 
+        },
+        { key: 'name', label: 'Name', render: r => <span className="font-medium text-gray-900">{r.name}</span> },
         { key: 'species', label: 'Species', render: r => <span className="capitalize">{r.species}</span> },
         { key: 'breed', label: 'Breed', render: r => r.breed || '—' },
         { key: 'gender', label: 'Gender', render: r => <span className="capitalize">{r.gender}</span> },
