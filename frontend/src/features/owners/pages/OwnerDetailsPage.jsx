@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { ownerApi } from '../../../api'
 import { Loader } from '../../../components/common'
 import { ArrowLeft, Pencil, Phone, Mail, MapPin } from 'lucide-react'
@@ -10,6 +11,8 @@ export default function OwnerDetailsPage() {
   const [owner, setOwner] = useState(null)
   const [pets, setPets] = useState([])
   const [loading, setLoading] = useState(true)
+  const { user } = useSelector(s => s.auth)
+  const canEdit = user?.role === 'doctor' || user?.role === 'receptionist'
 
   useEffect(() => {
     Promise.all([ownerApi.getById(id), ownerApi.getPets(id)])
@@ -30,7 +33,9 @@ export default function OwnerDetailsPage() {
           <h1 className="text-2xl font-bold text-gray-900">{owner.full_name}</h1>
           <p className="text-sm text-gray-500">{owner.city}, {owner.state}</p>
         </div>
-        <Link to={`/owners/${id}/edit`} className="btn-secondary flex items-center gap-2 text-sm"><Pencil size={15} /> Edit</Link>
+        {canEdit && (
+          <Link to={`/owners/${id}/edit`} className="btn-secondary flex items-center gap-2 text-sm"><Pencil size={15} /> Edit</Link>
+        )}
       </div>
 
       <div className="card">

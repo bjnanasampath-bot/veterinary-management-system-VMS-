@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { petApi } from '../../../api'
 import { Loader } from '../../../components/common'
 import { ArrowLeft, Pencil, PawPrint } from 'lucide-react'
@@ -9,6 +10,8 @@ export default function PetDetailsPage() {
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { user } = useSelector(s => s.auth)
+  const canEdit = user?.role === 'doctor' || user?.role === 'receptionist'
 
   useEffect(() => {
     petApi.getMedicalHistory(id).then(r => setData(r.data?.data || r.data)).finally(() => setLoading(false))
@@ -27,7 +30,9 @@ export default function PetDetailsPage() {
           <h1 className="text-2xl font-bold text-gray-900">{pet?.name}</h1>
           <p className="text-sm text-gray-500 capitalize">{pet?.species} • {pet?.breed || 'Unknown breed'} • {pet?.age}</p>
         </div>
-        <Link to={`/pets/${id}/edit`} className="btn-secondary flex items-center gap-2 text-sm"><Pencil size={15} /> Edit</Link>
+        {canEdit && (
+          <Link to={`/pets/${id}/edit`} className="btn-secondary flex items-center gap-2 text-sm"><Pencil size={15} /> Edit</Link>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
