@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Search, Plus, Pencil, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Loader, EmptyState, Badge } from './index'
 import toast from 'react-hot-toast'
@@ -9,6 +10,16 @@ export default function GenericListPage({
   columns, searchPlaceholder = 'Search...',
   filters = [], mapRowToActions = true, extraActions
 }) {
+  const { user } = useSelector(s => s.auth)
+  const role = user?.role
+
+  // Role-based action rules:
+  // admin    → View + Delete only (no Edit)
+  // doctor/receptionist → View + Edit only (no Delete)
+  // client   → View only
+  const canEdit   = role === 'doctor' || role === 'receptionist'
+  const canDelete = role === 'admin'
+
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -102,12 +113,12 @@ export default function GenericListPage({
                                 <Eye size={15} />
                               </Link>
                             )}
-                            {item._editPath && (
+                            {canEdit && item._editPath && (
                               <Link to={item._editPath} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded">
                                 <Pencil size={15} />
                               </Link>
                             )}
-                            {item._deleteName && (
+                            {canDelete && item._deleteName && (
                               <button onClick={() => handleDelete(item.id, item._deleteName)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded">
                                 <Trash2 size={15} />
                               </button>
@@ -115,6 +126,7 @@ export default function GenericListPage({
                           </div>
                         </td>
                       )}
+
                     </tr>
                   ))}
                 </tbody>
