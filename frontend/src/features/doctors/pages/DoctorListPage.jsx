@@ -1,3 +1,4 @@
+import { User } from 'lucide-react'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { doctorApi } from '../../../api'
 
