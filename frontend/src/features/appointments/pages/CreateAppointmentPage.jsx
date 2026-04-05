@@ -13,8 +13,14 @@ export default function CreateAppointmentPage() {
   const { register, handleSubmit, formState: { errors } } = useForm()
 
   useEffect(() => {
-    petApi.getAll({ page_size: 200 }).then(r => setPets(r.data?.results || r.data?.data || []))
-    doctorApi.getAll({ page_size: 100 }).then(r => setDoctors(r.data?.results || r.data?.data || []))
+    petApi.getAll({ page_size: 200 }).then(r => {
+      const data = r.data?.data || r.data?.results || (Array.isArray(r.data) ? r.data : [])
+      setPets(data)
+    })
+    doctorApi.getAll({ page_size: 100 }).then(r => {
+      const data = r.data?.data || r.data?.results || (Array.isArray(r.data) ? r.data : [])
+      setDoctors(data)
+    })
   }, [])
 
   const onSubmit = async (data) => {
