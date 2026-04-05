@@ -22,8 +22,12 @@ export default function AddPetPage() {
       Object.keys(data).forEach(key => {
         if (key === 'photo') {
           if (data[key]?.[0]) formData.append('photo', data[key][0])
-        } else if (data[key] !== undefined && data[key] !== '') {
-          formData.append(key, data[key])
+        } else if (data[key] !== undefined && data[key] !== '' && data[key] !== null) {
+          if (typeof data[key] === 'boolean') {
+            formData.append(key, data[key] ? 'true' : 'false')
+          } else {
+            formData.append(key, data[key])
+          }
         }
       })
       
