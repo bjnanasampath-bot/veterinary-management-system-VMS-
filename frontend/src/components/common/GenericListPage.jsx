@@ -34,9 +34,13 @@ export default function GenericListPage({
       const d = res.data
       if (d?.results) {
         setItems(d.results)
-        setPagination({ count: d.count, total_pages: d.total_pages })
+        setPagination({ count: d.count, total_pages: d.total_pages || Math.ceil(d.count / (d.page_size || 10)) || 1 })
       } else if (d?.data) {
         setItems(Array.isArray(d.data) ? d.data : [])
+      } else if (Array.isArray(d)) {
+        setItems(d)
+      } else {
+        setItems([])
       }
     } finally { setLoading(false) }
   }
