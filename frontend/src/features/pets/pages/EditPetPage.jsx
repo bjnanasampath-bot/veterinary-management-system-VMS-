@@ -71,7 +71,9 @@ export default function EditPetPage() {
         <FormField label="Species"><select {...register('species')} className="input-field"><option value="dog">Dog</option><option value="cat">Cat</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select></FormField>
         <FormField label="Breed"><input {...register('breed')} className="input-field" /></FormField>
         <FormField label="Gender"><select {...register('gender')} className="input-field"><option value="male">Male</option><option value="female">Female</option><option value="unknown">Unknown</option></select></FormField>
-        <FormField label="Date of Birth"><input {...register('date_of_birth')} type="date" className="input-field" /></FormField>
+        <FormField label="Date of Birth">
+          <input {...register('date_of_birth')} type="date" max={new Date().toISOString().split('T')[0]} className="input-field" />
+        </FormField>
         <FormField label="Weight (kg)"><input {...register('weight')} type="number" step="0.1" className="input-field" /></FormField>
         <FormField label="Color"><input {...register('color')} className="input-field" /></FormField>
       </div>

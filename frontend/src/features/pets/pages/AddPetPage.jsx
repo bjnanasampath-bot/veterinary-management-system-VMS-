@@ -77,7 +77,7 @@ export default function AddPetPage() {
           </select>
         </FormField>
         <FormField label="Date of Birth">
-          <input {...register('date_of_birth')} type="date" className="input-field" />
+          <input {...register('date_of_birth')} type="date" max={new Date().toISOString().split('T')[0]} className="input-field" />
         </FormField>
         <FormField label="Weight (kg)">
           <input {...register('weight')} type="number" step="0.1" className="input-field" placeholder="5.5" />
