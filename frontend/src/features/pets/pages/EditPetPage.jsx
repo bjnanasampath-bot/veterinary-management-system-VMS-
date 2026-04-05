@@ -29,18 +29,22 @@ export default function EditPetPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      const payload = { ...data };
-      if (!payload.date_of_birth) payload.date_of_birth = null;
-      if (!payload.weight) payload.weight = null;
-      if (!payload.microchip_id) payload.microchip_id = null;
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo') {
+          if (data[key]?.[0]) formData.append('photo', data[key][0])
+        } else if (key === 'owner') {
+          if (data[key]) formData.append('owner_id', data[key])
+        } else if (data[key] !== undefined && data[key] !== '' && data[key] !== null) {
+          if (typeof data[key] === 'boolean') {
+            formData.append(key, data[key] ? 'true' : 'false')
+          } else {
+            formData.append(key, data[key])
+          }
+        }
+      })
       
-      // Map owner to owner_id for PetDetailSerializer
-      if (payload.owner) {
-        payload.owner_id = payload.owner;
-        delete payload.owner;
-      }
-      
-      await petApi.update(id, payload)
+      await petApi.update(id, formData)
       toast.success('Pet updated!')
       navigate('/pets')
     } catch (err) {
@@ -55,6 +59,9 @@ export default function EditPetPage() {
   return (
     <FormPage title="Edit Pet" backPath="/pets" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Pet Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="Pet Name" required><input {...register('name', { required: true })} className="input-field" /></FormField>
         <FormField label="Owner" required>
           <select {...register('owner')} className="input-field">

@@ -20,7 +20,15 @@ export default function EditDoctorPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await doctorApi.update(id, data)
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo') {
+          if (data[key]?.[0]) formData.append('photo', data[key][0])
+        } else if (data[key] !== undefined && data[key] !== '' && data[key] !== null) {
+          formData.append(key, data[key])
+        }
+      })
+      await doctorApi.update(id, formData)
       toast.success('Doctor updated!')
       navigate('/doctors')
     } catch { toast.error('Update failed') }
@@ -32,6 +40,9 @@ export default function EditDoctorPage() {
   return (
     <FormPage title="Edit Doctor" backPath="/doctors" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Doctor Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="First Name"><input {...register('first_name', { required: true })} className="input-field" /></FormField>
         <FormField label="Last Name"><input {...register('last_name', { required: true })} className="input-field" /></FormField>
         <FormField label="Email"><input {...register('email', { required: true })} type="email" className="input-field" /></FormField>

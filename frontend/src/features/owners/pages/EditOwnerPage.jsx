@@ -20,7 +20,15 @@ export default function EditOwnerPage() {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await ownerApi.update(id, data)
+      const formData = new FormData()
+      Object.keys(data).forEach(key => {
+        if (key === 'photo') {
+          if (data[key]?.[0]) formData.append('photo', data[key][0])
+        } else if (data[key] !== undefined && data[key] !== '' && data[key] !== null) {
+          formData.append(key, data[key])
+        }
+      })
+      await ownerApi.update(id, formData)
       toast.success('Owner updated!')
       navigate('/owners')
     } catch { toast.error('Update failed') }
@@ -32,6 +40,9 @@ export default function EditOwnerPage() {
   return (
     <FormPage title="Edit Owner" backPath="/owners" onSubmit={handleSubmit(onSubmit)} loading={loading}>
       <div className="grid grid-cols-2 gap-4">
+        <FormField label="Owner Photo">
+          <input {...register('photo')} type="file" accept="image/*" className="input-field" />
+        </FormField>
         <FormField label="First Name"><input {...register('first_name', { required: true })} className="input-field" /></FormField>
         <FormField label="Last Name"><input {...register('last_name', { required: true })} className="input-field" /></FormField>
         <FormField label="Email"><input {...register('email', { required: true })} type="email" className="input-field" /></FormField>

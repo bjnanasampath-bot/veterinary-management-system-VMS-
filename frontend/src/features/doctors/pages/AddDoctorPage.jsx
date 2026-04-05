@@ -15,8 +15,8 @@ export default function AddDoctorPage() {
     try {
       const formData = new FormData()
       Object.keys(data).forEach(key => {
-        if (key === 'photo' && data[key]?.[0]) {
-          formData.append('photo', data[key][0])
+        if (key === 'photo') {
+          if (data[key]?.[0]) formData.append('photo', data[key][0])
         } else if (data[key] !== undefined && data[key] !== '') {
           formData.append(key, data[key])
         }
