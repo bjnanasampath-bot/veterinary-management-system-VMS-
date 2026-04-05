@@ -42,25 +42,13 @@ class DashboardStatsView(APIView):
             appts_q = Appointment.objects.filter(doctor=doctor_profile)
             bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
         elif role == 'client':
-            try:
-                owner_profile = user.owner_profile
-            except:
-                from apps.owners.models import Owner
-                owner_profile, created = Owner.objects.get_or_create(
-                    email=user.email,
-                    defaults={
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'phone': user.phone or '0000000000',
-                        'user': user
-                    }
-                )
-                if not created and not owner_profile.user:
-                    owner_profile.user = user
-                    owner_profile.save()
-            pets_q = Pet.objects.filter(owner=owner_profile)
-            appts_q = Appointment.objects.filter(pet__owner=owner_profile)
-            bills_q = Bill.objects.filter(pet__owner=owner_profile)
+            from django.db.models import Q
+            from apps.owners.models import Owner
+            owner_ids = list(Owner.objects.filter(Q(user=user) | Q(email=user.email)).values_list('id', flat=True))
+            
+            pets_q = Pet.objects.filter(owner_id__in=owner_ids)
+            appts_q = Appointment.objects.filter(pet__owner_id__in=owner_ids)
+            bills_q = Bill.objects.filter(pet__owner_id__in=owner_ids)
         else:
             # Admin and Receptionist see all
             pets_q = Pet.objects.all()
