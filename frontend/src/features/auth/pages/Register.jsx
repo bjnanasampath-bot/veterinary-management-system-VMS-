@@ -77,7 +77,6 @@ export default function Register() {
               <option value="client">Client (Pet Owner)</option>
               <option value="receptionist">Receptionist</option>
               <option value="doctor">Doctor</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
           <div>
