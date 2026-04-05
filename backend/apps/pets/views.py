@@ -45,7 +45,7 @@ class PetListCreateView(generics.ListCreateAPIView):
 
         serializer = PetSerializer(data=data)
         if serializer.is_valid():
-            pet = serializer.save()
+            pet = serializer.save(is_active=True)
             return success_response(data=PetSerializer(pet).data, message="Pet added successfully", status_code=status.HTTP_201_CREATED)
         return error_response(errors=serializer.errors)
 

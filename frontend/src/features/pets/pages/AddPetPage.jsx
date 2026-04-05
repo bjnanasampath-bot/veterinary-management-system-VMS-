@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import FormPage, { FormField } from '../../../components/common/FormPage'
 import { petApi, ownerApi } from '../../../api'
 import toast from 'react-hot-toast'
 
 export default function AddPetPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user } = useSelector(s => s.auth)
   const [owners, setOwners] = useState([])
   const [loading, setLoading] = useState(false)
   const { register, handleSubmit, setValue, formState: { errors } } = useForm()
