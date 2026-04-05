@@ -7,13 +7,22 @@ import toast from 'react-hot-toast'
 
 export default function AddPetPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [owners, setOwners] = useState([])
   const [loading, setLoading] = useState(false)
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm()
 
   useEffect(() => {
-    ownerApi.getAll({ page_size: 100 }).then(r => setOwners(r.data?.results || r.data?.data || []))
-  }, [])
+    ownerApi.getAll({ page_size: 200 }).then(res => {
+      const data = res.data?.data || res.data?.results || (Array.isArray(res.data) ? res.data : [])
+      setOwners(data)
+      // Auto-select if client
+      if (user.role === 'client' && data.length > 0) {
+        const myOwner = data.find(o => o.user === user.id || o.email === user.email)
+        if (myOwner) setValue('owner', myOwner.id)
+      }
+    })
+  }, [user.id, user.role, user.email, setValue])
 
   const onSubmit = async (data) => {
     setLoading(true)

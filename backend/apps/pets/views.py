@@ -34,10 +34,19 @@ class PetListCreateView(generics.ListCreateAPIView):
         return success_response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
-        serializer = PetSerializer(data=request.data)
+        data = request.data.copy()
+        if self.request.user.role == 'client' and not data.get('owner'):
+            from apps.owners.models import Owner
+            owner_profile = Owner.objects.filter(user=self.request.user).first()
+            if not owner_profile:
+                owner_profile = Owner.objects.filter(email=self.request.user.email).first()
+            if owner_profile:
+                data['owner'] = owner_profile.id
+
+        serializer = PetSerializer(data=data)
         if serializer.is_valid():
             pet = serializer.save()
-            return success_response(data=PetSerializer(pet).data, message="Pet added", status_code=status.HTTP_201_CREATED)
+            return success_response(data=PetSerializer(pet).data, message="Pet added successfully", status_code=status.HTTP_201_CREATED)
         return error_response(errors=serializer.errors)
 
 
