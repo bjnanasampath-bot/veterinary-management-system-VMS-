@@ -14,13 +14,24 @@ class PetListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         qs = Pet.objects.filter(is_active=True).select_related('owner')
         if self.request.user.role == 'client':
-            return qs.filter(owner__user=self.request.user)
+            from django.db.models import Q
+            return qs.filter(Q(owner__user=self.request.user) | Q(owner__email=self.request.user.email))
         return qs
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return PetListSerializer
         return PetSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return success_response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
         serializer = PetSerializer(data=request.data)
