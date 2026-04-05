@@ -6,10 +6,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from common.responses import success_response, error_response
-from .models import User
+from .models import User, PasswordResetOTP
 from .serializers import (
     CustomTokenObtainPairSerializer, RegisterSerializer,
-    UserSerializer, ChangePasswordSerializer
+    UserSerializer, ChangePasswordSerializer,
+    ForgotPasswordSerializer, VerifyOTPSerializer
 )
 
 
@@ -122,3 +123,74 @@ class GoogleAuthView(APIView):
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.filter(is_active=True)
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if not serializer.is_valid():
+            return error_response(message="Validation failed", errors=serializer.errors)
+
+        email = serializer.validated_data['email']
+
+        # Invalidate any existing unused OTPs for this email
+        PasswordResetOTP.objects.filter(email=email, is_used=False).update(is_used=True)
+
+        # Generate and save new OTP
+        otp = PasswordResetOTP.generate_otp()
+        PasswordResetOTP.objects.create(email=email, otp=otp)
+
+        # In development: print OTP to console
+        # In production: send via email/SMS
+        print(f"\n{'='*40}")
+        print(f"  PASSWORD RESET OTP for {email}")
+        print(f"  OTP: {otp}")
+        print(f"  Valid for 10 minutes")
+        print(f"{'='*40}\n")
+
+        return success_response(
+            message="A 6-digit security code has been sent. Please check your registered email/phone."
+        )
+
+
+class VerifyOTPView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = VerifyOTPSerializer(data=request.data)
+        if not serializer.is_valid():
+            return error_response(message="Validation failed", errors=serializer.errors)
+
+        email = serializer.validated_data['email']
+        otp_code = serializer.validated_data['otp']
+        new_password = serializer.validated_data['new_password']
+
+        # Find the latest unused OTP for this email
+        try:
+            otp_obj = PasswordResetOTP.objects.filter(
+                email=email, otp=otp_code, is_used=False
+            ).latest('created_at')
+        except PasswordResetOTP.DoesNotExist:
+            return error_response(message="Invalid security code. Please try again.")
+
+        if otp_obj.is_expired():
+            otp_obj.is_used = True
+            otp_obj.save()
+            return error_response(message="Security code has expired. Please request a new one.")
+
+        # Valid OTP — reset password
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return error_response(message="User not found.")
+
+        user.set_password(new_password)
+        user.save()
+
+        # Mark OTP as used
+        otp_obj.is_used = True
+        otp_obj.save()
+
+        return success_response(message="Password reset successfully. You can now log in.")

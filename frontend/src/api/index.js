@@ -8,6 +8,8 @@ export const authApi = {
   getProfile: () => api.get('/auth/profile/'),
   updateProfile: (data) => api.put('/auth/profile/', data),
   changePassword: (data) => api.post('/auth/change-password/', data),
+  forgotPassword: (email) => api.post('/auth/forgot-password/', { email }),
+  verifyOTP: (data) => api.post('/auth/verify-otp/', data),
 }
 
 export const ownerApi = {

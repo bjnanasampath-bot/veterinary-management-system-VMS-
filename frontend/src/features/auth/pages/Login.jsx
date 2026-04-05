@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { login } from '../authSlice'
-import { PawPrint, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw } from 'lucide-react'
 import GoogleAuthButton from '../components/GoogleAuthButton'
+import toast from 'react-hot-toast'
 
 export default function Login() {
   const dispatch = useDispatch()
@@ -12,7 +13,23 @@ export default function Login() {
   const { loading } = useSelector(s => s.auth)
   const { register, handleSubmit, formState: { errors } } = useForm()
 
-  const onSubmit = (data) => dispatch(login(data))
+  // --- CAPTCHA ---
+  const generateCaptcha = useCallback(() => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  }, [])
+  const [captchaText, setCaptchaText] = useState(() => generateCaptcha())
+  const [captchaInput, setCaptchaInput] = useState('')
+  const refreshCaptcha = () => { setCaptchaText(generateCaptcha()); setCaptchaInput('') }
+
+  const onSubmit = (data) => {
+    if (captchaInput.trim() !== captchaText) {
+      toast.error('CAPTCHA does not match. Please try again.')
+      refreshCaptcha()
+      return
+    }
+    dispatch(login(data))
+  }
 
   return (
     <div className="w-full max-w-md">
@@ -41,7 +58,15 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-primary-600 font-medium hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <div className="relative">
               <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -59,6 +84,46 @@ export default function Login() {
               </button>
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          </div>
+
+          {/* CAPTCHA */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Security CAPTCHA <span className="text-red-500">*</span>
+            </label>
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className="flex-1 px-4 py-2 rounded-lg text-center font-mono text-lg font-bold select-none"
+                style={{
+                  background: 'linear-gradient(135deg, #e0e7ff 0%, #f0fdf4 100%)',
+                  letterSpacing: '0.3em',
+                  color: '#1e293b',
+                  border: '1.5px dashed #94a3b8',
+                  textDecoration: 'line-through underline',
+                  textDecorationColor: '#94a3b8',
+                }}
+              >
+                {captchaText}
+              </div>
+              <button
+                type="button"
+                onClick={refreshCaptcha}
+                className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 transition-colors"
+                title="Refresh CAPTCHA"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </button>
+            </div>
+            <input
+              type="text"
+              value={captchaInput}
+              onChange={e => setCaptchaInput(e.target.value)}
+              className="input-field"
+              placeholder="Enter the code above"
+              maxLength={6}
+              autoComplete="off"
+            />
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary w-full py-2.5 mt-2">
