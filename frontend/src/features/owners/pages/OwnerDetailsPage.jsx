@@ -63,7 +63,7 @@ export default function OwnerDetailsPage() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-gray-800">Pets ({pets.length})</h2>
-              <Link to="/pets/add" className="text-sm text-primary-600 hover:underline font-medium">+ Add Pet</Link>
+              {canEdit && <Link to="/pets/add" className="text-sm text-primary-600 hover:underline font-medium">+ Add Pet</Link>}
             </div>
             {pets.length === 0 ? (
               <p className="text-gray-400 text-sm text-center py-8">No pets registered</p>
