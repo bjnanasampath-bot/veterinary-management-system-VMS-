@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { ownerApi } from '../../../api'
 import { Loader } from '../../../components/common'
-import { ArrowLeft, Pencil, Phone, Mail, MapPin } from 'lucide-react'
+import { ArrowLeft, Pencil, Phone, Mail, MapPin, User } from 'lucide-react'
 
 export default function OwnerDetailsPage() {
   const { id } = useParams()
