@@ -14,9 +14,10 @@ export default function GenericListPage({
   const role = user?.role
 
   // Role-based action rules:
-  // admin    → View + Delete only (no Edit)
-  // doctor/receptionist → View + Edit only (no Delete)
-  // client   → View only
+  // admin              → View + Delete only (no Edit, no Add)
+  // doctor/receptionist → View + Edit + Add (no Delete)
+  // client             → View only
+  const canAdd    = role === 'doctor' || role === 'receptionist' || role === 'client'
   const canEdit   = role === 'doctor' || role === 'receptionist'
   const canDelete = role === 'admin'
 
@@ -60,7 +61,7 @@ export default function GenericListPage({
         </div>
         <div className="flex gap-2">
           {extraActions}
-          {addPath && (
+          {canAdd && addPath && (
             <Link to={addPath} className="btn-primary flex items-center gap-2">
               <Plus size={16} /> Add New
             </Link>
