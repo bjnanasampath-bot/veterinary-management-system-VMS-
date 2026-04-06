@@ -19,10 +19,14 @@ export default function LandingPage() {
     <div className="landing-container">
       {/* Navbar section */}
       <nav className="landing-navbar">
-        <div className="navbar-logo">
+        <Link
+          to={isAuthenticated ? "/dashboard" : "/login"}
+          className="navbar-logo"
+          style={{ textDecoration: 'none' }}
+        >
           <div className="logo-icon">🐾</div>
           <span className="brand-name">VetCare</span>
-        </div>
+        </Link>
 
         <div className="navbar-links">
           <a href="#home" className="nav-link">Home</a>
