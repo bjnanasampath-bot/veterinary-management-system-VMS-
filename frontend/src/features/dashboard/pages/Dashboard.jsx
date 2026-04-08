@@ -4,7 +4,6 @@ import { reportApi, appointmentApi } from '../../../api'
 import { Loader } from '../../../components/common'
 import AdminDashboard from '../components/AdminDashboard'
 import DoctorDashboard from '../components/DoctorDashboard'
-import ReceptionistDashboard from '../components/ReceptionistDashboard'
 import ClientDashboard from '../components/ClientDashboard'
 
 export default function Dashboard() {
@@ -40,8 +39,6 @@ export default function Dashboard() {
         return <AdminDashboard stats={stats} todayAppts={todayAppts} revenue={revenue} apptByType={apptByType} statusColor={statusColor} />
       case 'doctor':
         return <DoctorDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
-      case 'receptionist':
-        return <ReceptionistDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
       case 'client':
         return <ClientDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
       default:

@@ -7,17 +7,17 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'doctor', 'receptionist', 'client'] },
-  { to: '/appointments', icon: CalendarDays, label: 'Appointments', roles: ['admin', 'doctor', 'receptionist', 'client'] },
-  { to: '/pets', icon: PawPrint, label: 'Pets', roles: ['admin', 'doctor', 'receptionist', 'client'] },
-  { to: '/owners', icon: Users, label: 'Owners', roles: ['admin', 'receptionist'] },
-  { to: '/doctors', icon: Stethoscope, label: 'Doctors', roles: ['admin', 'receptionist'] },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'doctor', 'client'] },
+  { to: '/appointments', icon: CalendarDays, label: 'Appointments', roles: ['admin', 'doctor', 'client'] },
+  { to: '/pets', icon: PawPrint, label: 'Pets', roles: ['admin', 'doctor', 'client'] },
+  { to: '/owners', icon: Users, label: 'Owners', roles: ['admin'] },
+  { to: '/doctors', icon: Stethoscope, label: 'Doctors', roles: ['admin'] },
   { to: '/lab-tests', icon: Activity, label: 'Lab Tests', roles: ['admin', 'doctor'] },
   { to: '/surgeries', icon: Scissors, label: 'Surgeries', roles: ['admin', 'doctor'] },
   { to: '/prescriptions', icon: FileText, label: 'Prescriptions', roles: ['admin', 'doctor'] },
   { to: '/pharmacy', icon: Pill, label: 'Pharmacy', roles: ['admin', 'doctor'] },
-  { to: '/vaccinations', icon: Syringe, label: 'Vaccinations', roles: ['admin', 'doctor', 'receptionist'] },
-  { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin', 'receptionist'] },
+  { to: '/vaccinations', icon: Syringe, label: 'Vaccinations', roles: ['admin', 'doctor'] },
+  { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin'] },
   { to: '/reports', icon: BarChart2, label: 'Reports', roles: ['admin'] },
 ]
 

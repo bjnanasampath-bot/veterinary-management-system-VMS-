@@ -26,7 +26,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('doctor', 'Doctor'),
-        ('receptionist', 'Receptionist'),
         ('client', 'Client'),
     ]
 
@@ -34,7 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='receptionist')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
     phone = models.CharField(max_length=15, blank=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     is_active = models.BooleanField(default=True)

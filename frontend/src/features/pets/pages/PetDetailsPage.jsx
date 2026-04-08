@@ -11,7 +11,7 @@ export default function PetDetailsPage() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { user } = useSelector(s => s.auth)
-  const canEdit = user?.role === 'doctor' || user?.role === 'receptionist'
+  const canEdit = user?.role === 'doctor'
 
   useEffect(() => {
     petApi.getMedicalHistory(id).then(r => setData(r.data?.data || r.data)).finally(() => setLoading(false))

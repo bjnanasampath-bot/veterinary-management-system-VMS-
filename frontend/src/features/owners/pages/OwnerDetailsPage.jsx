@@ -12,7 +12,7 @@ export default function OwnerDetailsPage() {
   const [pets, setPets] = useState([])
   const [loading, setLoading] = useState(true)
   const { user } = useSelector(s => s.auth)
-  const canEdit = user?.role === 'doctor' || user?.role === 'receptionist'
+  const canEdit = user?.role === 'doctor'
 
   useEffect(() => {
     Promise.all([ownerApi.getById(id), ownerApi.getPets(id)])
