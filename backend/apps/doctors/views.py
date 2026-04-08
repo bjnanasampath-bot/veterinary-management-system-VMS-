@@ -1,6 +1,7 @@
 from rest_framework import generics, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from common.responses import success_response, error_response
+from apps.accounts.models import User
 from .models import Doctor
 from .serializers import DoctorSerializer, DoctorListSerializer
 
@@ -29,7 +30,27 @@ class DoctorListCreateView(generics.ListCreateAPIView):
         serializer = DoctorSerializer(data=request.data)
         if serializer.is_valid():
             doctor = serializer.save()
-            return success_response(data=DoctorSerializer(doctor).data, message="Doctor created", status_code=status.HTTP_201_CREATED)
+            # Automatically create User for this doctor if not exists
+            user, created = User.objects.get_or_create(
+                email=doctor.email,
+                defaults={
+                    'first_name': doctor.first_name,
+                    'last_name': doctor.last_name,
+                    'role': 'doctor',
+                    'phone': doctor.phone
+                }
+            )
+            if created:
+                user.set_password('doctor123')
+                user.save()
+            doctor.user = user
+            doctor.save()
+            
+            return success_response(
+                data=DoctorSerializer(doctor).data, 
+                message=f"Doctor created. Login password is 'doctor123'.", 
+                status_code=status.HTTP_201_CREATED
+            )
         return error_response(errors=serializer.errors)
 
 

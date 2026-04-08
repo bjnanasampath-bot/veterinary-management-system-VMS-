@@ -83,13 +83,7 @@ export default function Register() {
               })} type="email" className="input-field" placeholder="john@vetcare.com" />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select {...register('role')} className="input-field">
-              <option value="client">Client (Pet Owner)</option>
-              <option value="doctor">Doctor</option>
-            </select>
-          </div>
+            <input type="hidden" {...register('role')} value="client" />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
             <div className="relative">
