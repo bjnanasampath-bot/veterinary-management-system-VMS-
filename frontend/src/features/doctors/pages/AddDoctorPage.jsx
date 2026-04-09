@@ -72,6 +72,13 @@ export default function AddDoctorPage() {
         <FormField label="Consultation Fee (₹)">
           <input {...register('consultation_fee')} type="number" className="input-field" placeholder="500" />
         </FormField>
+        <FormField label="Assign Password" required>
+          <input {...register('password', { required: true, minLength: 8 })} type="password" underline="false" className="input-field" placeholder="••••••••" />
+          <p className="text-[10px] text-gray-400 mt-1 italic tracking-wide">Doctor will use this password to login</p>
+        </FormField>
+        <FormField label="Confirm Password" required>
+          <input {...register('confirm_password', { required: true })} type="password" underline="false" className="input-field" placeholder="••••••••" />
+        </FormField>
       </div>
       <FormField label="Qualification">
         <input {...register('qualification')} className="input-field" placeholder="BVSc & AH, MVSc" />

@@ -14,11 +14,11 @@ export default function GenericListPage({
   const role = user?.role
 
   // Role-based action rules:
-  // admin              → View + Delete only (no Edit, no Add)
-  // doctor→ View + Edit + Add (no Delete)
+  // admin              → Full Control (Add, Edit, View, Delete)
+  // doctor             → View + Edit + Add (no Delete)
   // client             → View only
-  const canAdd    = role === 'doctor' || role === 'client'
-  const canEdit   = role === 'doctor'
+  const canAdd    = role === 'admin' || role === 'doctor' || role === 'client'
+  const canEdit   = role === 'admin' || role === 'doctor'
   const canDelete = role === 'admin'
 
   const [items, setItems] = useState([])
