@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { reportApi, appointmentApi } from '../../../api'
+import { reportApi, appointmentApi, doctorApi } from '../../../api'
 import { Loader } from '../../../components/common'
 import AdminDashboard from '../components/AdminDashboard'
 import DoctorDashboard from '../components/DoctorDashboard'
@@ -8,7 +8,12 @@ import ClientDashboard from '../components/ClientDashboard'
 
 export default function Dashboard() {
   const { user } = useSelector(s => s.auth)
+  const [stats, setStats] = useState(null)
+  const [revenue, setRevenue] = useState([])
+  const [apptByType, setApptByType] = useState([])
+  const [todayAppts, setTodayAppts] = useState([])
   const [attendance, setAttendance] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setLoading(true)
@@ -25,17 +30,25 @@ export default function Dashboard() {
     }
 
     Promise.all(promises).then(([statsRes, revRes, apptRes, todayRes, attRes]) => {
-      setStats(statsRes.data?.data)
-      setRevenue(revRes.data?.data || [])
-      setApptByType(apptRes.data?.data?.by_type || [])
-      setTodayAppts(todayRes.data?.data || [])
-      if (attRes) setAttendance(attRes.data?.results || [])
+      setStats(statsRes.data?.data || statsRes.data)
+      setRevenue(revRes.data?.data || revRes.data || [])
+      setApptByType(apptRes.data?.data?.by_type || apptRes.data?.by_type || [])
+      setTodayAppts(todayRes.data?.data || todayRes.data || [])
+      if (attRes) setAttendance(attRes.data?.results || attRes.data || [])
+    }).catch(err => {
+      console.error("Dashboard data fetch error:", err)
     }).finally(() => setLoading(false))
   }, [user.role])
 
   if (loading) return <Loader text="Loading dashboard..." />
 
-  const statusColor = (s) => ({ scheduled:'bg-blue-100 text-blue-700', confirmed:'bg-green-100 text-green-700', completed:'bg-emerald-100 text-emerald-700', in_progress:'bg-amber-100 text-amber-700', cancelled:'bg-rose-100 text-rose-700' }[s] || 'bg-slate-100 text-slate-600')
+  const statusColor = (s) => ({ 
+    scheduled:'bg-blue-100 text-blue-700', 
+    confirmed:'bg-green-100 text-green-700', 
+    completed:'bg-emerald-100 text-emerald-700', 
+    in_progress:'bg-amber-100 text-amber-700', 
+    cancelled:'bg-rose-100 text-rose-700' 
+  }[s] || 'bg-slate-100 text-slate-600')
 
   const renderDashboard = () => {
     switch (user.role) {

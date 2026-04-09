@@ -38,7 +38,7 @@ export const doctorApi = {
   delete: (id) => api.delete(`/doctors/${id}/`),
   getAttendance: (params) => api.get('/doctors/attendance/', { params }),
   markAttendance: (data) => api.post('/doctors/attendance/', data),
-  updateAttendance: (id, data) => api.put(`/doctors/attendance/${id}//`, data),
+  updateAttendance: (id, data) => api.put(`/doctors/attendance/${id}/`, data),
 }
 
 export const appointmentApi = {
