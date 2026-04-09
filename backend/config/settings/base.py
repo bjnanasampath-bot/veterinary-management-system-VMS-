@@ -1,12 +1,24 @@
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+import pkgutil
+import importlib.util
+
+# Patch for Python 3.14 compatibility (pkgutil.find_loader was removed)
+if not hasattr(pkgutil, 'find_loader'):
+    def find_loader(fullname):
+        try:
+            spec = importlib.util.find_spec(fullname)
+            return spec.loader if spec is not None else None
+        except Exception:
+            return None
+    pkgutil.find_loader = find_loader
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+ALLOWED_HOSTS = ['*']
 
 DJANGO_APPS = [
     'django.contrib.admin',
