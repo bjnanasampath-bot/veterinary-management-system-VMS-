@@ -23,7 +23,7 @@ class DashboardStatsView(APIView):
         if role == 'doctor':
             try:
                 doctor_profile = user.doctor_profile
-            except:
+            except AttributeError:
                 from apps.doctors.models import Doctor
                 doctor_profile, created = Doctor.objects.get_or_create(
                     email=user.email,

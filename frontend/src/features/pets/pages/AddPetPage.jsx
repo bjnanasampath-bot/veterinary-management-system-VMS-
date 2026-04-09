@@ -68,6 +68,7 @@ export default function AddPetPage() {
         </FormField>
         <FormField label="Species" required>
           <select {...register('species', { required: true })} className="input-field">
+            <option value="">Select Species</option>
             <option value="dog">Dog</option>
             <option value="cat">Cat</option>
             <option value="bird">Bird</option>

@@ -6,10 +6,30 @@ from .models import Doctor
 class DoctorSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     analytics = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True, min_length=8, required=False)
+    confirm_password = serializers.CharField(write_only=True, required=False)
+    user_id = serializers.ReadOnlyField(source='user.id')
 
     class Meta:
         model = Doctor
         fields = '__all__'
+
+    def validate(self, attrs):
+        password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
+        if password or confirm_password:
+            if not password or not confirm_password:
+                raise serializers.ValidationError({
+                    'password': 'Both password and confirm_password are required when setting a doctor login password.'
+                })
+            if password != confirm_password:
+                raise serializers.ValidationError({'password': 'Passwords do not match.'})
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop('password', None)
+        validated_data.pop('confirm_password', None)
+        return super().create(validated_data)
 
     def get_analytics(self, obj):
         now = timezone.now()

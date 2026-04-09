@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from decouple import config
 from common.responses import success_response, error_response
 from .models import User, PasswordResetOTP
 from .serializers import (
@@ -83,9 +84,10 @@ class GoogleAuthView(APIView):
 
         try:
             # Specify the CLIENT_ID of the app that accesses the backend:
-            # idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
+            CLIENT_ID = config('GOOGLE_CLIENT_ID', default='')
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
             # For now, we verify without CLIENT_ID for development or get it from settings
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
+            # idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
 
             email = idinfo.get('email')
             first_name = idinfo.get('given_name', '')

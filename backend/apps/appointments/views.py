@@ -19,7 +19,7 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
         elif self.request.user.role == 'doctor':
             try:
                 return qs.filter(doctor=self.request.user.doctor_profile)
-            except:
+            except AttributeError:
                 return qs.none()
         return qs
 

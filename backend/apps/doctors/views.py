@@ -1,5 +1,7 @@
 from rest_framework import generics, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.crypto import get_random_string
+from common.permissions import IsAdmin
 from common.responses import success_response, error_response
 from apps.accounts.models import User
 from .models import Doctor
@@ -8,6 +10,12 @@ from .serializers import DoctorSerializer, DoctorListSerializer
 
 class DoctorListCreateView(generics.ListCreateAPIView):
     queryset = Doctor.objects.filter(is_active=True)
+    def get_permissions(self):
+        from rest_framework.permissions import IsAuthenticated
+        from common.permissions import IsAdmin
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        return [IsAdmin()]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['specialization']
     search_fields = ['first_name', 'last_name', 'email', 'license_number']
@@ -29,26 +37,43 @@ class DoctorListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = DoctorSerializer(data=request.data)
         if serializer.is_valid():
+            password = request.data.get('password')
             doctor = serializer.save()
-            # Automatically create User for this doctor if not exists
+
+            user_defaults = {
+                'first_name': doctor.first_name,
+                'last_name': doctor.last_name,
+                'role': 'doctor',
+                'phone': doctor.phone or ''
+            }
             user, created = User.objects.get_or_create(
                 email=doctor.email,
-                defaults={
-                    'first_name': doctor.first_name,
-                    'last_name': doctor.last_name,
-                    'role': 'doctor',
-                    'phone': doctor.phone
-                }
+                defaults=user_defaults
             )
+
             if created:
-                user.set_password('doctor123')
+                generated_password = password or get_random_string(12)
+                user.set_password(generated_password)
+                user.role = 'doctor'
                 user.save()
+                credentials = {'email': user.email, 'password': generated_password}
+            else:
+                if password:
+                    user.set_password(password)
+                    user.save()
+                    credentials = {'email': user.email, 'password': password}
+                else:
+                    credentials = {'email': user.email}
+
             doctor.user = user
             doctor.save()
-            
+
             return success_response(
-                data=DoctorSerializer(doctor).data, 
-                message=f"Doctor created. Login password is 'doctor123'.", 
+                data={
+                    'doctor': DoctorSerializer(doctor).data,
+                    'credentials': credentials
+                },
+                message='Doctor created successfully.',
                 status_code=status.HTTP_201_CREATED
             )
         return error_response(errors=serializer.errors)
