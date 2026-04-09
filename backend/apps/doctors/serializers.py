@@ -39,6 +39,17 @@ class DoctorSerializer(serializers.ModelSerializer):
         validated_data.pop('confirm_password', None)
         return super().create(validated_data)
 
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        validated_data.pop('confirm_password', None)
+        
+        # If password is provided, update the User model
+        if password and instance.user:
+            instance.user.set_password(password)
+            instance.user.save()
+            
+        return super().update(instance, validated_data)
+
     def get_analytics(self, obj):
         now = timezone.now()
         today = now.date()

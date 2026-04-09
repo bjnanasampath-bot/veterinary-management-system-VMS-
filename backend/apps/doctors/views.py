@@ -83,6 +83,21 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.filter(is_active=True)
     serializer_class = DoctorSerializer
 
+    def get_permissions(self):
+        from rest_framework.permissions import IsAuthenticated
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        return [IsAdmin()]
+
+    def perform_update(self, serializer):
+        doctor = serializer.save()
+        if doctor.user:
+            user = doctor.user
+            user.email = doctor.email
+            user.first_name = doctor.first_name
+            user.last_name = doctor.last_name
+            user.save()
+
     def destroy(self, request, *args, **kwargs):
         doctor = self.get_object()
         doctor.is_active = False
