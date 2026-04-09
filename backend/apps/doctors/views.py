@@ -4,8 +4,8 @@ from django.utils.crypto import get_random_string
 from common.permissions import IsAdmin
 from common.responses import success_response, error_response
 from apps.accounts.models import User
-from .models import Doctor
-from .serializers import DoctorSerializer, DoctorListSerializer
+from .models import Doctor, Attendance
+from .serializers import DoctorSerializer, DoctorListSerializer, AttendanceSerializer
 
 
 class DoctorListCreateView(generics.ListCreateAPIView):
@@ -88,3 +88,29 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
         doctor.is_active = False
         doctor.save()
         return success_response(message="Doctor removed")
+class AttendanceView(generics.ListCreateAPIView):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['doctor', 'date', 'status']
+    ordering_fields = ['date']
+
+    def get_permissions(self):
+        from rest_framework.permissions import IsAuthenticated
+        return [IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        # Doctors can only self-checkin
+        if self.request.user.role == 'doctor':
+            doctor = Doctor.objects.get(user=self.request.user)
+            serializer.save(doctor=doctor)
+        else:
+            serializer.save()
+
+class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+    
+    def get_permissions(self):
+        from common.permissions import IsAdmin
+        return [IsAdmin()]

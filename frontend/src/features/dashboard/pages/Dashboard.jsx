@@ -8,24 +8,28 @@ import ClientDashboard from '../components/ClientDashboard'
 
 export default function Dashboard() {
   const { user } = useSelector(s => s.auth)
-  const [stats, setStats] = useState(null)
-  const [revenue, setRevenue] = useState([])
-  const [apptByType, setApptByType] = useState([])
-  const [todayAppts, setTodayAppts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [attendance, setAttendance] = useState([])
 
   useEffect(() => {
     setLoading(true)
-    Promise.all([
+    const promises = [
       reportApi.getDashboardStats(),
       reportApi.getRevenueReport({ months: 6 }),
       reportApi.getAppointmentReport({ days: 30 }),
       appointmentApi.getToday(),
-    ]).then(([statsRes, revRes, apptRes, todayRes]) => {
+    ]
+
+    if (user.role === 'admin') {
+      const today = new Date().toISOString().split('T')[0]
+      promises.push(doctorApi.getAttendance({ date: today }))
+    }
+
+    Promise.all(promises).then(([statsRes, revRes, apptRes, todayRes, attRes]) => {
       setStats(statsRes.data?.data)
       setRevenue(revRes.data?.data || [])
       setApptByType(apptRes.data?.data?.by_type || [])
       setTodayAppts(todayRes.data?.data || [])
+      if (attRes) setAttendance(attRes.data?.results || [])
     }).finally(() => setLoading(false))
   }, [user.role])
 
@@ -36,7 +40,7 @@ export default function Dashboard() {
   const renderDashboard = () => {
     switch (user.role) {
       case 'admin':
-        return <AdminDashboard stats={stats} todayAppts={todayAppts} revenue={revenue} apptByType={apptByType} statusColor={statusColor} />
+        return <AdminDashboard stats={stats} todayAppts={todayAppts} revenue={revenue} apptByType={apptByType} statusColor={statusColor} attendance={attendance} />
       case 'doctor':
         return <DoctorDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
       case 'client':

@@ -1,7 +1,15 @@
 from rest_framework import serializers
 from django.utils import timezone
 from datetime import timedelta
-from .models import Doctor
+from .models import Doctor, Attendance
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.ReadOnlyField(source='doctor.full_name')
+
+    class Meta:
+        model = Attendance
+        fields = ['id', 'doctor', 'doctor_name', 'date', 'status', 'check_in_time', 'notes', 'created_at']
+        read_only_fields = ['created_at']
 
 class DoctorSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
@@ -60,4 +68,3 @@ class DoctorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = ['id', 'full_name', 'email', 'phone', 'specialization', 'experience_years', 'consultation_fee', 'photo', 'is_active']
-

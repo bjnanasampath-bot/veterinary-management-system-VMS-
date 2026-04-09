@@ -43,3 +43,25 @@ class Doctor(BaseModel):
     @property
     def full_name(self):
         return f"Dr. {self.first_name} {self.last_name}"
+
+
+class Attendance(BaseModel):
+    STATUS_CHOICES = [
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('force_leave', 'Force Leave'),
+    ]
+
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='attendances')
+    date = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='present')
+    check_in_time = models.TimeField(null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'doctor_attendance'
+        unique_together = ['doctor', 'date']
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.doctor.full_name} - {self.date} - {self.status}"

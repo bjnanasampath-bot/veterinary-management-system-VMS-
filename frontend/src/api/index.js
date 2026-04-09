@@ -36,6 +36,9 @@ export const doctorApi = {
   create: (data) => api.post('/doctors/', data),
   update: (id, data) => api.put(`/doctors/${id}/`, data),
   delete: (id) => api.delete(`/doctors/${id}/`),
+  getAttendance: (params) => api.get('/doctors/attendance/', { params }),
+  markAttendance: (data) => api.post('/doctors/attendance/', data),
+  updateAttendance: (id, data) => api.put(`/doctors/attendance/${id}//`, data),
 }
 
 export const appointmentApi = {
