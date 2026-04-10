@@ -16,7 +16,7 @@ export default function DoctorDashboard({ stats, todayAppts, statusColor }) {
   const fetchTodayAttendance = async () => {
     try {
       setLoading(true)
-      const today = new Date().toISOString().split('T')[0]
+      const today = new Date().toLocaleDateString('en-CA')
       const res = await doctorApi.getAttendance({ date: today })
       // Since it returns a list, find the one for today if it exists
       setAttendance(res.data?.results?.[0] || null)

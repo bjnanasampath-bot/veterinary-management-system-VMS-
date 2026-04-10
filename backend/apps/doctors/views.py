@@ -1,4 +1,5 @@
 from rest_framework import generics, filters, status
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.crypto import get_random_string
 from common.permissions import IsAdmin
@@ -11,8 +12,6 @@ from .serializers import DoctorSerializer, DoctorListSerializer, AttendanceSeria
 class DoctorListCreateView(generics.ListCreateAPIView):
     queryset = Doctor.objects.filter(is_active=True)
     def get_permissions(self):
-        from rest_framework.permissions import IsAuthenticated
-        from common.permissions import IsAdmin
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         return [IsAdmin()]
@@ -109,9 +108,7 @@ class AttendanceView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['doctor', 'date', 'status']
     ordering_fields = ['date']
-
     def get_permissions(self):
-        from rest_framework.permissions import IsAuthenticated
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
@@ -127,5 +124,4 @@ class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AttendanceSerializer
     
     def get_permissions(self):
-        from common.permissions import IsAdmin
         return [IsAdmin()]

@@ -50,7 +50,7 @@ class DashboardStatsView(APIView):
             appts_q = Appointment.objects.filter(pet__owner_id__in=owner_ids)
             bills_q = Bill.objects.filter(pet__owner_id__in=owner_ids)
         else:
-            # Admin and Receptionist see all
+            # Admin sees all
             pets_q = Pet.objects.all()
             appts_q = Appointment.objects.all()
             bills_q = Bill.objects.all()

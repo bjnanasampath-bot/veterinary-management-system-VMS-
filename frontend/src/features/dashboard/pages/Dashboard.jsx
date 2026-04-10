@@ -25,7 +25,7 @@ export default function Dashboard() {
     ]
 
     if (user.role === 'admin') {
-      const today = new Date().toISOString().split('T')[0]
+      const today = new Date().toLocaleDateString('en-CA')
       promises.push(doctorApi.getAttendance({ date: today }))
     }
 

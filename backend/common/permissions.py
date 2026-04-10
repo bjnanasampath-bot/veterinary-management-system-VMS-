@@ -8,6 +8,3 @@ class IsDoctor(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['admin', 'doctor']
 
-class IsReceptionist(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ['admin', 'doctor', 'receptionist']
