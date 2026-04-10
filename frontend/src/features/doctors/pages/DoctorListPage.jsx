@@ -1,5 +1,6 @@
 import { User } from 'lucide-react'
 import GenericListPage from '../../../components/common/GenericListPage'
+import { Badge } from '../../../components/common'
 import { doctorApi } from '../../../api'
 
 export default function DoctorListPage() {
@@ -34,6 +35,15 @@ export default function DoctorListPage() {
           ) 
         },
         { key: 'full_name', label: 'Name', render: r => <span className="font-medium text-gray-900">{r.full_name}</span> },
+        { 
+          key: 'is_active', 
+          label: 'Status', 
+          render: r => (
+            <Badge type={r.is_active ? 'success' : 'danger'}>
+              {r.is_active ? 'Active' : 'Deleted'}
+            </Badge>
+          )
+        },
         { key: 'specialization', label: 'Specialization', render: r => <span className="capitalize">{r.specialization}</span> },
         { key: 'email', label: 'Email' },
         { key: 'phone', label: 'Phone' },

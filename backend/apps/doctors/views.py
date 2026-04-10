@@ -10,15 +10,22 @@ from .serializers import DoctorSerializer, DoctorListSerializer, AttendanceSeria
 
 
 class DoctorListCreateView(generics.ListCreateAPIView):
-    queryset = Doctor.objects.filter(is_active=True)
+    def get_queryset(self):
+        # Admin can see all doctors (active + inactive)
+        # Others only see active doctors
+        if self.request.user.is_authenticated and self.request.user.role == 'admin':
+            return Doctor.objects.all()
+        return Doctor.objects.filter(is_active=True)
+
     def get_permissions(self):
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         return [IsAdmin()]
+
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['specialization']
+    filterset_fields = ['specialization', 'is_active']
     search_fields = ['first_name', 'last_name', 'email', 'license_number']
-    ordering_fields = ['first_name', 'experience_years']
+    ordering_fields = ['first_name', 'experience_years', 'created_at']
 
     def get_serializer_class(self):
         return DoctorListSerializer if self.request.method == 'GET' else DoctorSerializer
@@ -34,16 +41,40 @@ class DoctorListCreateView(generics.ListCreateAPIView):
         return success_response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        
+        # Check if an inactive doctor with this email already exists
+        existing_doctor = Doctor.objects.filter(email=email).first()
+        if existing_doctor and not existing_doctor.is_active:
+            # Re-activate and update existing record
+            serializer = DoctorSerializer(existing_doctor, data=request.data, partial=True)
+            if serializer.is_valid():
+                doctor = serializer.save(is_active=True)
+                # Ensure user account is also active if it exists
+                if doctor.user:
+                    doctor.user.is_active = True
+                    password = request.data.get('password')
+                    if password:
+                        doctor.user.set_password(password)
+                    doctor.user.save()
+                
+                return success_response(
+                    data=DoctorSerializer(doctor).data,
+                    message='Doctor record reactivated and updated.',
+                    status_code=status.HTTP_200_OK
+                )
+
         serializer = DoctorSerializer(data=request.data)
         if serializer.is_valid():
             password = request.data.get('password')
-            doctor = serializer.save()
+            doctor = serializer.save(is_active=True) # Explicitly ensure is_active=True
 
             user_defaults = {
                 'first_name': doctor.first_name,
                 'last_name': doctor.last_name,
                 'role': 'doctor',
-                'phone': doctor.phone or ''
+                'phone': doctor.phone or '',
+                'is_active': True
             }
             user, created = User.objects.get_or_create(
                 email=doctor.email,
@@ -57,12 +88,11 @@ class DoctorListCreateView(generics.ListCreateAPIView):
                 user.save()
                 credentials = {'email': user.email, 'password': generated_password}
             else:
+                user.is_active = True # reactivation
                 if password:
                     user.set_password(password)
-                    user.save()
-                    credentials = {'email': user.email, 'password': password}
-                else:
-                    credentials = {'email': user.email}
+                user.save()
+                credentials = {'email': user.email, 'password': password or '(unchanged)'}
 
             doctor.user = user
             doctor.save()
@@ -79,11 +109,14 @@ class DoctorListCreateView(generics.ListCreateAPIView):
 
 
 class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Doctor.objects.filter(is_active=True)
     serializer_class = DoctorSerializer
 
+    def get_queryset(self):
+        if self.request.user.is_authenticated and self.request.user.role == 'admin':
+            return Doctor.objects.all()
+        return Doctor.objects.filter(is_active=True)
+
     def get_permissions(self):
-        from rest_framework.permissions import IsAuthenticated
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         return [IsAdmin()]
@@ -101,7 +134,12 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
         doctor = self.get_object()
         doctor.is_active = False
         doctor.save()
-        return success_response(message="Doctor removed")
+        # Also deactivate the associated user account
+        if doctor.user:
+            doctor.user.is_active = False
+            doctor.user.save()
+        return success_response(message="Doctor deactivated/removed")
+
 class AttendanceView(generics.ListCreateAPIView):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
