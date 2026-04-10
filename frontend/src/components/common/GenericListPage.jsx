@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Search, Plus, Pencil, Trash2, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Loader, EmptyState, Badge } from './index'
@@ -27,6 +27,8 @@ export default function GenericListPage({
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState({ count: 0, total_pages: 1 })
 
+  const location = useLocation()
+
   const load = async () => {
     setLoading(true)
     try {
@@ -45,7 +47,7 @@ export default function GenericListPage({
     } finally { setLoading(false) }
   }
 
-  useEffect(() => { load() }, [search, page])
+  useEffect(() => { load() }, [search, page, location.key])
 
   const handleDelete = async (id, name) => {
     if (!confirm(`Delete ${name}?`)) return
