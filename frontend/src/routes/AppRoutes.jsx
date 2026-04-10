@@ -7,6 +7,7 @@ import ServiceInfoPage from '../features/landing/pages/ServiceInfoPage'
 
 import Login from '../features/auth/pages/Login'
 import Register from '../features/auth/pages/Register'
+import ClientAuthPage from '../features/auth/pages/ClientAuthPage'
 import ForgotPassword from '../features/auth/pages/ForgotPassword'
 import ResetPassword from '../features/auth/pages/ResetPassword'
 import Dashboard from '../features/dashboard/pages/Dashboard'
@@ -66,7 +67,8 @@ export default function AppRoutes() {
       
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/client-portal" element={<ClientAuthPage />} />
+        <Route path="/register" element={<Navigate to="/client-portal" replace />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>

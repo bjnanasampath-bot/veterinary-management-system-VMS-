@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../authSlice'
 import {
   PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw,
@@ -11,7 +11,8 @@ import toast from 'react-hot-toast'
 
 export default function Login() {
   const dispatch = useDispatch()
-  const [activeRole, setActiveRole] = useState('admin') // 'admin' | 'doctor' | 'client'
+  const navigate = useNavigate()
+  const [activeRole, setActiveRole] = useState('admin') // 'admin' | 'doctor'
   const [showPassword, setShowPassword] = useState(false)
   const { loading } = useSelector(s => s.auth)
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
@@ -118,12 +119,11 @@ export default function Login() {
         {/* Right Side: Login Form */}
         <div className="w-full md:w-7/12 p-8 md:p-12 bg-white flex flex-col">
 
-          {/* Role Switcher — 3 tabs */}
+          {/* Role Switcher — Admin & Doctor only; Client goes to /client-portal */}
           <div className="flex p-1.5 bg-gray-100 rounded-2xl mb-10 w-full">
             {[
               { role: 'admin', icon: <UserCog size={16} />, label: 'Admin' },
               { role: 'doctor', icon: <Stethoscope size={16} />, label: 'Doctor' },
-              { role: 'client', icon: <User size={16} />, label: 'Client' },
             ].map(({ role, icon, label }) => (
               <button
                 key={role}
@@ -138,6 +138,13 @@ export default function Login() {
                 {label}
               </button>
             ))}
+            {/* Client → separate page */}
+            <button
+              onClick={() => navigate('/client-portal')}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 text-gray-500 hover:text-sky-600 hover:bg-sky-50"
+            >
+              <User size={16} /> Client
+            </button>
           </div>
 
           {/* Role heading */}
