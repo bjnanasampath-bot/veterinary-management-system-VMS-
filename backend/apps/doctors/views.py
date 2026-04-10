@@ -11,10 +11,8 @@ from .serializers import DoctorSerializer, DoctorListSerializer, AttendanceSeria
 
 class DoctorListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
-        # Admin can see all doctors (active + inactive)
-        # Others only see active doctors
-        if self.request.user.is_authenticated and self.request.user.role == 'admin':
-            return Doctor.objects.all()
+        # By default, show only active doctors (even to admin)
+        # This fixes the user's "not deleting" complaint
         return Doctor.objects.filter(is_active=True)
 
     def get_permissions(self):
@@ -23,7 +21,7 @@ class DoctorListCreateView(generics.ListCreateAPIView):
         return [IsAdmin()]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['specialization', 'is_active']
+    filterset_fields = ['specialization']
     search_fields = ['first_name', 'last_name', 'email', 'license_number']
     ordering_fields = ['first_name', 'experience_years', 'created_at']
 
@@ -50,7 +48,6 @@ class DoctorListCreateView(generics.ListCreateAPIView):
             serializer = DoctorSerializer(existing_doctor, data=request.data, partial=True)
             if serializer.is_valid():
                 doctor = serializer.save(is_active=True)
-                # Ensure user account is also active if it exists
                 if doctor.user:
                     doctor.user.is_active = True
                     password = request.data.get('password')
@@ -67,7 +64,7 @@ class DoctorListCreateView(generics.ListCreateAPIView):
         serializer = DoctorSerializer(data=request.data)
         if serializer.is_valid():
             password = request.data.get('password')
-            doctor = serializer.save(is_active=True) # Explicitly ensure is_active=True
+            doctor = serializer.save(is_active=True)
 
             user_defaults = {
                 'first_name': doctor.first_name,
@@ -88,7 +85,7 @@ class DoctorListCreateView(generics.ListCreateAPIView):
                 user.save()
                 credentials = {'email': user.email, 'password': generated_password}
             else:
-                user.is_active = True # reactivation
+                user.is_active = True
                 if password:
                     user.set_password(password)
                 user.save()
@@ -110,11 +107,7 @@ class DoctorListCreateView(generics.ListCreateAPIView):
 
 class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DoctorSerializer
-
-    def get_queryset(self):
-        if self.request.user.is_authenticated and self.request.user.role == 'admin':
-            return Doctor.objects.all()
-        return Doctor.objects.filter(is_active=True)
+    queryset = Doctor.objects.filter(is_active=True)
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -134,11 +127,10 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
         doctor = self.get_object()
         doctor.is_active = False
         doctor.save()
-        # Also deactivate the associated user account
         if doctor.user:
             doctor.user.is_active = False
             doctor.user.save()
-        return success_response(message="Doctor deactivated/removed")
+        return success_response(message="Doctor removed")
 
 class AttendanceView(generics.ListCreateAPIView):
     queryset = Attendance.objects.all()
@@ -150,7 +142,6 @@ class AttendanceView(generics.ListCreateAPIView):
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-        # Doctors can only self-checkin
         if self.request.user.role == 'doctor':
             doctor = Doctor.objects.get(user=self.request.user)
             serializer.save(doctor=doctor)

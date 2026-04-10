@@ -36,15 +36,12 @@ export default function DoctorListPage() {
         },
         { key: 'full_name', label: 'Name', render: r => <span className="font-medium text-gray-900">{r.full_name}</span> },
         { 
-          key: 'is_active', 
-          label: 'Status', 
+          key: 'specialization', 
+          label: 'Specialization', 
           render: r => (
-            <Badge type={r.is_active ? 'success' : 'danger'}>
-              {r.is_active ? 'Active' : 'Deleted'}
-            </Badge>
+            <Badge label={r.specialization || 'General'} variant="info" />
           )
         },
-        { key: 'specialization', label: 'Specialization', render: r => <span className="capitalize">{r.specialization}</span> },
         { key: 'email', label: 'Email' },
         { key: 'phone', label: 'Phone' },
         { key: 'experience_years', label: 'Experience', render: r => `${r.experience_years} yrs` },
