@@ -1,18 +1,15 @@
 import { useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { PawPrint, Eye, EyeOff, Lock, Phone, RefreshCw } from 'lucide-react'
+import { PawPrint, Eye, EyeOff, Lock, Phone, RefreshCw, ArrowRight } from 'lucide-react'
 import { authApi } from '../../../api'
 import toast from 'react-hot-toast'
-
-import GoogleAuthButton from '../components/GoogleAuthButton'
 
 export default function Register() {
   const navigate = useNavigate()
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm()
 
   // --- CAPTCHA ---
   const generateCaptcha = useCallback(() => {
@@ -22,15 +19,6 @@ export default function Register() {
   const [captchaText, setCaptchaText] = useState(() => generateCaptcha())
   const [captchaInput, setCaptchaInput] = useState('')
   const refreshCaptcha = () => { setCaptchaText(generateCaptcha()); setCaptchaInput('') }
-
-  const handleGoogleSuccess = (data) => {
-    if (data.is_new) {
-      setValue('first_name', data.first_name)
-      setValue('last_name', data.last_name)
-      setValue('email', data.email)
-      toast.info('Details filled from Google. Please choose a role and password.')
-    }
-  }
 
   const onSubmit = async (data) => {
     if (captchaInput.trim() !== captchaText) {
@@ -45,6 +33,9 @@ export default function Register() {
     } catch (err) {
       if (!err.response) {
         toast.error('Network error. Please check your connection.')
+      } else {
+        const msg = err.response?.data?.message || 'Registration failed.'
+        toast.error(msg)
       }
     }
   }
@@ -52,19 +43,17 @@ export default function Register() {
   return (
     <div className="w-full max-w-md">
       <div className="bg-white rounded-2xl shadow-xl p-8">
+        {/* Header */}
         <div className="flex flex-col items-center mb-6">
           <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mb-3">
             <PawPrint size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
-          <p className="text-gray-500 text-sm">VetCare Management System</p>
-        </div>
-
-        <div className="mb-6 pb-6 border-b border-gray-100">
-          <GoogleAuthButton onSuccess={handleGoogleSuccess} text="signup_with" />
+          <p className="text-gray-500 text-sm mt-1">Register as a VetCare client</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
@@ -75,15 +64,26 @@ export default function Register() {
               <input {...register('last_name', { required: true })} className="input-field" placeholder="Doe" />
             </div>
           </div>
+
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input {...register('email', {
+            <input
+              {...register('email', {
                 required: 'Email is required',
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address (e.g. name@gmail.com)' }
-              })} type="email" className="input-field" placeholder="john@vetcare.com" />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address' }
+              })}
+              type="email"
+              className="input-field"
+              placeholder="john@email.com"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
-            <input type="hidden" {...register('role')} value="client" />
+
+          {/* Hidden role */}
+          <input type="hidden" {...register('role')} value="client" />
+
+          {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
             <div className="relative">
@@ -101,6 +101,8 @@ export default function Register() {
             </div>
             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
           </div>
+
+          {/* Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <div className="relative">
@@ -120,12 +122,17 @@ export default function Register() {
               </button>
             </div>
           </div>
+
+          {/* Confirm Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
             <div className="relative">
               <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                {...register('confirm_password', { required: true, validate: v => v === watch('password') || 'Passwords do not match' })}
+                {...register('confirm_password', {
+                  required: true,
+                  validate: v => v === watch('password') || 'Passwords do not match'
+                })}
                 type={showConfirm ? 'text' : 'password'}
                 className="input-field pl-9 pr-10"
                 placeholder="Repeat password"
@@ -140,6 +147,7 @@ export default function Register() {
             </div>
             {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password.message}</p>}
           </div>
+
           {/* CAPTCHA */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -179,14 +187,25 @@ export default function Register() {
               autoComplete="off"
             />
           </div>
-          <button type="submit" disabled={isSubmitting} className="btn-primary w-full py-2.5">
-            {isSubmitting ? 'Creating...' : 'Create Account'}
+
+          {/* Submit */}
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full py-2.5 flex items-center justify-center gap-2">
+            {isSubmitting ? 'Creating Account...' : (
+              <>Create Account <ArrowRight size={16} /></>
+            )}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Already have an account? <Link to="/login" className="text-primary-600 font-medium hover:underline">Sign In</Link>
-        </p>
+        {/* Footer Navigation */}
+        <div className="mt-5 pt-5 border-t border-gray-100 flex items-center justify-center gap-4 text-sm">
+          <span className="text-gray-500">Already registered?</span>
+          <Link
+            to="/login"
+            className="flex items-center gap-1.5 font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            Login <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
     </div>
   )
