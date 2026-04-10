@@ -3,12 +3,15 @@ import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { login } from '../authSlice'
-import { PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw, ShieldCheck, UserCog, Stethoscope } from 'lucide-react'
+import {
+  PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw,
+  ShieldCheck, UserCog, Stethoscope, User
+} from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const dispatch = useDispatch()
-  const [activeRole, setActiveRole] = useState('admin') // 'admin' or 'doctor'
+  const [activeRole, setActiveRole] = useState('admin') // 'admin' | 'doctor' | 'client'
   const [showPassword, setShowPassword] = useState(false)
   const { loading } = useSelector(s => s.auth)
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
@@ -24,8 +27,9 @@ export default function Login() {
 
   const handleRoleSwitch = (role) => {
     setActiveRole(role)
-    reset() // Clear form fields
+    reset()
     refreshCaptcha()
+    setShowPassword(false)
   }
 
   const onSubmit = (data) => {
@@ -34,33 +38,43 @@ export default function Login() {
       refreshCaptcha()
       return
     }
-    // We pass the data to the same login endpoint; 
-    // the backend will determine if the user has the correct role.
     dispatch(login(data))
   }
 
   const theme = {
     admin: {
-      primary: 'bg-indigo-600',
-      text: 'text-indigo-600',
-      light: 'bg-indigo-50',
-      border: 'border-indigo-100',
       gradient: 'from-indigo-600 to-violet-700',
+      activeBg: 'bg-white text-indigo-600',
       icon: <ShieldCheck size={40} className="text-indigo-600" />,
-      label: 'Administrator Portal'
+      iconBg: 'bg-indigo-50',
+      label: 'Administrator Portal',
+      subtitle: 'Full system access — manage doctors, clients, billing & reports.',
+      placeholder: 'admin@vetcare.com',
+      btnLabel: 'Enter Dashboard',
     },
     doctor: {
-      primary: 'bg-emerald-600',
-      text: 'text-emerald-600',
-      light: 'bg-emerald-50',
-      border: 'border-emerald-100',
       gradient: 'from-emerald-600 to-teal-700',
+      activeBg: 'bg-white text-emerald-600',
       icon: <Stethoscope size={40} className="text-emerald-600" />,
-      label: 'Doctor Portfolio'
-    }
+      iconBg: 'bg-emerald-50',
+      label: 'Doctor Portal',
+      subtitle: 'View your schedule, manage treatments and patient records.',
+      placeholder: 'doctor@vetcare.com',
+      btnLabel: 'Enter Portal',
+    },
+    client: {
+      gradient: 'from-sky-500 to-blue-600',
+      activeBg: 'bg-white text-sky-600',
+      icon: <User size={40} className="text-sky-600" />,
+      iconBg: 'bg-sky-50',
+      label: 'Client Login',
+      subtitle: 'View your pets, appointments, vaccinations and billing details.',
+      placeholder: 'yourname@email.com',
+      btnLabel: 'Login to My Account',
+    },
   }
 
-  const currentTheme = theme[activeRole]
+  const t = theme[activeRole]
 
   return (
     <div className="w-full max-w-5xl px-4 flex flex-col items-center">
@@ -70,27 +84,28 @@ export default function Login() {
           <PawPrint size={32} className="text-primary-600" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">VetCare <span className="text-primary-600">Pro</span></h1>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            VetCare <span className="text-primary-600">Pro</span>
+          </h1>
           <p className="text-gray-500 text-sm font-medium">Next-Gen Veterinary Management</p>
         </div>
       </div>
 
       <div className="w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-gray-100">
-        
-        {/* Left Side: Role Background/Info (Desktop) */}
-        <div className={`hidden md:flex md:w-5/12 p-12 flex-col justify-between relative overflow-hidden transition-all duration-700 bg-gradient-to-br ${currentTheme.gradient}`}>
-          {/* Abstract Decorations */}
+
+        {/* Left Side: Gradient Info Panel */}
+        <div className={`hidden md:flex md:w-5/12 p-12 flex-col justify-between relative overflow-hidden transition-all duration-700 bg-gradient-to-br ${t.gradient}`}>
           <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-white/20 rounded-full blur-3xl" />
           <div className="absolute bottom-[-5%] left-[-5%] w-48 h-48 bg-black/10 rounded-full blur-2xl" />
-          
+
           <div className="relative z-10">
             <h2 className="text-white text-4xl font-bold leading-tight mb-4">
-              Welcome back to your {activeRole === 'admin' ? 'Admin' : 'Medical'} Dashboard
+              {activeRole === 'admin' && 'Welcome back, Administrator'}
+              {activeRole === 'doctor' && 'Welcome back, Doctor'}
+              {activeRole === 'client' && 'Welcome, Pet Parent!'}
             </h2>
             <div className="w-16 h-1.5 bg-white/40 rounded-full mb-8" />
-            <p className="text-white/80 text-lg">
-              Manage appointments, patient history, and clinic operations with ease and precision.
-            </p>
+            <p className="text-white/80 text-lg leading-relaxed">{t.subtitle}</p>
           </div>
 
           <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
@@ -102,50 +117,46 @@ export default function Login() {
 
         {/* Right Side: Login Form */}
         <div className="w-full md:w-7/12 p-8 md:p-12 bg-white flex flex-col">
-          
-          {/* Role Switcher Tabs */}
-          <div className="flex p-1.5 bg-gray-100 rounded-2xl mb-10 w-full max-w-sm self-center md:self-start">
-            <button
-              onClick={() => handleRoleSwitch('admin')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                activeRole === 'admin' 
-                ? 'bg-white text-indigo-600 shadow-md' 
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <UserCog size={18} />
-              Admin
-            </button>
-            <button
-              onClick={() => handleRoleSwitch('doctor')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                activeRole === 'doctor' 
-                ? 'bg-white text-emerald-600 shadow-md' 
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Stethoscope size={18} />
-              Doctor
-            </button>
+
+          {/* Role Switcher — 3 tabs */}
+          <div className="flex p-1.5 bg-gray-100 rounded-2xl mb-10 w-full">
+            {[
+              { role: 'admin', icon: <UserCog size={16} />, label: 'Admin' },
+              { role: 'doctor', icon: <Stethoscope size={16} />, label: 'Doctor' },
+              { role: 'client', icon: <User size={16} />, label: 'Client' },
+            ].map(({ role, icon, label }) => (
+              <button
+                key={role}
+                onClick={() => handleRoleSwitch(role)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                  activeRole === role
+                    ? `${theme[role].activeBg} shadow-md`
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {icon}
+                {label}
+              </button>
+            ))}
           </div>
 
-          <div className="mb-8 overflow-hidden">
-            <div className="flex items-center gap-4 mb-2 animate-in fade-in slide-in-from-left duration-500">
-              <div className={`p-3 rounded-2xl ${currentTheme.light}`}>
-                {currentTheme.icon}
-              </div>
+          {/* Role heading */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-2">
+              <div className={`p-3 rounded-2xl ${t.iconBg}`}>{t.icon}</div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{currentTheme.label}</h3>
+                <h3 className="text-2xl font-bold text-gray-900">{t.label}</h3>
                 <p className="text-gray-500 text-sm">Please enter your credentials to continue</p>
               </div>
             </div>
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1">
             <div className="space-y-4">
-              {/* Email Field */}
+              {/* Email */}
               <div className="group">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-primary-600 lowercase capitalize">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -153,19 +164,17 @@ export default function Login() {
                   <input
                     {...register('email', { required: 'Email is required' })}
                     type="email"
-                    placeholder={activeRole === 'admin' ? 'admin@vetcare.com' : 'doctor@vetcare.com'}
+                    placeholder={t.placeholder}
                     className={`w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 focus:bg-white focus:border-primary-500 focus:outline-none transition-all duration-300 ${errors.email ? 'border-red-500' : ''}`}
                   />
                 </div>
                 {errors.email && <p className="text-red-500 text-xs mt-1.5 ml-2">{errors.email.message}</p>}
               </div>
 
-              {/* Password Field */}
+              {/* Password */}
               <div className="group">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-primary-600 lowercase capitalize">
-                    Password
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700">Password</label>
                   <Link to="/forgot-password" className="text-xs text-primary-600 font-bold hover:text-primary-700 transition-colors">
                     Forgot Password?
                   </Link>
@@ -190,7 +199,7 @@ export default function Login() {
               </div>
 
               {/* CAPTCHA */}
-              <div className="bg-gray-50 p-4 rounded-2xl border-2 border-gray-100 group focus-within:border-primary-500 transition-all duration-300">
+              <div className="bg-gray-50 p-4 rounded-2xl border-2 border-gray-100 focus-within:border-primary-500 transition-all duration-300">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-semibold text-gray-700">Security Verification</label>
                   <button
@@ -227,31 +236,37 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-4 rounded-2xl text-white font-bold text-lg transition-all duration-300 shadow-xl hover:scale-[1.02] flex items-center justify-center gap-3 ${currentTheme.gradient}`}
+              className={`w-full py-4 rounded-2xl text-white font-bold text-lg transition-all duration-300 shadow-xl hover:scale-[1.02] flex items-center justify-center gap-3 bg-gradient-to-r ${t.gradient}`}
             >
               {loading ? (
                 <>
                   <RefreshCw size={20} className="animate-spin" />
                   Authenticating...
                 </>
-              ) : (
-                `Enter ${activeRole === 'admin' ? 'Dashboard' : 'Portal'}`
-              )}
+              ) : t.btnLabel}
             </button>
           </form>
 
-          {/* Footer Info */}
-          <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-2 text-sm text-gray-500">
-            <span>Powered by VetCare Technology</span>
-            <div className="w-1 h-1 bg-gray-300 rounded-full" />
-            <Link to="/register" className="text-primary-600 font-bold hover:underline">Support</Link>
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-500">
+            {activeRole === 'client' ? (
+              <span>
+                New to VetCare?{' '}
+                <Link to="/register" className="text-primary-600 font-bold hover:underline">
+                  Create an Account
+                </Link>
+              </span>
+            ) : (
+              <span>Powered by VetCare Technology &nbsp;•&nbsp; Staff Access Only</span>
+            )}
           </div>
         </div>
       </div>
-      
+
       {/* Decorative Blur Elements */}
       <div className="fixed top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
       <div className="fixed bottom-0 left-0 -z-10 w-[500px] h-[500px] bg-indigo-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
