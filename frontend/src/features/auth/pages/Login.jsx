@@ -1,17 +1,16 @@
 import { useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { login } from '../authSlice'
 import {
   PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw,
-  ShieldCheck, UserCog, Stethoscope, User
+  ShieldCheck, UserCog, Stethoscope
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [activeRole, setActiveRole] = useState('admin') // 'admin' | 'doctor'
   const [showPassword, setShowPassword] = useState(false)
   const { loading } = useSelector(s => s.auth)
@@ -119,7 +118,7 @@ export default function Login() {
         {/* Right Side: Login Form */}
         <div className="w-full md:w-7/12 p-8 md:p-12 bg-white flex flex-col">
 
-          {/* Role Switcher — Admin & Doctor only; Client goes to /client-portal */}
+          {/* Role Switcher — Admin & Doctor only */}
           <div className="flex p-1.5 bg-gray-100 rounded-2xl mb-10 w-full">
             {[
               { role: 'admin', icon: <UserCog size={16} />, label: 'Admin' },
@@ -138,13 +137,6 @@ export default function Login() {
                 {label}
               </button>
             ))}
-            {/* Client → separate page */}
-            <button
-              onClick={() => navigate('/client-portal')}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 text-gray-500 hover:text-sky-600 hover:bg-sky-50"
-            >
-              <User size={16} /> Client
-            </button>
           </div>
 
           {/* Role heading */}
@@ -260,16 +252,7 @@ export default function Login() {
 
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-500">
-            {activeRole === 'client' ? (
-              <span>
-                New to VetCare?{' '}
-                <Link to="/register" className="text-primary-600 font-bold hover:underline">
-                  Create an Account
-                </Link>
-              </span>
-            ) : (
-              <span>Powered by VetCare Technology &nbsp;•&nbsp; Staff Access Only</span>
-            )}
+            <span>Powered by VetCare Technology &nbsp;•&nbsp; Staff Access Only</span>
           </div>
         </div>
       </div>
