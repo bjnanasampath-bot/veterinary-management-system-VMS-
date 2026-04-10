@@ -11,7 +11,7 @@ export default function LandingPage() {
     if (isAuthenticated) {
       navigate('/dashboard');
     } else {
-      navigate('/register');
+      navigate('/client-portal');
     }
   };
 
@@ -41,7 +41,7 @@ export default function LandingPage() {
           ) : (
             <div className="auth-buttons">
               <Link to="/login" className="btn-login">Login</Link>
-              <Link to="/register" className="btn-register">Signup / Register</Link>
+              <Link to="/client-portal" className="btn-register">Signup / Register</Link>
             </div>
           )}
         </div>
