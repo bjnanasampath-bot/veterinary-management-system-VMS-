@@ -5,7 +5,7 @@ import { doctorApi } from '../../../api'
 import toast from 'react-hot-toast'
 import { Clock, CheckCircle2, AlertCircle, Calendar } from 'lucide-react'
 
-export default function DoctorDashboard({ stats, todayAppts, statusColor }) {
+export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], statusColor }) {
   const [attendance, setAttendance] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -43,8 +43,8 @@ export default function DoctorDashboard({ stats, todayAppts, statusColor }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="My Appointments Today" value={stats?.today_appointments || 0} icon="📅" color="blue" />
         <StatCard title="Total My Patients" value={stats?.total_pets || 0} icon="🐾" color="green" />
-        <StatCard title="My Pending Reviews" value={stats?.pending_appointments || 0} icon="⏳" color="yellow" />
-        <StatCard title="In Progress Treatments" value={stats?.pending_bills || 0} icon="🧾" color="purple" />
+        <StatCard title="New Requests" value={pendingAppts.length} icon="⏳" color="yellow" />
+        <StatCard title="Active Treatments" value={stats?.pending_bills || 0} icon="🧾" color="purple" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -72,7 +72,7 @@ export default function DoctorDashboard({ stats, todayAppts, statusColor }) {
             <div className={`rounded-2xl p-5 flex items-center gap-4 border ${
               attendance.status === 'present' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
               attendance.status === 'force_leave' ? 'bg-amber-50 border-amber-100 text-amber-800' :
-              'bg-gray-50 border-gray-100 text-gray-700'
+              'bg-gray-100 border-gray-100 text-gray-700'
             }`}>
               <div className={`p-3 rounded-xl ${attendance.status === 'present' ? 'bg-emerald-100' : 'bg-amber-100'}`}>
                 <CheckCircle2 size={24} />
@@ -93,46 +93,73 @@ export default function DoctorDashboard({ stats, todayAppts, statusColor }) {
           </div>
         </div>
 
-        {/* Schedule Card */}
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">My Schedule (Today)</h2>
-            <Link to="/appointments" className="text-sm text-primary-600 hover:underline">View all</Link>
-          </div>
-          {todayAppts.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">No appointments assigned to you today</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-left py-2 text-gray-500 font-medium">Pet</th>
-                    <th className="text-left py-2 text-gray-500 font-medium">Owner</th>
-                    <th className="text-left py-2 text-gray-500 font-medium">Time</th>
-                    <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                    <th className="text-right py-2 text-gray-500 font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {todayAppts.map(a => (
-                    <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
-                      <td className="py-2.5 font-medium">{a.pet_name}</td>
-                      <td className="py-2.5 text-gray-600">{a.owner_name}</td>
-                      <td className="py-2.5 text-gray-600">{a.appointment_time}</td>
-                      <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(a.status)}`}>
-                          {a.status}
-                        </span>
-                      </td>
-                      <td className="py-2.5 text-right">
-                        <Link to={`/appointments/${a.id}`} className="text-primary-600 hover:text-primary-800 font-medium">Examine</Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Schedule & Requests */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* New Pending Requests */}
+          {pendingAppts.length > 0 && (
+            <div className="card border-yellow-100 bg-yellow-50/30">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+                  New Appointment Requests
+                </h2>
+                <Link to="/appointments" className="text-sm text-yellow-700 hover:underline">Review all</Link>
+              </div>
+              <div className="space-y-3">
+                {pendingAppts.slice(0, 3).map(a => (
+                  <div key={a.id} className="bg-white p-4 rounded-xl shadow-sm border border-yellow-100 flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-gray-900">{a.pet_name} - {a.appointment_type}</p>
+                      <p className="text-sm text-gray-500">{a.appointment_date} at {a.appointment_time}</p>
+                    </div>
+                    <Link to={`/appointments/${a.id}`} className="btn-secondary px-4 py-1.5 text-xs bg-yellow-100 border-yellow-200 text-yellow-800 hover:bg-yellow-200">
+                      Handle Request
+                    </Link>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
+
+          {/* Schedule Today */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Today's Active Schedule</h2>
+              <Link to="/appointments" className="text-sm text-primary-600 hover:underline">View all</Link>
+            </div>
+            {todayAppts.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-8">No active appointments for you today</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-2 text-gray-500 font-medium">Pet</th>
+                      <th className="text-left py-2 text-gray-500 font-medium">Time</th>
+                      <th className="text-left py-2 text-gray-500 font-medium">Status</th>
+                      <th className="text-right py-2 text-gray-500 font-medium">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {todayAppts.map(a => (
+                      <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="py-2.5 font-medium">{a.pet_name}</td>
+                        <td className="py-2.5 text-gray-600">{a.appointment_time}</td>
+                        <td className="py-2.5">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(a.status)}`}>
+                            {a.status}
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <Link to={`/appointments/${a.id}`} className="text-primary-600 hover:text-primary-800 font-medium">Manage</Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

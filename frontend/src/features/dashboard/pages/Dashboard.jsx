@@ -13,6 +13,8 @@ export default function Dashboard() {
   const [apptByType, setApptByType] = useState([])
   const [todayAppts, setTodayAppts] = useState([])
   const [attendance, setAttendance] = useState([])
+  const [pendingAppts, setPendingAppts] = useState([])
+  const [upcomingAppts, setUpcomingAppts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -27,14 +29,27 @@ export default function Dashboard() {
     if (user.role === 'admin') {
       const today = new Date().toLocaleDateString('en-CA')
       promises.push(doctorApi.getAttendance({ date: today }))
+    } else if (user.role === 'doctor') {
+      // Fetch new pending requests for doctors
+      promises.push(appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }))
+    } else if (user.role === 'client') {
+      // Fetch all upcoming appointments for client
+      promises.push(appointmentApi.getAll({ status: 'scheduled,confirmed', ordering: 'appointment_date' }))
     }
 
-    Promise.all(promises).then(([statsRes, revRes, apptRes, todayRes, attRes]) => {
+    Promise.all(promises).then(([statsRes, revRes, apptRes, todayRes, extraRes]) => {
       setStats(statsRes.data?.data || statsRes.data)
       setRevenue(revRes.data?.data || revRes.data || [])
       setApptByType(apptRes.data?.data?.by_type || apptRes.data?.by_type || [])
       setTodayAppts(todayRes.data?.data || todayRes.data || [])
-      if (attRes) setAttendance(attRes.data?.results || attRes.data || [])
+      
+      if (user.role === 'admin') {
+        setAttendance(extraRes.data?.results || extraRes.data || [])
+      } else if (user.role === 'doctor') {
+        setPendingAppts(extraRes.data?.results || extraRes.data?.data || [])
+      } else if (user.role === 'client') {
+        setUpcomingAppts(extraRes.data?.results || extraRes.data?.data || [])
+      }
     }).catch(err => {
       console.error("Dashboard data fetch error:", err)
     }).finally(() => setLoading(false))
@@ -55,9 +70,9 @@ export default function Dashboard() {
       case 'admin':
         return <AdminDashboard stats={stats} todayAppts={todayAppts} revenue={revenue} apptByType={apptByType} statusColor={statusColor} attendance={attendance} />
       case 'doctor':
-        return <DoctorDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
+        return <DoctorDashboard stats={stats} todayAppts={todayAppts} pendingAppts={pendingAppts} statusColor={statusColor} />
       case 'client':
-        return <ClientDashboard stats={stats} todayAppts={todayAppts} statusColor={statusColor} />
+        return <ClientDashboard stats={stats} upcomingAppts={upcomingAppts} statusColor={statusColor} />
       default:
         return <div className="card text-center p-12 text-gray-400">Unauthorized role</div>
     }
