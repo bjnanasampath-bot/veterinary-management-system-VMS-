@@ -1,11 +1,12 @@
 import GenericListPage from '../../../components/common/GenericListPage'
 import { vaccinationApi } from '../../../api'
 
-export default function VaccinationListPage() {
+export default function VaccinationListPage({ isEmbedded }) {
   return (
     <GenericListPage
       title="Vaccinations" subtitle="Track all pet vaccinations"
       addPath="/vaccinations/add"
+      isEmbedded={isEmbedded}
       fetchFn={vaccinationApi.getAll}
       deleteFn={vaccinationApi.delete}
       searchPlaceholder="Search by pet name, vaccine..."

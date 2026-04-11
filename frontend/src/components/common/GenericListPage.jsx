@@ -10,7 +10,7 @@ export default function GenericListPage({
   columns, searchPlaceholder = 'Search...',
   filters = [], mapRowToActions = true, extraActions,
   showAdd = true, showEdit = true, showDelete = true,
-  topContent
+  topContent, isEmbedded
 }) {
   const { user } = useSelector(s => s.auth)
   const role = user?.role
@@ -62,20 +62,22 @@ export default function GenericListPage({
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+      {!isEmbedded && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+          </div>
+          <div className="flex gap-2">
+            {extraActions}
+            {canAdd && addPath && (
+              <Link to={addPath} className="btn-primary flex items-center gap-2">
+                <Plus size={16} /> Add New
+              </Link>
+            )}
+          </div>
         </div>
-        <div className="flex gap-2">
-          {extraActions}
-          {canAdd && addPath && (
-            <Link to={addPath} className="btn-primary flex items-center gap-2">
-              <Plus size={16} /> Add New
-            </Link>
-          )}
-        </div>
-      </div>
+      )}
 
       {topContent}
 

@@ -52,6 +52,8 @@ import AddLabTest from '../features/lab_tests/pages/AddLabTest'
 import SurgeryListPage from '../features/surgeries/pages/SurgeryListPage'
 import AddSurgery from '../features/surgeries/pages/AddSurgery'
 
+import MedicalServicesHub from '../features/treatments/pages/MedicalServicesHub'
+
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useSelector(s => s.auth)
   if (!isAuthenticated) return <Navigate to="/login" replace />
@@ -109,6 +111,8 @@ export default function AppRoutes() {
 
         <Route path="/pharmacy" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PharmacyListPage /></ProtectedRoute>} />
         <Route path="/pharmacy/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPharmacyItem /></ProtectedRoute>} />
+        
+        <Route path="/medical-services" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><MedicalServicesHub /></ProtectedRoute>} />
         
         <Route path="/prescriptions" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PrescriptionListPage /></ProtectedRoute>} />
         <Route path="/prescriptions/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPrescription /></ProtectedRoute>} />

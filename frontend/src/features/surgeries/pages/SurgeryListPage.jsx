@@ -7,11 +7,12 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-700',
 }
 
-export default function SurgeryListPage() {
+export default function SurgeryListPage({ isEmbedded }) {
   return (
     <GenericListPage
       title="Surgeries" subtitle="Manage surgical operations"
       addPath="/surgeries/add"
+      isEmbedded={isEmbedded}
       fetchFn={async (p) => {
         const res = await surgeryApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

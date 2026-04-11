@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, PawPrint, Users, UserCog, CalendarDays,
   Syringe, Receipt, BarChart2, X, Stethoscope,
-  Pill, Activity, Scissors, FileText
+  Pill, Activity, Scissors, FileText, ClipboardList
 } from 'lucide-react'
 
 const navItems = [
@@ -12,11 +12,9 @@ const navItems = [
   { to: '/pets', icon: PawPrint, label: 'Pets', roles: ['admin', 'doctor', 'client'] },
   { to: '/owners', icon: Users, label: 'Owners', roles: ['admin'] },
   { to: '/doctors', icon: Stethoscope, label: 'Doctors', roles: ['admin'] },
-  { to: '/lab-tests', icon: Activity, label: 'Lab Tests', roles: ['admin', 'doctor'] },
-  { to: '/surgeries', icon: Scissors, label: 'Surgeries', roles: ['admin', 'doctor'] },
+  { to: '/medical-services', icon: ClipboardList, label: 'Medical Services', roles: ['admin', 'doctor'] },
   { to: '/prescriptions', icon: FileText, label: 'Prescriptions', roles: ['admin', 'doctor'] },
   { to: '/pharmacy', icon: Pill, label: 'Pharmacy', roles: ['admin', 'doctor'] },
-  { to: '/vaccinations', icon: Syringe, label: 'Vaccinations', roles: ['admin', 'doctor'] },
   { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin'] },
   { to: '/reports', icon: BarChart2, label: 'Reports', roles: ['admin'] },
 ]

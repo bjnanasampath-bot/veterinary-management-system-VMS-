@@ -7,11 +7,12 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-700',
 }
 
-export default function LabTestListPage() {
+export default function LabTestListPage({ isEmbedded }) {
   return (
     <GenericListPage
       title="Lab Tests" subtitle="Manage patient lab tests and results"
       addPath="/lab-tests/add"
+      isEmbedded={isEmbedded}
       fetchFn={async (p) => {
         const res = await labTestApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []
