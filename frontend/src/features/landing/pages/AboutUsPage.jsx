@@ -30,16 +30,8 @@ export default function AboutUsPage() {
 
         {/* Feature Grid */}
         <div className="grid md:grid-cols-2 gap-12 mb-24 items-center">
-          <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px] bg-black">
-            <iframe 
-               width="100%" 
-               height="100%" 
-               src="https://www.youtube.com/embed/5P3fP2L9AOk?autoplay=1&mute=1&loop=1&playlist=5P3fP2L9AOk&controls=0&modestbranding=1" 
-               title="Healthy Pets and Vets" 
-               frameBorder="0" 
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-               allowFullScreen
-            ></iframe>
+          <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px]">
+            <img src="/about-us.jpg" alt="Modern Veterinary Facility" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
           </div>
           <div className="space-y-8">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Why Choose VetCare?</h2>
