@@ -45,7 +45,7 @@ export default function LandingPage() {
           <a href="#home" className="nav-link">Home</a>
           <a href="#about-us" className="nav-link">About Us</a>
           <a href="#services" className="nav-link">Services</a>
-          <Link to={isAuthenticated ? "/settings" : "/login"} className="nav-link">Settings</Link>
+          {isAuthenticated && <Link to="/settings" className="nav-link">Settings</Link>}
         </div>
 
         <div className="navbar-actions">

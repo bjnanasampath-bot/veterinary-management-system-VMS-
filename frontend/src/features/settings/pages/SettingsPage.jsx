@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { settingsApi, authApi } from '../../../api'
-import { User, Shield, Building, Percent, Globe, Save, Loader2, Paintbrush, Moon, Sun, Check } from 'lucide-react'
+import { User, Shield, Building, Percent, Globe, Save, Loader2, Paintbrush, Moon, Sun, Check, Layout, Clock } from 'lucide-react'
 import { useTheme } from '../../../context/ThemeContext'
 import toast from 'react-hot-toast'
 
@@ -55,7 +55,10 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'account', label: 'My Account', icon: User },
     { id: 'appearance', label: 'Appearance', icon: Paintbrush },
-    ...(user?.role === 'admin' ? [{ id: 'system', label: 'Clinic Settings', icon: Building }] : []),
+    ...(user?.role === 'admin' ? [
+      { id: 'landing', label: 'Home Page', icon: Layout },
+      { id: 'system', label: 'Clinic Settings', icon: Building }
+    ] : []),
   ]
 
   return (
@@ -250,15 +253,53 @@ export default function SettingsPage() {
             </div>
           )}
 
+          {activeTab === 'landing' && user?.role === 'admin' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
+                        <h3 className="font-bold text-gray-900 dark:text-white">Home Page Content</h3>
+                        <p className="text-xs text-gray-500">Customize the text and branding on your public home page</p>
+                    </div>
+                    <div className="p-6 divide-y divide-gray-100 dark:divide-slate-800">
+                        {settings.filter(s => s.key.startsWith('landing_') || s.key.startsWith('app_')).map(s => (
+                            <div key={s.key} className="py-6 first:pt-0 last:pb-0">
+                                <div className="flex items-start justify-between gap-10">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Paintbrush size={16} className="text-primary-400" />
+                                            <h4 className="font-bold text-gray-900 dark:text-white capitalize italic">{s.key.replace(/_/g, ' ')}</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{s.description}</p>
+                                    </div>
+                                    <div className="w-64 flex gap-2">
+                                        <textarea 
+                                            defaultValue={s.value}
+                                            rows={2}
+                                            onBlur={(e) => {
+                                                if (e.target.value !== s.value) {
+                                                    handleUpdateSystemSetting(s.key, e.target.value)
+                                                }
+                                            }}
+                                            className="input-field text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white resize-none" 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+          )}
+
           {activeTab === 'system' && user?.role === 'admin' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
                     <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
-                        <h3 className="font-bold text-gray-900 dark:text-white">System Preferences</h3>
-                        <p className="text-xs text-gray-500">Configure global settings for the entire clinic</p>
+                        <h3 className="font-bold text-gray-900 dark:text-white">Clinic Configuration</h3>
+                        <p className="text-xs text-gray-500">Manage business details and system preferences</p>
                     </div>
                     <div className="p-6 divide-y divide-gray-100 dark:divide-slate-800">
-                        {settings.map(s => (
+                        {settings.filter(s => !s.key.startsWith('landing_') && !s.key.startsWith('app_')).map(s => (
                             <div key={s.key} className="py-6 first:pt-0 last:pb-0">
                                 <div className="flex items-start justify-between gap-10">
                                     <div className="flex-1">
@@ -266,7 +307,6 @@ export default function SettingsPage() {
                                             {s.key === 'clinic_name' && <Building size={16} className="text-gray-400" />}
                                             {s.key === 'tax_percentage' && <Percent size={16} className="text-gray-400" />}
                                             {s.key === 'currency' && <Globe size={16} className="text-gray-400" />}
-                                            {s.key.includes('landing') && <Paintbrush size={16} className="text-gray-400" />}
                                             <h4 className="font-bold text-gray-900 dark:text-white capitalize italic">{s.key.replace(/_/g, ' ')}</h4>
                                         </div>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">{s.description}</p>
