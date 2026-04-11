@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 // Loader
 export function Loader({ text = 'Loading...' }) {
   return (
@@ -51,7 +53,8 @@ export function PageHeader({ title, subtitle, action }) {
 }
 
 // StatCard
-export function StatCard({ title, value, icon, color = 'blue', subtitle }) {
+export function StatCard({ title, value, icon, color = 'blue', subtitle, to, onClick }) {
+  const navigate = useNavigate()
   const colors = {
     blue: 'bg-blue-50 text-blue-600',
     green: 'bg-green-50 text-green-600',
@@ -59,8 +62,19 @@ export function StatCard({ title, value, icon, color = 'blue', subtitle }) {
     red: 'bg-red-50 text-red-600',
     purple: 'bg-purple-50 text-purple-600',
   }
+
+  const handleClick = () => {
+    if (to) navigate(to)
+    if (onClick) onClick()
+  }
+
+  const isClickable = to || onClick
+
   return (
-    <div className="card flex items-center gap-4">
+    <div 
+      onClick={handleClick}
+      className={`card flex items-center gap-4 transition-all ${isClickable ? 'cursor-pointer hover:border-primary-500 hover:shadow-md active:scale-[0.98]' : ''}`}
+    >
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${colors[color]}`}>
         {icon}
       </div>

@@ -21,10 +21,10 @@ export default function AdminDashboard({ stats, todayAppts, revenue, apptByType,
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Pets" value={stats?.total_pets || 0} icon="🐾" color="blue" />
-        <StatCard title="Total Owners" value={stats?.total_owners || 0} icon="👥" color="green" />
-        <StatCard title="Today's Appointments" value={stats?.today_appointments || 0} icon="📅" color="yellow" />
-        <StatCard title="Monthly Revenue" value={`₹${(stats?.monthly_revenue || 0).toLocaleString()}`} icon="💰" color="purple" />
+        <StatCard title="Total Pets" value={stats?.total_pets || 0} icon="🐾" color="blue" to="/pets" />
+        <StatCard title="Total Owners" value={stats?.total_owners || 0} icon="👥" color="green" to="/owners" />
+        <StatCard title="Today's Appointments" value={stats?.today_appointments || 0} icon="📅" color="yellow" to="/appointments" />
+        <StatCard title="Monthly Revenue" value={`₹${(stats?.monthly_revenue || 0).toLocaleString()}`} icon="💰" color="purple" to="/bills" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">

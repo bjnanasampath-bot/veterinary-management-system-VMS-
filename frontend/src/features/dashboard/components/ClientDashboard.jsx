@@ -28,10 +28,10 @@ export default function ClientDashboard({ stats, upcomingAppts = [], statusColor
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="My Pets" value={stats?.total_pets || 0} icon="🐾" color="blue" />
-        <StatCard title="My Visits Today" value={stats?.today_appointments || 0} icon="📅" color="green" />
-        <StatCard title="All Upcoming" value={upcomingAppts.length} icon="⏳" color="yellow" />
-        <StatCard title="Pending Payments" value={stats?.pending_bills || 0} icon="🧾" color="red" />
+        <StatCard title="My Pets" value={stats?.total_pets || 0} icon="🐾" color="blue" to="/pets" />
+        <StatCard title="My Visits Today" value={stats?.today_appointments || 0} icon="📅" color="green" to="/appointments" />
+        <StatCard title="All Upcoming" value={upcomingAppts.length} icon="⏳" color="yellow" to="/appointments" />
+        <StatCard title="Pending Payments" value={stats?.pending_bills || 0} icon="🧾" color="red" to="/bills" />
       </div>
 
       <div className="card">

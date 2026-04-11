@@ -41,10 +41,10 @@ export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="My Appointments Today" value={stats?.today_appointments || 0} icon="📅" color="blue" />
-        <StatCard title="Total My Patients" value={stats?.total_pets || 0} icon="🐾" color="green" />
-        <StatCard title="New Requests" value={pendingAppts.length} icon="⏳" color="yellow" />
-        <StatCard title="Active Treatments" value={stats?.pending_bills || 0} icon="🧾" color="purple" />
+        <StatCard title="My Appointments Today" value={stats?.today_appointments || 0} icon="📅" color="blue" to="/appointments" />
+        <StatCard title="Total My Patients" value={stats?.total_pets || 0} icon="🐾" color="green" to="/pets" />
+        <StatCard title="New Requests" value={pendingAppts.length} icon="⏳" color="yellow" to="/appointments" />
+        <StatCard title="Active Treatments" value={stats?.pending_bills || 0} icon="🧾" color="purple" to="/bills" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
