@@ -22,7 +22,59 @@ class TreatmentListCreateView(generics.ListCreateAPIView):
         serializer = TreatmentSerializer(data=request.data)
         if serializer.is_valid():
             treatment = serializer.save()
-            return success_response(data=TreatmentSerializer(treatment).data, message="Treatment recorded", status_code=status.HTTP_201_CREATED)
+            
+            # Automatic Billing Logic
+            try:
+                from apps.billing.models import Bill, BillItem
+                from django.db import transaction
+                
+                with transaction.atomic():
+                    # Create a Draft Bill
+                    bill = Bill.objects.create(
+                        pet=treatment.pet,
+                        appointment=treatment.appointment,
+                        created_by=request.user,
+                        status='draft',
+                        notes=f"Clinical bill generated from treatment: {treatment.treatment_name}"
+                    )
+                    
+                    subtotal = 0
+                    
+                    # 1. Consultation Fee
+                    if treatment.doctor and treatment.doctor.consultation_fee > 0:
+                        fee = treatment.doctor.consultation_fee
+                        BillItem.objects.create(
+                            bill=bill,
+                            description=f"Consultation Fee - {treatment.doctor.full_name}",
+                            item_type='consultation',
+                            unit_price=fee,
+                            quantity=1,
+                            total_price=fee
+                        )
+                        subtotal += fee
+                        
+                    # 2. Treatment Cost
+                    if treatment.cost > 0:
+                        BillItem.objects.create(
+                            bill=bill,
+                            description=f"Treatment: {treatment.treatment_name}",
+                            item_type='treatment',
+                            unit_price=treatment.cost,
+                            quantity=1,
+                            total_price=treatment.cost
+                        )
+                        subtotal += treatment.cost
+                        
+                    # Calculate Totals (18% tax by default in model)
+                    bill.subtotal = subtotal
+                    bill.tax_amount = (subtotal * bill.tax_percent) / 100
+                    bill.total_amount = subtotal + bill.tax_amount
+                    bill.save()
+            except Exception as e:
+                print(f"Error generating automatic bill: {e}")
+                # We don't fail the treatment creation if billing fails
+            
+            return success_response(data=TreatmentSerializer(treatment).data, message="Treatment recorded and Draft Bill generated", status_code=status.HTTP_201_CREATED)
         return error_response(errors=serializer.errors)
 
 

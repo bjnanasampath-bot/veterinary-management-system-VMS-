@@ -52,10 +52,20 @@ export default function BillDetailsPage() {
   const handleSendEmail = async () => {
     setSending(true)
     try {
+      // If bill is draft, approve it first by setting to pending
+      if (bill.status === 'draft') {
+        await billingApi.update(id, { status: 'pending' })
+      }
+      
       await billingApi.sendEmail(id)
-      toast.success('Bill sent to client email!')
+      
+      // Refresh bill data to show updated status
+      const res = await billingApi.getById(id)
+      setBill(res.data?.data || res.data)
+      
+      toast.success(bill.status === 'draft' ? 'Bill approved and sent to client!' : 'Invoice sent successfully!')
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send email')
+      toast.error(error.response?.data?.message || 'Failed to process invoice')
     } finally {
       setSending(false)
     }
@@ -88,7 +98,7 @@ export default function BillDetailsPage() {
         <button onClick={() => window.print()} className="btn-secondary flex items-center gap-2 text-sm"><Printer size={15} /> Print</button>
         <button onClick={handleDownloadPDF} className="btn-secondary flex items-center gap-2 text-sm"><Download size={15} /> Download PDF</button>
         <button onClick={handleSendEmail} disabled={sending} className="btn-primary flex items-center gap-2 text-sm">
-          <Send size={15} /> {sending ? 'Sending...' : 'Send to Client'}
+          <Send size={15} /> {sending ? 'Processing...' : (bill.status === 'draft' ? 'Approve & Send to Client' : 'Send to Client')}
         </button>
       </div>
 
