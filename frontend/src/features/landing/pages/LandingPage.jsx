@@ -30,11 +30,11 @@ export default function LandingPage() {
 
         <div className="navbar-links">
           <a href="#home" className="nav-link">Home</a>
+          <a href="#about-us" className="nav-link">About Us</a>
+          <a href="#services" className="nav-link">Services</a>
         </div>
 
         <div className="navbar-actions">
-          <a href="#about-us" className="nav-link">About Us</a>
-          <a href="#services" className="nav-link">Services</a>
           {isAuthenticated ? (
             <Link to="/dashboard" className="btn-dashboard">Dashboard</Link>
           ) : (
