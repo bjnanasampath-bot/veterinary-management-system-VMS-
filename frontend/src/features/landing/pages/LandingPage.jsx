@@ -33,7 +33,7 @@ export default function LandingPage() {
       {/* Navbar section */}
       <nav className="landing-navbar">
         <Link
-          to={isAuthenticated ? "/dashboard" : "/login"}
+          to="/"
           className="navbar-logo"
           style={{ textDecoration: 'none' }}
         >
