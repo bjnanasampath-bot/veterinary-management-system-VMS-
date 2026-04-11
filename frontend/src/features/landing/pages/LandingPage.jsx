@@ -101,8 +101,17 @@ export default function LandingPage() {
         </div>
         
         <div className="about-hero-block">
-          <div className="about-image-side">
-            <img src="/about-us.png" alt="Our Premium Team" />
+          <div className="about-image-side video-container">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/N641pT165dI?autoplay=1&mute=1&loop=1&playlist=N641pT165dI&controls=0&showinfo=0&modestbranding=1" 
+              title="Veterinary Clinic Tour" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              style={{ objectFit: 'cover' }}
+            ></iframe>
           </div>
           <div className="about-text-side">
             <h3 className="text-3xl font-bold mb-4">Dedicated to Excellence</h3>
