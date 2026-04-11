@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import AuthLayout from '../components/layout/AuthLayout'
 import LandingPage from '../features/landing/pages/LandingPage'
+import AboutUsPage from '../features/landing/pages/AboutUsPage'
 import ServiceInfoPage from '../features/landing/pages/ServiceInfoPage'
 
 import Login from '../features/auth/pages/Login'
@@ -66,6 +67,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/services/:serviceId" element={<ServiceInfoPage />} />
       
       <Route element={<AuthLayout />}>

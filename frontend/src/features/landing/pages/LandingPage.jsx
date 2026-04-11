@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Users, Heart, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { settingsApi } from '../../../api';
 import './LandingPage.css';
@@ -93,23 +94,32 @@ export default function LandingPage() {
       </main>
 
       {/* About Us Section */}
-      <section className="info-section" id="about-us">
+      <section className="info-section premium-border" id="about-us">
         <div className="section-header">
           <h2>{siteSettings.landing_about_title || 'About Us'}</h2>
           <p>{siteSettings.landing_about_description || 'Learn more about our mission and the team that cares for your pets.'}</p>
         </div>
-        <div className="about-grid">
-          <div className="about-card">
-            <h3>Experienced Team</h3>
-            <p>Our veterinarians bring decades of experience and specialized knowledge to every consult.</p>
+        
+        <div className="about-hero-block">
+          <div className="about-image-side">
+            <img src="/vet_team_premium_1775894912373.png" alt="Our Premium Team" />
           </div>
-          <div className="about-card">
-            <h3>Modern Facility</h3>
-            <p>Equipped with the latest diagnostic and surgical tools, our clinic is built for pet comfort and safety.</p>
-          </div>
-          <div className="about-card">
-            <h3>Compassionate Care</h3>
-            <p>We treat every patient as part of our own family, ensuring love and gentle handling.</p>
+          <div className="about-text-side">
+            <h3 className="text-3xl font-bold mb-4">Dedicated to Excellence</h3>
+            <p className="mb-6 opacity-80">Our clinic is recognized as a leader in veterinary medicine, combining years of expertise with genuine love for animals. We believe in providing transparency, comfort, and state-of-the-art diagnostics for every pet.</p>
+            <div className="about-grid-mini">
+              <div className="about-card-mini">
+                <Users size={20} className="text-primary-600 mb-2"/>
+                <h4 className="font-bold text-sm">Expert Doctors</h4>
+              </div>
+              <div className="about-card-mini">
+                <Heart size={20} className="text-red-500 mb-2"/>
+                <h4 className="font-bold text-sm">Kind Care</h4>
+              </div>
+            </div>
+            <button onClick={() => navigate('/about-us')} className="cta-button mt-8 shadow-md">
+               Learn Full Story
+            </button>
           </div>
         </div>
       </section>

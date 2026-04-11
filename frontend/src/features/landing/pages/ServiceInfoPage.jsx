@@ -89,35 +89,76 @@ export default function ServiceInfoPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           
           {/* Header Banner */}
-          <div className="bg-gradient-to-br from-primary-50 to-sky-50 px-8 py-12 md:py-16 text-center border-b border-primary-100">
-            <div className="text-6xl mb-6 inline-block bg-white p-6 rounded-full shadow-sm">{service.icon}</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{service.title}</h1>
-            <p className="text-xl text-primary-700 font-medium">{service.subtitle}</p>
+          <div className="bg-gradient-to-br from-primary-50 to-sky-50 dark:from-slate-800 dark:to-slate-900 px-8 py-12 md:py-20 text-center border-b border-primary-100 dark:border-slate-800">
+            <div className="text-7xl mb-8 transform hover:scale-110 transition-transform duration-300 pointer-events-none">
+              <div className="inline-block bg-white dark:bg-slate-950 p-8 rounded-full shadow-2xl border-4 border-primary-50 dark:border-slate-800">
+                {service.icon}
+              </div>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">{service.title}</h1>
+            <p className="text-xl md:text-2xl text-primary-600 dark:text-primary-400 font-semibold italic">{service.subtitle}</p>
           </div>
 
           {/* Content Body */}
-          <div className="p-8 md:p-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Overview</h2>
-            <p className="text-lg text-gray-600 leading-relaxed mb-10">
+          <div className="p-8 md:p-16">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Professional Overview</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-12">
               {service.description}
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Key Benefits & Features</h2>
-            <div className="grid sm:grid-cols-2 gap-4 mb-12">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8">What we provide</h2>
+            <div className="grid sm:grid-cols-2 gap-6 mb-16">
               {service.benefits.map((benefit, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <CheckCircle2 className="text-green-500 mt-0.5 shrink-0" size={20} />
-                  <span className="text-gray-700 font-medium">{benefit}</span>
+                <div key={idx} className="flex items-center gap-4 p-5 bg-white dark:bg-slate-950 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 hover:border-primary-200 dark:hover:border-primary-900 transition-all group">
+                  <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                    <CheckCircle2 className="text-green-600 dark:text-green-400 shrink-0" size={24} />
+                  </div>
+                  <span className="text-gray-800 dark:text-gray-200 font-bold">{benefit}</span>
                 </div>
               ))}
             </div>
 
+            {/* Process Section */}
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8">Our Process</h2>
+            <div className="relative border-l-2 border-primary-100 dark:border-slate-800 ml-4 space-y-10 mb-16">
+              <div className="relative pl-8">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-600 border-4 border-white dark:border-slate-900 shadow-sm"></div>
+                <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Step 1: Consultation</h4>
+                <p className="text-gray-500 dark:text-gray-400">Initial meeting to discuss your pet's health history and current concerns.</p>
+              </div>
+              <div className="relative pl-8">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-600 border-4 border-white dark:border-slate-900 shadow-sm"></div>
+                <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Step 2: Diagnosis</h4>
+                <p className="text-gray-500 dark:text-gray-400">We perform necessary tests using state-of-the-art equipment to pin-point issues.</p>
+              </div>
+              <div className="relative pl-8">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-600 border-4 border-white dark:border-slate-900 shadow-sm"></div>
+                <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-1">Step 3: Treatment Plan</h4>
+                <p className="text-gray-500 dark:text-gray-400">A detailed plan is created and discussed with you for the best recovery path.</p>
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div className="mb-16">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Common Questions</h2>
+              <div className="space-y-4">
+                <div className="p-5 bg-white dark:bg-slate-950 rounded-2xl border border-gray-100 dark:border-slate-800">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-2">How long does the procedure take?</h4>
+                  <p className="text-sm text-gray-500">Most specialized services take between 1-3 hours, but we will provide a specific estimate during consultation.</p>
+                </div>
+                <div className="p-5 bg-white dark:bg-slate-950 rounded-2xl border border-gray-100 dark:border-slate-800">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-2">Is there a recovery period?</h4>
+                  <p className="text-sm text-gray-500">Yes, recovery depends on the service type. We provide full at-home care instructions for every case.</p>
+                </div>
+              </div>
+            </div>
+
             {/* CTA */}
-            <div className="text-center p-8 bg-slate-50 rounded-2xl border border-slate-100">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to schedule an appointment?</h3>
-              <p className="text-gray-500 mb-6">Ensure your pet gets the best care possible today.</p>
-              <button onClick={() => navigate('/register')} className="btn-primary py-3 px-8 text-lg font-medium shadow-md hover:shadow-lg">
-                Book {service.title} Now
+            <div className="text-center p-10 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-3xl text-white shadow-xl">
+              <h3 className="text-2xl font-bold mb-2">Book Your Visit Today</h3>
+              <p className="opacity-90 mb-8 max-w-md mx-auto italic">"Because your pets deserve the gold standard in veterinary care."</p>
+              <button onClick={() => navigate('/register')} className="bg-white text-primary-600 py-4 px-10 rounded-full font-bold text-lg shadow-lg hover:bg-opacity-90 hover:scale-105 transition-all">
+                Schedule Appointment Now
               </button>
             </div>
           </div>
