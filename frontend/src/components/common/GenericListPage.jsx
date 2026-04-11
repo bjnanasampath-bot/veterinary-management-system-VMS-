@@ -9,7 +9,7 @@ export default function GenericListPage({
   title, subtitle, addPath, fetchFn, deleteFn,
   columns, searchPlaceholder = 'Search...',
   filters = [], mapRowToActions = true, extraActions,
-  showAdd = true
+  showAdd = true, showEdit = true, showDelete = true
 }) {
   const { user } = useSelector(s => s.auth)
   const role = user?.role
@@ -19,8 +19,8 @@ export default function GenericListPage({
   // doctor             → View + Edit + Add (no Delete)
   // client             → View only
   const canAdd    = showAdd && (role === 'admin' || role === 'doctor' || role === 'client')
-  const canEdit   = role === 'admin' || role === 'doctor'
-  const canDelete = role === 'admin'
+  const canEdit   = showEdit && (role === 'admin' || role === 'doctor')
+  const canDelete = showDelete && (role === 'admin')
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)

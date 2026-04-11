@@ -12,6 +12,7 @@ export default function PetListPage() {
       title="Pets" subtitle="Manage all registered pets"
       addPath="/pets/add"
       showAdd={role !== 'admin'}
+      showEdit={role !== 'admin'}
       fetchFn={async (p) => {
         const res = await petApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

@@ -12,6 +12,7 @@ export default function OwnerListPage() {
       title="Owners" subtitle="Manage pet owners"
       addPath="/owners/add"
       showAdd={role !== 'admin'}
+      showEdit={role !== 'admin'}
       fetchFn={async (p) => {
         const res = await ownerApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []
