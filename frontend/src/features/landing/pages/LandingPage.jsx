@@ -30,7 +30,6 @@ export default function LandingPage() {
 
         <div className="navbar-links">
           <a href="#home" className="nav-link">Home</a>
-          <a href="#about" className="nav-link">About</a>
         </div>
 
         <div className="navbar-actions">
