@@ -5,6 +5,15 @@ import './LandingPage.css';
 
 export default function AboutUsPage() {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const images = ['/pet1.jpg', '/pet2.jpg', '/pet3.jpg'];
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [images.length]);
 
   return (
     <div className="landing-container">
@@ -28,10 +37,32 @@ export default function AboutUsPage() {
           </p>
         </section>
 
-        {/* Feature Grid */}
+        {/* Feature Grid with Slider */}
         <div className="grid md:grid-cols-2 gap-12 mb-24 items-center">
-          <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px]">
-            <img src="/about-us.jpg" alt="Modern Veterinary Facility" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
+          <div className="relative group rounded-3xl overflow-hidden shadow-2xl h-[500px] bg-slate-900">
+            {images.map((img, idx) => (
+              <img 
+                key={idx}
+                src={img} 
+                alt={`Pet ${idx + 1}`} 
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                  currentSlide === idx ? 'opacity-100' : 'opacity-0'
+                }`} 
+              />
+            ))}
+            
+            {/* Slider Dots */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+              {images.map((_, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`w-3 h-3 rounded-full border-2 border-white transition-all ${
+                    currentSlide === idx ? 'bg-white scale-125' : 'bg-transparent'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
           <div className="space-y-8">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Why Choose VetCare?</h2>
