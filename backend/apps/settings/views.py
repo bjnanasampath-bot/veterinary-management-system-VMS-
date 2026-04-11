@@ -6,7 +6,7 @@ from .serializers import SystemSettingSerializer
 class SystemSettingListView(generics.ListAPIView):
     queryset = SystemSetting.objects.all()
     serializer_class = SystemSettingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class SystemSettingUpdateView(generics.UpdateAPIView):
     queryset = SystemSetting.objects.all()
