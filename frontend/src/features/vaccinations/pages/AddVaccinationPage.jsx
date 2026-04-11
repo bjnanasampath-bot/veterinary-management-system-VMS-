@@ -1,28 +1,41 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import FormPage, { FormField } from '../../../components/common/FormPage'
 import { vaccinationApi, petApi, doctorApi } from '../../../api'
 import toast from 'react-hot-toast'
 
 export default function AddVaccinationPage() {
   const navigate = useNavigate()
+  const { user } = useSelector(s => s.auth)
   const [loading, setLoading] = useState(false)
   const [pets, setPets] = useState([])
   const [doctors, setDoctors] = useState([])
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit, setValue } = useForm()
 
   useEffect(() => {
     petApi.getAll({ page_size: 200 }).then(r => setPets(r.data?.results || r.data?.data || []))
-    doctorApi.getAll({ page_size: 100 }).then(r => setDoctors(r.data?.results || r.data?.data || []))
-  }, [])
+    doctorApi.getAll({ page_size: 100 }).then(r => {
+      const list = r.data?.results || r.data?.data || []
+      setDoctors(list)
+      
+      // Auto-select current doctor
+      if (user?.role === 'doctor') {
+        const currentDoctor = list.find(d => d.email === user.email)
+        if (currentDoctor) {
+          setValue('doctor', currentDoctor.id)
+        }
+      }
+    })
+  }, [user, setValue])
 
   const onSubmit = async (data) => {
     setLoading(true)
     try {
       await vaccinationApi.create(data)
       toast.success('Vaccination recorded!')
-      navigate('/vaccinations')
+      navigate('/medical-services')
     } catch { toast.error('Failed to record vaccination') }
     finally { setLoading(false) }
   }
