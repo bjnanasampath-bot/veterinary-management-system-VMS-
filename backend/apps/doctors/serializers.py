@@ -58,12 +58,22 @@ class DoctorSerializer(serializers.ModelSerializer):
         year_ago = today - timedelta(days=365)
 
         apps = obj.appointments.all()
+        treatments = obj.treatments.all().select_related('pet', 'pet__owner')
+
+        # Extract unique medicines
+        all_meds = []
+        for t in treatments:
+            if isinstance(t.medications, list):
+                all_meds.extend([m.get('name') for m in t.medications if isinstance(m, dict) and m.get('name')])
         
         return {
             'daily': apps.filter(appointment_date=today).count(),
             'weekly': apps.filter(appointment_date__gte=week_ago).count(),
             'monthly': apps.filter(appointment_date__gte=month_ago).count(),
             'yearly': apps.filter(appointment_date__gte=year_ago).count(),
+            'clients_seen': treatments.values_list('pet__owner', flat=True).distinct().count(),
+            'medicines_used': sorted(list(set(all_meds))),
+            'prescription_history': list(treatments.values('id', 'pet__name', 'prescription', 'treatment_date')[:10]),
             'status_breakdown': {
                 'completed': apps.filter(status='completed').count(),
                 'scheduled': apps.filter(status='scheduled').count(),

@@ -134,12 +134,61 @@ export default function DoctorDetailsPage() {
               </div>
               
               <div className="flex flex-col justify-center items-center p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Total Lifetime Appointments</p>
-                <p className="text-5xl font-black text-gray-900 tracking-tight">{stats.yearly || 0}</p>
+                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-2">Impact Score</p>
+                <div className="relative">
+                  <p className="text-5xl font-black text-gray-900 tracking-tight">{stats.clients_seen || 0}</p>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Unique Clients Helped</p>
                 <div className="mt-4 flex items-center gap-2 text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
                   <Activity size={12} />
-                  <span>Active Work Mode</span>
+                  <span>High Impact Performance</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Medicines Used Section */}
+            <div className="card">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                < Award className="text-primary-500" size={18} />
+                Medicine Portfolio
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {(stats.medicines_used || []).length > 0 ? (
+                  stats.medicines_used.map((med, i) => (
+                    <span key={i} className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 shadow-sm">
+                      {med}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-gray-400 text-xs italic">No documented medicine usage yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Prescriptions History Section */}
+            <div className="card">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Activity className="text-primary-500" size={18} />
+                Recent Prescriptions
+              </h3>
+              <div className="space-y-3">
+                {(stats.prescription_history || []).length > 0 ? (
+                  stats.prescription_history.map(p => (
+                    <div key={p.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 transition-colors">
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="font-bold text-xs text-gray-900 truncate max-w-[120px]">{p.pet__name}</p>
+                        <span className="text-[10px] text-gray-400">{p.treatment_date}</span>
+                      </div>
+                      <p className="text-[11px] text-gray-600 line-clamp-2 leading-relaxed">
+                        {p.prescription || "General medical consultation."}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-400 text-xs italic">No prescription history recorded.</p>
+                )}
               </div>
             </div>
           </div>
