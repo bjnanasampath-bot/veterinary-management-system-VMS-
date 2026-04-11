@@ -103,11 +103,12 @@ export default function LandingPage() {
         <div className="about-hero-block">
           <div className="about-image-side video-container h-[400px] overflow-hidden rounded-3xl shadow-2xl">
             <iframe 
-              src="https://player.vimeo.com/video/117934677?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" 
               width="100%" 
               height="100%" 
+              src="https://www.youtube.com/embed/5P3fP2L9AOk?autoplay=1&mute=1&loop=1&playlist=5P3fP2L9AOk&controls=0&modestbranding=1" 
+              title="Healthy Pets and Veterinary Care" 
               frameBorder="0" 
-              allow="autoplay; fullscreen" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
               style={{ objectFit: 'cover' }}
             ></iframe>
