@@ -44,7 +44,7 @@ export default function Navbar({ onMenuClick }) {
           <Settings size={20} />
         </button>
 
-        <button onClick={() => navigate('/dashboard')} className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Dashboard Home">
+        <button onClick={() => navigate('/')} className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Home">
           <Home size={20} />
         </button>
 
