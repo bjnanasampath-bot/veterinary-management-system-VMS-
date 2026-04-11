@@ -1,8 +1,11 @@
 from rest_framework import generics, filters, status
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from common.responses import success_response, error_response
 from .models import PharmacyItem, Prescription
 from .serializers import PharmacyItemSerializer, PrescriptionSerializer
+from django.db.models import Count, Sum
+from django.utils import timezone
 
 class PharmacyItemListCreateView(generics.ListCreateAPIView):
     queryset = PharmacyItem.objects.filter(is_active=True)
@@ -76,3 +79,27 @@ class PrescriptionDetailView(generics.RetrieveUpdateDestroyAPIView):
         presc.is_active = False
         presc.save()
         return success_response(message="Prescription removed")
+
+class PharmacyAnalyticsView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        now = timezone.now()
+        today = now.date()
+        
+        # Overall Stock Stats
+        total_items = PharmacyItem.objects.filter(is_active=True).count()
+        low_stock = PharmacyItem.objects.filter(is_active=True, stock_quantity__gt=0, stock_quantity__lt=10).count()
+        out_of_stock = PharmacyItem.objects.filter(is_active=True, stock_quantity=0).count()
+        expired_soon = PharmacyItem.objects.filter(is_active=True, expiry_date__lte=today + timezone.timedelta(days=30)).count()
+
+        # Activity summary
+        prescriptions_today = Prescription.objects.filter(is_active=True, created_at__date=today).count()
+        
+        return success_response(data={
+            'total_items': total_items,
+            'low_stock': low_stock,
+            'out_of_stock': out_of_stock,
+            'expired_soon': expired_soon,
+            'prescriptions_today': prescriptions_today
+        })

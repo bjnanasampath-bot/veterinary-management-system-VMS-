@@ -9,4 +9,7 @@ urlpatterns = [
     # Prescriptions
     path('prescriptions/', views.PrescriptionListCreateView.as_view(), name='prescription-list-create'),
     path('prescriptions/<uuid:pk>/', views.PrescriptionDetailView.as_view(), name='prescription-detail'),
+    
+    # Analytics
+    path('analytics/', views.PharmacyAnalyticsView.as_view(), name='pharmacy-analytics'),
 ]

@@ -9,7 +9,8 @@ export default function GenericListPage({
   title, subtitle, addPath, fetchFn, deleteFn,
   columns, searchPlaceholder = 'Search...',
   filters = [], mapRowToActions = true, extraActions,
-  showAdd = true, showEdit = true, showDelete = true
+  showAdd = true, showEdit = true, showDelete = true,
+  topContent
 }) {
   const { user } = useSelector(s => s.auth)
   const role = user?.role
@@ -75,6 +76,8 @@ export default function GenericListPage({
           )}
         </div>
       </div>
+
+      {topContent}
 
       <div className="card">
         <div className="flex gap-3 mb-5">
