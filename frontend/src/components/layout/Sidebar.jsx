@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, PawPrint, Users, UserCog, CalendarDays,
   Syringe, Receipt, BarChart2, X, Stethoscope,
-  Pill, Activity, Scissors, FileText, ClipboardList
+  Pill, Activity, Scissors, FileText, ClipboardList, Settings
 } from 'lucide-react'
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { to: '/pharmacy', icon: Pill, label: 'Pharmacy', roles: ['admin', 'doctor'] },
   { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin'] },
   { to: '/reports', icon: BarChart2, label: 'Reports', roles: ['admin'] },
+  { to: '/settings', icon: Settings, label: 'Settings', roles: ['admin', 'doctor', 'client'] },
 ]
 
 export default function Sidebar({ open, onClose }) {

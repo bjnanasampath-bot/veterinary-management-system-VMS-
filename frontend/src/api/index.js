@@ -118,3 +118,8 @@ export const prescriptionApi = {
   update: (id, data) => api.put(`/pharmacy/prescriptions/${id}/`, data),
   delete: (id) => api.delete(`/pharmacy/prescriptions/${id}/`),
 }
+
+export const settingsApi = {
+  getAll: () => api.get('/settings/'),
+  update: (key, data) => api.patch(`/settings/${key}/`, data),
+}

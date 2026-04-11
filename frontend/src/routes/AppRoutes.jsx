@@ -53,6 +53,7 @@ import SurgeryListPage from '../features/surgeries/pages/SurgeryListPage'
 import AddSurgery from '../features/surgeries/pages/AddSurgery'
 
 import MedicalServicesHub from '../features/treatments/pages/MedicalServicesHub'
+import SettingsPage from '../features/settings/pages/SettingsPage'
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useSelector(s => s.auth)
@@ -106,6 +107,8 @@ export default function AppRoutes() {
         <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin']}><BillListPage /></ProtectedRoute>} />
         <Route path="/billing/create" element={<ProtectedRoute allowedRoles={['admin']}><CreateBillPage /></ProtectedRoute>} />
         <Route path="/billing/:id" element={<ProtectedRoute allowedRoles={['admin', 'client']}><BillDetailsPage /></ProtectedRoute>} />
+
+        <Route path="/settings" element={<SettingsPage />} />
 
         <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']}><ReportsDashboard /></ProtectedRoute>} />
 
