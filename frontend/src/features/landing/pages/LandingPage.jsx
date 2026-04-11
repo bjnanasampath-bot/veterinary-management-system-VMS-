@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTheme } from '../../../context/ThemeContext';
+import { settingsApi } from '../../../api';
 import './LandingPage.css';
 
 export default function LandingPage() {
   const { isAuthenticated } = useSelector((s) => s.auth);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [siteSettings, setSiteSettings] = useState({});
+
+  useEffect(() => {
+    settingsApi.getAll().then(res => {
+      const data = res.data?.results || res.data?.data || res.data || [];
+      const settingsMap = {};
+      data.forEach(s => settingsMap[s.key] = s.value);
+      setSiteSettings(settingsMap);
+    }).catch(err => console.error("Failed to load settings", err));
+  }, []);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -59,9 +70,9 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="hero-section" id="home">
         <div className="hero-content">
-          <h1 className="hero-title">Premium Veterinary Care for Your Best Friends</h1>
+          <h1 className="hero-title">{siteSettings.landing_hero_title || 'Premium Veterinary Care for Your Best Friends'}</h1>
           <p className="hero-subtitle">
-            Providing compassionate and state-of-the-art medical services to keep your pets happy, healthy, and thriving.
+            {siteSettings.landing_hero_subtitle || 'Providing compassionate and state-of-the-art medical services to keep your pets happy, healthy, and thriving.'}
           </p>
           <div className="hero-cta">
             <button className="cta-button" onClick={handleGetStarted}>
@@ -84,8 +95,8 @@ export default function LandingPage() {
       {/* About Us Section */}
       <section className="info-section" id="about-us">
         <div className="section-header">
-          <h2>About Us</h2>
-          <p>Learn more about our mission and the team that cares for your pets.</p>
+          <h2>{siteSettings.landing_about_title || 'About Us'}</h2>
+          <p>{siteSettings.landing_about_description || 'Learn more about our mission and the team that cares for your pets.'}</p>
         </div>
         <div className="about-grid">
           <div className="about-card">

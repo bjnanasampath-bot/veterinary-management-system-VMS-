@@ -229,7 +229,8 @@ export default function SettingsPage() {
                                             {s.key === 'clinic_name' && <Building size={16} className="text-gray-400" />}
                                             {s.key === 'tax_percentage' && <Percent size={16} className="text-gray-400" />}
                                             {s.key === 'currency' && <Globe size={16} className="text-gray-400" />}
-                                            <h4 className="font-bold text-gray-900 dark:text-white capitalize italic">{s.key.replace('_', ' ')}</h4>
+                                            {s.key.includes('landing') && <Paintbrush size={16} className="text-gray-400" />}
+                                            <h4 className="font-bold text-gray-900 dark:text-white capitalize italic">{s.key.replace(/_/g, ' ')}</h4>
                                         </div>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">{s.description}</p>
                                     </div>
