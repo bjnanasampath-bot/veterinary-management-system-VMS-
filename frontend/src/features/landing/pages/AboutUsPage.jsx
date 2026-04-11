@@ -32,12 +32,11 @@ export default function AboutUsPage() {
         <div className="grid md:grid-cols-2 gap-12 mb-24 items-center">
           <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px] bg-black">
             <iframe 
+               src="https://player.vimeo.com/video/117934677?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" 
                width="100%" 
                height="100%" 
-               src="https://www.youtube.com/embed/N641pT165dI?autoplay=1&mute=1&loop=1&playlist=N641pT165dI&controls=0&modestbranding=1" 
-               title="Clinic Tour" 
                frameBorder="0" 
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+               allow="autoplay; fullscreen" 
                allowFullScreen
             ></iframe>
           </div>

@@ -101,14 +101,13 @@ export default function LandingPage() {
         </div>
         
         <div className="about-hero-block">
-          <div className="about-image-side video-container">
+          <div className="about-image-side video-container h-[400px] overflow-hidden rounded-3xl shadow-2xl">
             <iframe 
+              src="https://player.vimeo.com/video/117934677?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1" 
               width="100%" 
               height="100%" 
-              src="https://www.youtube.com/embed/N641pT165dI?autoplay=1&mute=1&loop=1&playlist=N641pT165dI&controls=0&showinfo=0&modestbranding=1" 
-              title="Veterinary Clinic Tour" 
               frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allow="autoplay; fullscreen" 
               allowFullScreen
               style={{ objectFit: 'cover' }}
             ></iframe>
