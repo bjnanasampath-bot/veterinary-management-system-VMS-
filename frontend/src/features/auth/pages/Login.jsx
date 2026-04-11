@@ -152,6 +152,18 @@ function LoginPanel({ role }) {
 
 // ─── MAIN PAGE ─────────────────────────────────────────────────────────────
 export default function Login() {
+  const [logoName, setLogoName] = useState('VetCare')
+
+  useEffect(() => {
+    import('../../../api').then(({ settingsApi }) => {
+      settingsApi.getAll().then(res => {
+        const data = res.data?.results || res.data?.data || res.data || []
+        const logo = data.find(s => s.key === 'app_logo_name')?.value
+        if (logo) setLogoName(logo)
+      })
+    })
+  }, [])
+
   return (
     <div className="w-full max-w-4xl px-4 flex flex-col items-center">
 
@@ -162,7 +174,7 @@ export default function Login() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            VetCare <span className="text-primary-600">Pro</span>
+            {logoName} <span className="text-primary-600">Pro</span>
           </h1>
           <p className="text-gray-500 text-sm font-medium">Staff Login Portal — Next-Gen Veterinary Management</p>
         </div>

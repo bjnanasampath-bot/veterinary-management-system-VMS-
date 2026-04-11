@@ -38,7 +38,7 @@ export default function LandingPage() {
           style={{ textDecoration: 'none' }}
         >
           <div className="logo-icon">🐾</div>
-          <span className="brand-name">VetCare</span>
+          <span className="brand-name">{siteSettings.app_logo_name || 'VetCare'}</span>
         </Link>
 
         <div className="navbar-links">
@@ -117,8 +117,8 @@ export default function LandingPage() {
       {/* Services Section */}
       <section className="info-section services-section" id="services">
         <div className="section-header">
-          <h2>Our Services</h2>
-          <p>Comprehensive veterinary solutions for your pets.</p>
+          <h2>{siteSettings.landing_services_title || 'Our Services'}</h2>
+          <p>{siteSettings.landing_services_description || 'Comprehensive veterinary solutions for your pets.'}</p>
         </div>
         <div className="services-grid">
           <div className="service-item" onClick={() => navigate('/services/routine-checkups')}>
@@ -146,7 +146,7 @@ export default function LandingPage() {
       
       {/* Footer */}
       <footer className="landing-footer">
-        <p>&copy; {new Date().getFullYear()} VetCare Management System. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} {siteSettings.app_footer_text || 'VetCare Management System. All rights reserved.'}</p>
       </footer>
     </div>
   );
