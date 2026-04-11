@@ -102,7 +102,7 @@ export default function LandingPage() {
         
         <div className="about-hero-block">
           <div className="about-image-side">
-            <img src="/vet_team_premium_1775894912373.png" alt="Our Premium Team" />
+            <img src="/about-us.png" alt="Our Premium Team" />
           </div>
           <div className="about-text-side">
             <h3 className="text-3xl font-bold mb-4">Dedicated to Excellence</h3>

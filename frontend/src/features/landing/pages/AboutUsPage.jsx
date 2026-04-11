@@ -31,7 +31,7 @@ export default function AboutUsPage() {
         {/* Feature Grid */}
         <div className="grid md:grid-cols-2 gap-12 mb-24 items-center">
           <div className="rounded-3xl overflow-hidden shadow-2xl">
-            <img src="/vet_team_premium_1775894912373.png" alt="Our Team" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
+            <img src="/about-us.png" alt="Our Team" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
           </div>
           <div className="space-y-8">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white">Why Choose VetCare?</h2>
