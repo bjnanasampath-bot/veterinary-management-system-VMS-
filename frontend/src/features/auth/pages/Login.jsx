@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { login } from '../authSlice'
+import { settingsApi } from '../../../api'
 import {
   PawPrint, Mail, Lock, Eye, EyeOff, RefreshCw,
   ShieldCheck, Stethoscope, ArrowRight
@@ -155,13 +156,11 @@ export default function Login() {
   const [logoName, setLogoName] = useState('VetCare')
 
   useEffect(() => {
-    import('../../../api').then(({ settingsApi }) => {
-      settingsApi.getAll().then(res => {
-        const data = res.data?.results || res.data?.data || res.data || []
-        const logo = data.find(s => s.key === 'app_logo_name')?.value
-        if (logo) setLogoName(logo)
-      })
-    })
+    settingsApi.getAll().then(res => {
+      const data = res.data?.results || res.data?.data || res.data || []
+      const logo = data.find(s => s.key === 'app_logo_name')?.value
+      if (logo) setLogoName(logo)
+    }).catch(() => {})
   }, [])
 
   return (

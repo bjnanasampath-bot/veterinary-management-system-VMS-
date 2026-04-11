@@ -210,6 +210,43 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Language and Region */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden mt-6">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Language & Regional</h3>
+                  <p className="text-xs text-gray-500">Manage your language and timezone preferences</p>
+                </div>
+                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Preferred Language</label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Globe size={16} />
+                      </div>
+                      <select className="w-full bg-white dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary-500 outline-none appearance-none transition-all dark:text-white">
+                        <option>English (US)</option>
+                        <option>Telugu</option>
+                        <option>Hindi</option>
+                        <option>Spanish</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Timezone</label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Clock size={16} />
+                      </div>
+                      <select className="w-full bg-white dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary-500 outline-none appearance-none transition-all dark:text-white">
+                        <option>(GMT+05:30) India Standard Time</option>
+                        <option>(GMT+00:00) UTC</option>
+                        <option>(GMT-08:00) Pacific Standard Time</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
