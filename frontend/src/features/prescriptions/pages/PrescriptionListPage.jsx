@@ -1,5 +1,5 @@
 import GenericListPage from '../../../components/common/GenericListPage'
-import { prescriptionApi } from '../../../api'
+import { treatmentApi } from '../../../api'
 
 const statusColors = {
   active: 'bg-green-100 text-green-700',
@@ -10,29 +10,57 @@ const statusColors = {
 export default function PrescriptionListPage() {
   return (
     <GenericListPage
-      title="Prescriptions" subtitle="Manage patient medications"
-      addPath="/prescriptions/add"
+      title="Prescriptions" 
+      subtitle="View all medical prescriptions from treatments"
+      showAdd={false}
       fetchFn={async (p) => {
-        const res = await prescriptionApi.getAll(p)
+        const res = await treatmentApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []
-        dataList.forEach(r => {
-          r._editPath = `/prescriptions/${r.id}/edit`
-          r._deleteName = r.medication_name
+        
+        // Flatten medications from treatments into a list of prescription-like rows
+        const prescriptions = []
+        dataList.forEach(t => {
+          if (t.medications && Array.isArray(t.medications)) {
+            t.medications.forEach((m, idx) => {
+              prescriptions.push({
+                idx: `${t.id}-${idx}`,
+                pet_name: t.pet_name,
+                medication_name: m.name || 'Unknown',
+                dosage: m.dosage || 'N/A',
+                frequency: m.frequency || 'N/A',
+                duration: m.duration || 'N/A',
+                date: t.treatment_date,
+                status: 'active'
+              })
+            })
+          } else if (t.prescription) {
+            prescriptions.push({
+              idx: t.id,
+              pet_name: t.pet_name,
+              medication_name: 'Prescription Detail',
+              dosage: t.prescription,
+              frequency: 'As prescribed',
+              duration: '-',
+              date: t.treatment_date,
+              status: 'active'
+            })
+          }
         })
-        return res
+        
+        return { ...res, data: { ...res.data, results: prescriptions } }
       }}
-      deleteFn={prescriptionApi.delete}
       searchPlaceholder="Search prescriptions..."
       columns={[
-        { key: 'medication_name', label: 'Medication', render: r => <span className="font-medium">{r.medication_name}</span> },
+        { key: 'medication_name', label: 'Medication', render: r => <span className="font-medium text-primary-700">{r.medication_name}</span> },
         { key: 'pet_name', label: 'Patient (Pet)' },
-        { key: 'dosage', label: 'Dosage', render: r => `${r.dosage} - ${r.frequency}` },
-        { key: 'duration_days', label: 'Duration', render: r => `${r.duration_days} days` },
-        { key: 'status', label: 'Status', render: r => (
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-gray-100'}`}>
-            {r.status}
-          </span>
+        { key: 'dosage', label: 'Instructions', render: r => (
+          <div className="flex flex-col">
+            <span className="text-gray-900 font-medium">{r.dosage}</span>
+            <span className="text-[10px] text-gray-500">{r.frequency}</span>
+          </div>
         )},
+        { key: 'duration', label: 'Duration' },
+        { key: 'date', label: 'Prescribed On' },
       ]}
     />
   )
