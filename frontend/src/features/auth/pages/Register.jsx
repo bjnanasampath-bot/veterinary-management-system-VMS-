@@ -13,7 +13,7 @@ export default function Register() {
 
   // --- CAPTCHA ---
   const generateCaptcha = useCallback(() => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
     return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   }, [])
   const [captchaText, setCaptchaText] = useState(() => generateCaptcha())
@@ -161,8 +161,6 @@ export default function Register() {
                   letterSpacing: '0.3em',
                   color: '#1e293b',
                   border: '1.5px dashed #94a3b8',
-                  textDecoration: 'line-through underline',
-                  textDecorationColor: '#94a3b8',
                 }}
               >
                 {captchaText}

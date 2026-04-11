@@ -13,7 +13,7 @@ import toast from 'react-hot-toast'
 // ─── Shared CAPTCHA hook ───────────────────────────────────────────────────
 function useCaptcha() {
   const generate = useCallback(() => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
     return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   }, [])
   const [text, setText] = useState(() => generate())
@@ -38,7 +38,6 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
           style={{
             background: 'linear-gradient(135deg,#e0f2fe,#f0fdf4)',
             border: '1.5px dashed #94a3b8',
-            textDecoration: 'line-through double #cbd5e1',
             color: '#1e293b',
           }}>
           {text}
