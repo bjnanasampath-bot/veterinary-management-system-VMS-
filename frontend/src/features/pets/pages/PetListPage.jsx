@@ -1,12 +1,17 @@
+import { useSelector } from 'react-redux'
 import { PawPrint } from 'lucide-react'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { petApi } from '../../../api'
 
 export default function PetListPage() {
+  const { user } = useSelector(s => s.auth)
+  const role = user?.role
+
   return (
     <GenericListPage
       title="Pets" subtitle="Manage all registered pets"
       addPath="/pets/add"
+      showAdd={role !== 'admin'}
       fetchFn={async (p) => {
         const res = await petApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

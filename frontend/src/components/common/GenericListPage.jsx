@@ -8,7 +8,8 @@ import toast from 'react-hot-toast'
 export default function GenericListPage({
   title, subtitle, addPath, fetchFn, deleteFn,
   columns, searchPlaceholder = 'Search...',
-  filters = [], mapRowToActions = true, extraActions
+  filters = [], mapRowToActions = true, extraActions,
+  showAdd = true
 }) {
   const { user } = useSelector(s => s.auth)
   const role = user?.role
@@ -17,7 +18,7 @@ export default function GenericListPage({
   // admin              → Full Control (Add, Edit, View, Delete)
   // doctor             → View + Edit + Add (no Delete)
   // client             → View only
-  const canAdd    = role === 'admin' || role === 'doctor' || role === 'client'
+  const canAdd    = showAdd && (role === 'admin' || role === 'doctor' || role === 'client')
   const canEdit   = role === 'admin' || role === 'doctor'
   const canDelete = role === 'admin'
 

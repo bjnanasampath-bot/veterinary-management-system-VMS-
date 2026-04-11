@@ -1,3 +1,4 @@
+import { useSelector } from 'react-redux'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { appointmentApi } from '../../../api'
 
@@ -11,10 +12,14 @@ const statusColors = {
 }
 
 export default function AppointmentListPage() {
+  const { user } = useSelector(s => s.auth)
+  const role = user?.role
+
   return (
     <GenericListPage
       title="Appointments" subtitle="Manage all appointments"
       addPath="/appointments/create"
+      showAdd={role !== 'admin'}
       fetchFn={async (p) => {
         const res = await appointmentApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

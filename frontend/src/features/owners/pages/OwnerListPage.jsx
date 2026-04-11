@@ -1,12 +1,17 @@
+import { useSelector } from 'react-redux'
 import { User } from 'lucide-react'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { ownerApi } from '../../../api'
 
 export default function OwnerListPage() {
+  const { user } = useSelector(s => s.auth)
+  const role = user?.role
+
   return (
     <GenericListPage
       title="Owners" subtitle="Manage pet owners"
       addPath="/owners/add"
+      showAdd={role !== 'admin'}
       fetchFn={async (p) => {
         const res = await ownerApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []
