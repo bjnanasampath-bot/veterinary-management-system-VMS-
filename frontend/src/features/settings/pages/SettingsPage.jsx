@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { settingsApi, authApi } from '../../../api'
-import { User, Shield, Building, Percent, Globe, Save, Loader2 } from 'lucide-react'
+import { User, Shield, Building, Percent, Globe, Save, Loader2, Paintbrush, Moon, Sun, Check } from 'lucide-react'
+import { useTheme } from '../../../context/ThemeContext'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
   const { user } = useSelector(s => s.auth)
+  const { theme, setTheme } = useTheme()
   const [activeTab, setActiveTab] = useState('account')
   const [settings, setSettings] = useState([])
   const [profileData, setProfileData] = useState({ first_name: user?.first_name || '', last_name: user?.last_name || '', phone: user?.phone || '' })
@@ -52,14 +54,15 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'account', label: 'My Account', icon: User },
+    { id: 'appearance', label: 'Appearance', icon: Paintbrush },
     ...(user?.role === 'admin' ? [{ id: 'system', label: 'Clinic Settings', icon: Building }] : []),
   ]
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500">Manage your account and clinic preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400">Manage your account and clinic preferences</p>
       </div>
 
       <div className="flex gap-6">
@@ -72,7 +75,7 @@ export default function SettingsPage() {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 activeTab === tab.id 
                   ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' 
-                  : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm'
               }`}
             >
               <tab.icon size={18} />
@@ -86,10 +89,10 @@ export default function SettingsPage() {
           {activeTab === 'account' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {/* Profile Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                  <h3 className="font-bold text-gray-900">Personal Information</h3>
-                  <p className="text-xs text-gray-500 mt-1">Update your name and contact details</p>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Personal Information</h3>
+                  <p className="text-xs text-gray-500">Update your name and contact details</p>
                 </div>
                 <form onSubmit={handleUpdateProfile} className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -98,7 +101,7 @@ export default function SettingsPage() {
                       <input 
                         value={profileData.first_name} 
                         onChange={e => setProfileData({...profileData, first_name: e.target.value})}
-                        className="input-field" 
+                        className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -106,7 +109,7 @@ export default function SettingsPage() {
                       <input 
                         value={profileData.last_name} 
                         onChange={e => setProfileData({...profileData, last_name: e.target.value})}
-                        className="input-field" 
+                        className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                       />
                     </div>
                   </div>
@@ -115,7 +118,7 @@ export default function SettingsPage() {
                     <input 
                       value={profileData.phone} 
                       onChange={e => setProfileData({...profileData, phone: e.target.value})}
-                      className="input-field" 
+                      className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                     />
                   </div>
                   <button disabled={loading} className="btn-primary w-fit px-8 py-2.5 flex items-center gap-2">
@@ -126,11 +129,11 @@ export default function SettingsPage() {
               </div>
 
               {/* Password Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-2">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 flex items-center gap-2">
                   <Shield size={18} className="text-primary-600" />
                   <div>
-                    <h3 className="font-bold text-gray-900">Security</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white">Security</h3>
                     <p className="text-xs text-gray-500">Change your account password</p>
                   </div>
                 </div>
@@ -141,7 +144,7 @@ export default function SettingsPage() {
                       type="password" 
                       value={passData.old_password} 
                       onChange={e => setPassData({...passData, old_password: e.target.value})}
-                      className="input-field" 
+                      className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -151,7 +154,7 @@ export default function SettingsPage() {
                         type="password" 
                         value={passData.new_password} 
                         onChange={e => setPassData({...passData, new_password: e.target.value})}
-                        className="input-field" 
+                        className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -160,7 +163,7 @@ export default function SettingsPage() {
                         type="password" 
                         value={passData.confirm_password} 
                         onChange={e => setPassData({...passData, confirm_password: e.target.value})}
-                        className="input-field" 
+                        className="input-field dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                       />
                     </div>
                   </div>
@@ -172,14 +175,52 @@ export default function SettingsPage() {
             </div>
           )}
 
+          {activeTab === 'appearance' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+               <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Interface Theme</h3>
+                  <p className="text-xs text-gray-500">Choose how the application looks for you</p>
+                </div>
+                <div className="p-6 grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setTheme('light')}
+                    className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${
+                      theme === 'light' ? 'border-primary-600 bg-primary-50/30' : 'border-gray-100 dark:border-slate-800 hover:border-gray-200'
+                    }`}
+                  >
+                    <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-primary-600">
+                      <Sun size={24} />
+                    </div>
+                    <span className="font-bold text-sm text-gray-900 dark:text-white">Light Mode</span>
+                    {theme === 'light' && <div className="absolute top-2 right-2 bg-primary-600 text-white rounded-full p-0.5"><Check size={12} /></div>}
+                  </button>
+
+                  <button 
+                    onClick={() => setTheme('dark')}
+                    className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${
+                      theme === 'dark' ? 'border-primary-600 bg-primary-50/30' : 'border-gray-100 dark:border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="w-12 h-12 bg-slate-900 rounded-full shadow-sm flex items-center justify-center text-yellow-400">
+                      <Moon size={24} />
+                    </div>
+                    <span className="font-bold text-sm text-gray-900 dark:text-white">Dark Mode</span>
+                    {theme === 'dark' && <div className="absolute top-2 right-2 bg-primary-600 text-white rounded-full p-0.5"><Check size={12} /></div>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'system' && user?.role === 'admin' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                        <h3 className="font-bold text-gray-900">System Preferences</h3>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
+                        <h3 className="font-bold text-gray-900 dark:text-white">System Preferences</h3>
                         <p className="text-xs text-gray-500">Configure global settings for the entire clinic</p>
                     </div>
-                    <div className="p-6 divide-y divide-gray-100">
+                    <div className="p-6 divide-y divide-gray-100 dark:divide-slate-800">
                         {settings.map(s => (
                             <div key={s.key} className="py-6 first:pt-0 last:pb-0">
                                 <div className="flex items-start justify-between gap-10">
@@ -188,9 +229,9 @@ export default function SettingsPage() {
                                             {s.key === 'clinic_name' && <Building size={16} className="text-gray-400" />}
                                             {s.key === 'tax_percentage' && <Percent size={16} className="text-gray-400" />}
                                             {s.key === 'currency' && <Globe size={16} className="text-gray-400" />}
-                                            <h4 className="font-bold text-gray-900 capitalize italic">{s.key.replace('_', ' ')}</h4>
+                                            <h4 className="font-bold text-gray-900 dark:text-white capitalize italic">{s.key.replace('_', ' ')}</h4>
                                         </div>
-                                        <p className="text-sm text-gray-500">{s.description}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{s.description}</p>
                                     </div>
                                     <div className="w-64 flex gap-2">
                                         <input 
@@ -200,7 +241,7 @@ export default function SettingsPage() {
                                                     handleUpdateSystemSetting(s.key, e.target.value)
                                                 }
                                             }}
-                                            className="input-field text-sm" 
+                                            className="input-field text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white" 
                                         />
                                     </div>
                                 </div>
