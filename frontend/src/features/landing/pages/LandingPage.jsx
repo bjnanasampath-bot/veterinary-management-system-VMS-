@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTheme } from '../../../context/ThemeContext';
 import './LandingPage.css';
 
 export default function LandingPage() {
   const { isAuthenticated } = useSelector((s) => s.auth);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
@@ -32,10 +34,17 @@ export default function LandingPage() {
           <a href="#home" className="nav-link">Home</a>
           <a href="#about-us" className="nav-link">About Us</a>
           <a href="#services" className="nav-link">Services</a>
-          {isAuthenticated && <Link to="/settings" className="nav-link">Settings</Link>}
+          <Link to={isAuthenticated ? "/settings" : "/login"} className="nav-link">Settings</Link>
         </div>
 
         <div className="navbar-actions">
+          <button 
+            onClick={toggleTheme} 
+            className="theme-toggle-btn"
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
           {isAuthenticated ? (
             <Link to="/dashboard" className="btn-dashboard">Dashboard</Link>
           ) : (
