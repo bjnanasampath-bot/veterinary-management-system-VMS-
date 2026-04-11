@@ -18,42 +18,58 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
-    const promises = [
-      reportApi.getDashboardStats(),
-      reportApi.getRevenueReport({ months: 6 }),
-      reportApi.getAppointmentReport({ days: 30 }),
-      appointmentApi.getToday(),
-    ]
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // 1. Fetch cross-role base stats
+        const statsRes = await reportApi.getDashboardStats();
+        setStats(statsRes.data?.data || statsRes.data);
 
-    if (user.role === 'admin') {
-      const today = new Date().toLocaleDateString('en-CA')
-      promises.push(doctorApi.getAttendance({ date: today }))
-    } else if (user.role === 'doctor') {
-      // Fetch new pending requests for doctors
-      promises.push(appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }))
-    } else if (user.role === 'client') {
-      // Fetch all upcoming appointments for client
-      promises.push(appointmentApi.getAll({ status: 'scheduled,confirmed', ordering: 'appointment_date' }))
-    }
+        // 2. Fetch role-specific data
+        if (user.role === 'admin') {
+          const today = new Date().toLocaleDateString('en-CA');
+          const [revRes, apptRes, todayRes, attendanceRes] = await Promise.all([
+            reportApi.getRevenueReport({ months: 6 }).catch(() => ({ data: [] })),
+            reportApi.getAppointmentReport({ days: 30 }).catch(() => ({ data: {} })),
+            appointmentApi.getToday().catch(() => ({ data: [] })),
+            doctorApi.getAttendance({ date: today }).catch(() => ({ data: [] }))
+          ]);
 
-    Promise.all(promises).then(([statsRes, revRes, apptRes, todayRes, extraRes]) => {
-      setStats(statsRes.data?.data || statsRes.data)
-      setRevenue(revRes.data?.data || revRes.data || [])
-      setApptByType(apptRes.data?.data?.by_type || apptRes.data?.by_type || [])
-      setTodayAppts(todayRes.data?.data || todayRes.data || [])
-      
-      if (user.role === 'admin') {
-        setAttendance(extraRes.data?.results || extraRes.data || [])
-      } else if (user.role === 'doctor') {
-        setPendingAppts(extraRes.data?.results || extraRes.data?.data || [])
-      } else if (user.role === 'client') {
-        setUpcomingAppts(extraRes.data?.results || extraRes.data?.data || [])
+          setRevenue(revRes.data?.data || revRes.data || []);
+          setApptByType(apptRes.data?.data?.by_type || apptRes.data?.by_type || []);
+          setTodayAppts(todayRes.data?.data || todayRes.data || []);
+          setAttendance(attendanceRes.data?.results || attendanceRes.data || []);
+
+        } else if (user.role === 'doctor') {
+          const [todayRes, pendingRes] = await Promise.all([
+            appointmentApi.getToday().catch(() => ({ data: [] })),
+            appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }).catch(() => ({ data: [] }))
+          ]);
+
+          setTodayAppts(todayRes.data?.data || todayRes.data || []);
+          setPendingAppts(pendingRes.data?.results || pendingRes.data?.data || []);
+
+        } else if (user.role === 'client') {
+          const [upcomingRes] = await Promise.all([
+            appointmentApi.getAll({ 
+              status: 'scheduled,confirmed', 
+              ordering: 'appointment_date' 
+            }).catch(() => ({ data: [] }))
+          ]);
+
+          setUpcomingAppts(upcomingRes.data?.results || upcomingRes.data?.data || []);
+        }
+      } catch (err) {
+        console.error("Dashboard primary data fetch error:", err);
+      } finally {
+        setLoading(false);
       }
-    }).catch(err => {
-      console.error("Dashboard data fetch error:", err)
-    }).finally(() => setLoading(false))
-  }, [user.role])
+    };
+
+    if (user.role) {
+      fetchData();
+    }
+  }, [user.role]);
 
   if (loading) return <Loader text="Loading dashboard..." />
 
