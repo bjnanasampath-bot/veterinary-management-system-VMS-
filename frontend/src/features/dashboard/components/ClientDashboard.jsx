@@ -7,22 +7,22 @@ export default function ClientDashboard({ stats, upcomingAppts = [], statusColor
     <div className="space-y-6">
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link to="/appointments/create" className="card hover:border-primary-500 transition-colors flex items-center gap-4 p-5">
-          <div className="w-14 h-14 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600">
+        <Link to="/appointments/create" className="card hover:border-primary-500 dark:hover:border-primary-500 transition-colors flex items-center gap-4 p-5">
+          <div className="w-14 h-14 bg-primary-100 dark:bg-primary-900/40 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400">
             <CalendarPlus size={28} />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 text-lg text-left">Book a Visit</h3>
-            <p className="text-sm text-gray-400 font-normal">Schedule some care for your pet</p>
+            <h3 className="font-bold text-gray-900 dark:text-white text-lg text-left">Book a Visit</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-300 font-normal">Schedule some care for your pet</p>
           </div>
         </Link>
-        <Link to="/pets" className="card hover:border-pink-500 transition-colors flex items-center gap-4 p-5">
-          <div className="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-600">
+        <Link to="/pets" className="card hover:border-pink-500 dark:hover:border-pink-500 transition-colors flex items-center gap-4 p-5">
+          <div className="w-14 h-14 bg-pink-100 dark:bg-pink-900/40 rounded-2xl flex items-center justify-center text-pink-600 dark:text-pink-400">
             <HeartPulse size={28} />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 text-lg text-left">Health Records</h3>
-            <p className="text-sm text-gray-400 font-normal">View medications and history</p>
+            <h3 className="font-bold text-gray-900 dark:text-white text-lg text-left">Health Records</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-300 font-normal">View medications and history</p>
           </div>
         </Link>
       </div>
@@ -36,12 +36,12 @@ export default function ClientDashboard({ stats, upcomingAppts = [], statusColor
 
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Your Upcoming Appointments</h2>
-          <Link to="/appointments" className="text-sm text-primary-600 hover:underline">See full history</Link>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Upcoming Appointments</h2>
+          <Link to="/appointments" className="text-sm text-primary-600 dark:text-primary-400 hover:underline">See full history</Link>
         </div>
         {upcomingAppts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-sm mb-4">You have no upcoming appointments</p>
+            <p className="text-gray-400 dark:text-slate-500 text-sm mb-4">You have no upcoming appointments</p>
             <Link to="/appointments/create" className="btn-primary inline-flex items-center gap-2">
               <Plus size={16} /> Book Now
             </Link>
@@ -50,27 +50,27 @@ export default function ClientDashboard({ stats, upcomingAppts = [], statusColor
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left py-2 text-gray-500 font-medium">Pet</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Date</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Time</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                  <th className="text-right py-2 text-gray-500 font-medium">Details</th>
+                <tr className="border-b border-gray-100 dark:border-slate-800">
+                  <th className="text-left py-2 text-gray-500 dark:text-slate-400 font-medium">Pet</th>
+                  <th className="text-left py-2 text-gray-500 dark:text-slate-400 font-medium">Date</th>
+                  <th className="text-left py-2 text-gray-500 dark:text-slate-400 font-medium">Time</th>
+                  <th className="text-left py-2 text-gray-500 dark:text-slate-400 font-medium">Status</th>
+                  <th className="text-right py-2 text-gray-500 dark:text-slate-400 font-medium">Details</th>
                 </tr>
               </thead>
               <tbody>
                 {upcomingAppts.map(a => (
-                  <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="py-2.5 font-medium">{a.pet_name}</td>
-                    <td className="py-2.5 text-gray-600">{a.appointment_date}</td>
-                    <td className="py-2.5 text-gray-600">{a.appointment_time}</td>
+                  <tr key={a.id} className="border-b border-gray-50 dark:border-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                    <td className="py-2.5 font-medium dark:text-white">{a.pet_name}</td>
+                    <td className="py-2.5 text-gray-600 dark:text-gray-300">{a.appointment_date}</td>
+                    <td className="py-2.5 text-gray-600 dark:text-gray-300">{a.appointment_time}</td>
                     <td className="py-2.5">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(a.status)}`}>
                         {a.status}
                       </span>
                     </td>
                     <td className="py-2.5 text-right">
-                      <Link to={`/appointments/${a.id}`} className="text-primary-600 hover:text-primary-800 font-medium">View</Link>
+                      <Link to={`/appointments/${a.id}`} className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">View</Link>
                     </td>
                   </tr>
                 ))}
