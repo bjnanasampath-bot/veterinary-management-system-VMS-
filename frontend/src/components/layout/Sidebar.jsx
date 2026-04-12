@@ -15,7 +15,7 @@ const navItems = [
   { to: '/medical-services', icon: ClipboardList, label: 'Medical Services', roles: ['admin', 'doctor'] },
   { to: '/prescriptions', icon: FileText, label: 'Prescriptions', roles: ['admin', 'doctor'] },
   { to: '/pharmacy', icon: Pill, label: 'Pharmacy', roles: ['admin', 'doctor'] },
-  { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin'] },
+  { to: '/billing', icon: Receipt, label: 'Billing', roles: ['admin', 'doctor'] },
   { to: '/reports', icon: BarChart2, label: 'Reports', roles: ['admin'] },
   { to: '/settings', icon: Settings, label: 'Settings', roles: ['admin', 'doctor', 'client'] },
 ]

@@ -10,15 +10,73 @@ export default function CreateBillPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [pets, setPets] = useState([])
-  const { register, handleSubmit, control, watch } = useForm({
+  const { register, handleSubmit, control, watch, setValue } = useForm({
     defaultValues: { items: [{ description: '', item_type: 'consultation', quantity: 1, unit_price: 0 }], discount_percent: 0, tax_percent: 18 }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const items = watch('items')
+  const selectedPetId = watch('pet')
 
   useEffect(() => {
     petApi.getAll({ page_size: 200 }).then(r => setPets(r.data?.results || r.data?.data || []))
   }, [])
+
+  useEffect(() => {
+    if (selectedPetId) {
+      petApi.getMedicalHistory(selectedPetId).then(r => {
+        const data = r.data?.data || r.data
+        let newItems = []
+        const now = new Date()
+
+        // Filter for records from the last 7 days to avoid billing for old history
+        const isRecent = (dateStr) => {
+          if (!dateStr) return false;
+          const diffDays = (now - new Date(dateStr)) / (1000 * 60 * 60 * 24);
+          return diffDays >= 0 && diffDays <= 7;
+        };
+
+        data.appointments?.filter(a => isRecent(a.appointment_date)).forEach(a => {
+          newItems.push({
+            description: `Consultation - Dr. ${a.doctor_name} (${a.appointment_date})`,
+            item_type: 'consultation',
+            quantity: 1,
+            unit_price: 500 // Base consultation fee
+          })
+        })
+
+        data.treatments?.filter(t => isRecent(t.treatment_date)).forEach(t => {
+          newItems.push({
+            description: `Treatment: ${t.treatment_name}`,
+            item_type: 'treatment',
+            quantity: 1,
+            unit_price: Number(t.cost) || 1200
+          })
+          t.medications?.forEach(m => {
+            newItems.push({
+              description: `Medication: ${m.name || m}`,
+              item_type: 'medication',
+              quantity: 1,
+              unit_price: 350
+            })
+          })
+        })
+
+        data.vaccinations?.filter(v => isRecent(v.vaccination_date)).forEach(v => {
+          newItems.push({
+            description: `Vaccination: ${v.vaccine_name}`,
+            item_type: 'vaccination',
+            quantity: 1,
+            unit_price: Number(v.cost) || 850
+          })
+        })
+
+        if (newItems.length > 0) {
+          setValue('items', newItems)
+          toast.success('Auto-filled recent consultation and medication charges')
+        }
+      })
+    }
+  }, [selectedPetId, setValue])
 
   const subtotal = items.reduce((s, i) => s + (Number(i.quantity) * Number(i.unit_price) || 0), 0)
   const discountAmt = subtotal * (Number(watch('discount_percent')) / 100 || 0)

@@ -106,9 +106,9 @@ export default function AppRoutes() {
         <Route path="/vaccinations" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><VaccinationListPage /></ProtectedRoute>} />
         <Route path="/vaccinations/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddVaccinationPage /></ProtectedRoute>} />
 
-        <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin']}><BillListPage /></ProtectedRoute>} />
-        <Route path="/billing/create" element={<ProtectedRoute allowedRoles={['admin']}><CreateBillPage /></ProtectedRoute>} />
-        <Route path="/billing/:id" element={<ProtectedRoute allowedRoles={['admin', 'client']}><BillDetailsPage /></ProtectedRoute>} />
+        <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><BillListPage /></ProtectedRoute>} />
+        <Route path="/billing/create" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><CreateBillPage /></ProtectedRoute>} />
+        <Route path="/billing/:id" element={<ProtectedRoute allowedRoles={['admin', 'client', 'doctor']}><BillDetailsPage /></ProtectedRoute>} />
 
         <Route path="/settings" element={<SettingsPage />} />
 
