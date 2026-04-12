@@ -83,9 +83,22 @@ export default function LandingPage() {
         </div>
         <div className="hero-image-wrapper">
           <div className="decorative-blob"></div>
-          {/* Using a solid nice graphic illustration placeholder instead of broken image */}
-          <div className="hero-graphic">
-             <div className="paw-large">🐾</div>
+          <div className="hero-image-container">
+            <img src="/hero_pets.png" alt="Happy pets" className="hero-image-premium" />
+            <div className="floating-badge badge-1">
+              <span className="badge-icon">⭐</span>
+              <div className="badge-text">
+                <strong>4.9/5</strong>
+                <p>Client Rating</p>
+              </div>
+            </div>
+            <div className="floating-badge badge-2">
+              <span className="badge-icon">🩺</span>
+              <div className="badge-text">
+                <strong>24/7</strong>
+                <p>Expert Care</p>
+              </div>
+            </div>
           </div>
         </div>
       </main>

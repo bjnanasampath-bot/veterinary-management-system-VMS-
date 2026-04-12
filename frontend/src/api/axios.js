@@ -19,20 +19,34 @@ api.interceptors.response.use(
       original._retry = true
       try {
         const refresh = localStorage.getItem('refresh_token')
-        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/token/refresh/`, { refresh })
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/auth/token/refresh/`, { refresh })
         localStorage.setItem('access_token', res.data.access)
         original.headers.Authorization = `Bearer ${res.data.access}`
         return api(original)
-      } catch {
+      } catch (err) {
         localStorage.clear()
-        window.location.href = '/login'
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+           window.location.href = '/login'
+        }
+        return Promise.reject(error)
       }
     }
-    const resData = error.response?.data || {}
-    const fieldErrors = resData.errors || {}
-    const firstFieldError = Object.values(fieldErrors).flat()[0]
-    const msg = firstFieldError || resData.message || resData.detail || 'Something went wrong'
-    toast.error(msg)
+    
+    if (error.response?.status !== 401) {
+      const resData = error.response?.data || {}
+      const fieldErrors = resData.errors || {}
+      const firstFieldError = Object.values(fieldErrors).flat()[0]
+      let msg = firstFieldError || resData.message || resData.detail
+      
+      // If no response from server
+      if (!error.response && error.message === 'Network Error') {
+        msg = 'Unable to connect to the server. Please check your connection.'
+      } else if (!msg) {
+        msg = 'Something went wrong'
+      }
+      
+      toast.error(msg)
+    }
     return Promise.reject(error)
   }
 )
