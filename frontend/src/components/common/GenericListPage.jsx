@@ -65,8 +65,8 @@ export default function GenericListPage({
       {!isEmbedded && (
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
+            {subtitle && <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{subtitle}</p>}
           </div>
           <div className="flex gap-2">
             {extraActions}
@@ -106,20 +106,20 @@ export default function GenericListPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100">
+                  <tr className="border-b border-gray-100 dark:border-slate-800">
                     {columns.map(c => (
-                      <th key={c.key} className="text-left py-3 px-2 text-gray-500 font-medium text-xs uppercase tracking-wide">
+                      <th key={c.key} className="text-left py-3 px-2 text-gray-500 dark:text-slate-400 font-medium text-xs uppercase tracking-wide">
                         {c.label}
                       </th>
                     ))}
-                    {mapRowToActions && <th className="text-right py-3 px-2 text-gray-500 font-medium text-xs uppercase">Actions</th>}
+                    {mapRowToActions && <th className="text-right py-3 px-2 text-gray-500 dark:text-slate-400 font-medium text-xs uppercase">Actions</th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-800/50">
                   {items.map(item => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                       {columns.map(c => (
-                        <td key={c.key} className="py-3 px-2 text-gray-700">
+                        <td key={c.key} className="py-3 px-2 text-gray-700 dark:text-gray-300">
                           {c.render ? c.render(item) : item[c.key] ?? '—'}
                         </td>
                       ))}
@@ -127,24 +127,23 @@ export default function GenericListPage({
                         <td className="py-3 px-2">
                           <div className="flex items-center justify-end gap-1">
                             {item._viewPath && (
-                              <Link to={item._viewPath} className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded">
+                              <Link to={item._viewPath} className="p-1.5 text-gray-400 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800 rounded">
                                 <Eye size={15} />
                               </Link>
                             )}
                             {canEdit && item._editPath && (
-                              <Link to={item._editPath} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded">
+                              <Link to={item._editPath} className="p-1.5 text-gray-400 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded">
                                 <Pencil size={15} />
                               </Link>
                             )}
                             {canDelete && item._deleteName && (
-                              <button onClick={() => handleDelete(item.id, item._deleteName)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded">
+                              <button onClick={() => handleDelete(item.id, item._deleteName)} className="p-1.5 text-gray-400 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-slate-800 rounded">
                                 <Trash2 size={15} />
                               </button>
                             )}
                           </div>
                         </td>
                       )}
-
                     </tr>
                   ))}
                 </tbody>
@@ -152,13 +151,13 @@ export default function GenericListPage({
             </div>
 
             {pagination.total_pages > 1 && (
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-500">Total: {pagination.count} records</p>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-slate-800">
+                <p className="text-sm text-gray-500 dark:text-slate-400">Total: {pagination.count} records</p>
                 <div className="flex gap-2">
                   <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="btn-secondary px-3 py-1 disabled:opacity-40">
                     <ChevronLeft size={16} />
                   </button>
-                  <span className="text-sm text-gray-600 px-3 py-1.5">Page {page} / {pagination.total_pages}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300 px-3 py-1.5">Page {page} / {pagination.total_pages}</span>
                   <button disabled={page === pagination.total_pages} onClick={() => setPage(p => p + 1)} className="btn-secondary px-3 py-1 disabled:opacity-40">
                     <ChevronRight size={16} />
                   </button>
