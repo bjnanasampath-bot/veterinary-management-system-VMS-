@@ -92,6 +92,11 @@ export default function GenericListPage({
               className="input-field pl-9"
             />
           </div>
+          {isEmbedded && canAdd && addPath && (
+            <Link to={addPath} className="btn-primary flex items-center gap-2 max-h-[42px] whitespace-nowrap">
+              <Plus size={16} /> Add New
+            </Link>
+          )}
         </div>
 
         {loading ? <Loader /> : items.length === 0 ? (
