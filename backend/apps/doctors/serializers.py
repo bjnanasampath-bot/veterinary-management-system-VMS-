@@ -35,8 +35,26 @@ class DoctorSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password', None)
+        password = validated_data.pop('password', None)
         validated_data.pop('confirm_password', None)
+        
+        from apps.accounts.models import User
+        
+        email = validated_data.get('email')
+        user = User.objects.filter(email=email).first()
+        if not user:
+            if not password:
+                password = "Password@123" # Default secure password if none provided
+            user = User.objects.create_user(
+                email=email,
+                first_name=validated_data.get('first_name'),
+                last_name=validated_data.get('last_name'),
+                phone=validated_data.get('phone', ''),
+                role='doctor',
+                password=password
+            )
+            
+        validated_data['user'] = user
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
