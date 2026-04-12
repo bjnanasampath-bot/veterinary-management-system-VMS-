@@ -19,7 +19,7 @@ export default function AppointmentListPage() {
     <GenericListPage
       title="Appointments" subtitle="Manage all appointments"
       addPath="/appointments/create"
-      showAdd={role !== 'admin'}
+      showAdd={role === 'client'}
       fetchFn={async (p) => {
         const res = await appointmentApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

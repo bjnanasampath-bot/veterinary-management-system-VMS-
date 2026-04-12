@@ -97,11 +97,30 @@ export default function PetDetailsPage() {
           <div className="card">
             <h2 className="font-semibold text-gray-900 mb-3">Treatments</h2>
             {data.treatments?.length === 0 ? <p className="text-gray-400 text-sm text-center py-4">No treatments recorded</p> : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {data.treatments?.slice(0, 4).map(t => (
-                  <div key={t.id} className="py-1.5 border-b border-gray-50 last:border-0">
-                    <div className="flex justify-between"><p className="text-sm font-medium">{t.treatment_name}</p><span className="text-xs text-gray-400">{t.treatment_date}</span></div>
-                    <p className="text-xs text-gray-500 mt-0.5">{t.diagnosis}</p>
+                  <div key={t.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{t.treatment_name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">By {t.doctor_name || 'Doctor'}</p>
+                      </div>
+                      <span className="text-xs font-semibold px-2 py-1 rounded-md bg-white border border-gray-200 text-gray-600">{t.treatment_date}</span>
+                    </div>
+                    {t.diagnosis && (
+                      <p className="text-xs text-gray-700 bg-white p-2 rounded border border-gray-100 mb-1.5"><span className="font-semibold text-gray-600">Diagnosis:</span> {t.diagnosis}</p>
+                    )}
+                    {t.notes && (
+                      <p className="text-xs text-gray-700 bg-white p-2 rounded border border-gray-100 mb-1.5"><span className="font-semibold text-gray-600">Notes:</span> {t.notes}</p>
+                    )}
+                    {t.medications && t.medications.length > 0 && (
+                      <div className="text-xs text-gray-700 bg-white p-2 rounded border border-gray-100 flex gap-1 flex-wrap items-center">
+                        <span className="font-semibold text-gray-600 border-r border-gray-200 pr-2 mr-1">Meds:</span>
+                        {t.medications.map((m, i) => (
+                           <span key={i} className="bg-primary-50 text-primary-700 px-1.5 py-0.5 rounded text-[10px]">{m.name || m}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
