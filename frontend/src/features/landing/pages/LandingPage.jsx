@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Users, Heart, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
+import { fetchSettings } from '../../settings/settingsSlice';
 import { settingsApi } from '../../../api';
 import './LandingPage.css';
 
 export default function LandingPage() {
   const { isAuthenticated } = useSelector((s) => s.auth);
+  const siteSettings = useSelector((s) => s.settings.data);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [siteSettings, setSiteSettings] = useState({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    settingsApi.getAll().then(res => {
-      const data = res.data?.results || res.data?.data || res.data || [];
-      const settingsMap = {};
-      data.forEach(s => settingsMap[s.key] = s.value);
-      setSiteSettings(settingsMap);
-    }).catch(err => console.error("Failed to load settings", err));
-  }, []);
+    dispatch(fetchSettings());
+  }, [dispatch]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {

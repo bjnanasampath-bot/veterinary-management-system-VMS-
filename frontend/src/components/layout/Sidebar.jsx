@@ -22,6 +22,7 @@ const navItems = [
 
 export default function Sidebar({ open, onClose }) {
   const { user } = useSelector(s => s.auth)
+  const siteSettings = useSelector(s => s.settings.data)
   const filteredNavItems = navItems.filter(item => item.roles.includes(user.role))
 
   return (
@@ -40,7 +41,7 @@ export default function Sidebar({ open, onClose }) {
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <PawPrint size={18} className="text-white" />
             </div>
-            <span className="font-bold text-gray-900 dark:text-white text-lg">VetCare</span>
+            <span className="font-bold text-gray-900 dark:text-white text-lg">{siteSettings.app_logo_name || 'VetCare'}</span>
           </div>
           <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <X size={20} />
@@ -69,7 +70,7 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         <div className="px-4 py-3 border-t border-gray-100 text-xs text-gray-400 text-center">
-          VetCare v1.0 • MCA Project
+          {siteSettings.clinic_name || 'VetCare'} • MCA Project
         </div>
       </aside>
     </>

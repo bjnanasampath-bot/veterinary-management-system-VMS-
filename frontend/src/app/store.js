@@ -8,6 +8,8 @@ import treatmentReducer from '../features/treatments/treatmentSlice'
 import vaccinationReducer from '../features/vaccinations/vaccinationSlice'
 import billingReducer from '../features/billing/billingSlice'
 
+import settingsReducer from '../features/settings/settingsSlice'
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -18,5 +20,6 @@ export const store = configureStore({
     treatments: treatmentReducer,
     vaccinations: vaccinationReducer,
     billing: billingReducer,
+    settings: settingsReducer,
   },
 })

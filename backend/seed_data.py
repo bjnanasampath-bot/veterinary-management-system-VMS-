@@ -26,7 +26,7 @@ from apps.owners.models import Owner
 from apps.pets.models import Pet
 from apps.doctors.models import Doctor
 
-print("🌱 Seeding database with sample data...")
+print("Seeding database with sample data...")
 
 # Create Owners
 owners_data = [
@@ -46,7 +46,7 @@ owners = []
 for data in owners_data:
     owner, created = Owner.objects.get_or_create(email=data['email'], defaults=data)
     owners.append(owner)
-    status = "✅ Created" if created else "⏭ Already exists"
+    status = "Created" if created else "Already exists"
     print(f"  {status}: Owner {owner.full_name}")
 
 # Create Pets
@@ -75,7 +75,7 @@ for data in pets_data:
         name=data['name'], owner=data['owner'],
         defaults=data
     )
-    status = "✅ Created" if created else "⏭ Already exists"
+    status = "Created" if created else "Already exists"
     print(f"  {status}: Pet {pet.name} ({pet.species}) - Owner: {pet.owner.full_name}")
 
 # Create Doctors
@@ -109,10 +109,10 @@ doctors_data = [
 
 for data in doctors_data:
     doctor, created = Doctor.objects.get_or_create(email=data['email'], defaults=data)
-    status = "✅ Created" if created else "⏭ Already exists"
+    status = "Created" if created else "Already exists"
     print(f"  {status}: Doctor Dr. {doctor.first_name} {doctor.last_name} ({doctor.specialization})")
 
-print("\n🎉 Database seeding complete!")
-print(f"  ✅ {Owner.objects.count()} Owners")
-print(f"  ✅ {Pet.objects.count()} Pets")
-print(f"  ✅ {Doctor.objects.count()} Doctors")
+print("\nDatabase seeding complete!")
+print(f"  {Owner.objects.count()} Owners")
+print(f"  {Pet.objects.count()} Pets")
+print(f"  {Doctor.objects.count()} Doctors")

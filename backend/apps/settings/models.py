@@ -11,3 +11,4 @@ class SystemSetting(models.Model):
 
     class Meta:
         db_table = 'system_settings'
+        ordering = ['id']

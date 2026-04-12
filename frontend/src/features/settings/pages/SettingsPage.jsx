@@ -16,7 +16,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      settingsApi.getAll().then(r => setSettings(r.data?.results || r.data?.data || r.data || []))
+      settingsApi.getAll({ page_size: 100 }).then(r => setSettings(r.data?.results || r.data?.data || r.data || []))
     }
   }, [user])
 
@@ -47,7 +47,7 @@ export default function SettingsPage() {
       await settingsApi.update(key, { value })
       toast.success(`Setting '${key}' updated`)
       // Refresh settings
-      const r = await settingsApi.getAll()
+      const r = await settingsApi.getAll({ page_size: 100 })
       setSettings(r.data?.results || r.data?.data || r.data || [])
     } catch { toast.error('Failed to update system setting') }
   }

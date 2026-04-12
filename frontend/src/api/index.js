@@ -120,6 +120,6 @@ export const prescriptionApi = {
 }
 
 export const settingsApi = {
-  getAll: () => api.get('/settings/'),
+  getAll: (params) => api.get('/settings/', { params }),
   update: (key, data) => api.patch(`/settings/${key}/`, data),
 }
