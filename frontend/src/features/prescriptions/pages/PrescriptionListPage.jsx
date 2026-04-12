@@ -1,3 +1,4 @@
+import { useSelector } from 'react-redux'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { treatmentApi } from '../../../api'
 
@@ -8,11 +9,13 @@ const statusColors = {
 }
 
 export default function PrescriptionListPage() {
+  const role = useSelector(s => s.auth.user?.role)
   return (
     <GenericListPage
       title="Prescriptions" 
       subtitle="View all medical prescriptions from treatments"
-      showAdd={false}
+      addPath="/prescriptions/add"
+      showAdd={role === 'doctor'}
       fetchFn={async (p) => {
         const res = await treatmentApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []

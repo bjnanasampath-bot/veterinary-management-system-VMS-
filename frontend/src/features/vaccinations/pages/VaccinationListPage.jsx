@@ -1,11 +1,14 @@
+import { useSelector } from 'react-redux'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { vaccinationApi } from '../../../api'
 
 export default function VaccinationListPage({ isEmbedded }) {
+  const role = useSelector(s => s.auth.user?.role)
   return (
     <GenericListPage
       title="Vaccinations" subtitle="Track all pet vaccinations"
       addPath="/vaccinations/add"
+      showAdd={role === 'doctor'}
       isEmbedded={isEmbedded}
       fetchFn={vaccinationApi.getAll}
       deleteFn={vaccinationApi.delete}

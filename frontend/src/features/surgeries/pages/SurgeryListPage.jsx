@@ -1,3 +1,4 @@
+import { useSelector } from 'react-redux'
 import GenericListPage from '../../../components/common/GenericListPage'
 import { surgeryApi } from '../../../api'
 
@@ -8,10 +9,12 @@ const statusColors = {
 }
 
 export default function SurgeryListPage({ isEmbedded }) {
+  const role = useSelector(s => s.auth.user?.role)
   return (
     <GenericListPage
       title="Surgeries" subtitle="Manage surgical operations"
       addPath="/surgeries/add"
+      showAdd={role === 'doctor'}
       isEmbedded={isEmbedded}
       fetchFn={async (p) => {
         const res = await surgeryApi.getAll(p)
