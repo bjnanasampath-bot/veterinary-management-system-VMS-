@@ -111,17 +111,12 @@ export default function LandingPage() {
         </div>
         
         <div className="about-hero-block">
-          <div className="about-image-side video-container h-[400px] overflow-hidden rounded-3xl shadow-2xl">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/kYv_37L15uE?autoplay=1&mute=1&loop=1&playlist=kYv_37L15uE&controls=0&modestbranding=1" 
-              title="Playful Pets" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-              style={{ objectFit: 'cover' }}
-            ></iframe>
+          <div className="about-image-side h-[400px] overflow-hidden rounded-3xl shadow-2xl relative">
+            <img 
+              src="/about_us_caring.png" 
+              alt="Veterinarian caring for pets" 
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
           </div>
           <div className="about-text-side">
             <h3 className="text-3xl font-bold mb-4">Dedicated to Excellence</h3>
