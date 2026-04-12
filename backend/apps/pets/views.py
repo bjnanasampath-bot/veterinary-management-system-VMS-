@@ -16,6 +16,15 @@ class PetListCreateView(generics.ListCreateAPIView):
         if self.request.user.role == 'client':
             from django.db.models import Q
             return qs.filter(Q(owner__user=self.request.user) | Q(owner__email=self.request.user.email))
+        elif self.request.user.role == 'doctor':
+            from apps.doctors.models import Doctor
+            from django.db.models import Q
+            doctor = Doctor.objects.filter(user=self.request.user).first()
+            if doctor:
+                return qs.filter(
+                    Q(appointments__doctor=doctor) | Q(treatments__doctor=doctor)
+                ).distinct()
+            return qs.none()
         return qs
 
     def get_serializer_class(self):
@@ -57,6 +66,15 @@ class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
         qs = Pet.objects.filter(is_active=True).select_related('owner')
         if self.request.user.role == 'client':
             return qs.filter(owner__user=self.request.user)
+        elif self.request.user.role == 'doctor':
+            from apps.doctors.models import Doctor
+            from django.db.models import Q
+            doctor = Doctor.objects.filter(user=self.request.user).first()
+            if doctor:
+                return qs.filter(
+                    Q(appointments__doctor=doctor) | Q(treatments__doctor=doctor)
+                ).distinct()
+            return qs.none()
         return qs
 
     def destroy(self, request, *args, **kwargs):
@@ -71,6 +89,15 @@ class PetMedicalHistoryView(generics.RetrieveAPIView):
         qs = Pet.objects.filter(is_active=True)
         if self.request.user.role == 'client':
             return qs.filter(owner__user=self.request.user)
+        elif self.request.user.role == 'doctor':
+            from apps.doctors.models import Doctor
+            from django.db.models import Q
+            doctor = Doctor.objects.filter(user=self.request.user).first()
+            if doctor:
+                return qs.filter(
+                    Q(appointments__doctor=doctor) | Q(treatments__doctor=doctor)
+                ).distinct()
+            return qs.none()
         return qs
 
     def retrieve(self, request, *args, **kwargs):
