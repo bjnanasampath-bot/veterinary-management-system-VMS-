@@ -49,13 +49,19 @@ export default function Navbar({ onMenuClick }) {
         </button>
 
         <div className="flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-slate-800">
-          <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-            <User size={16} className="text-primary-600" />
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-sm font-medium text-gray-900">{user?.first_name}</p>
-            <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
-          </div>
+          <button 
+            onClick={() => navigate('/settings')} 
+            className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 p-1.5 rounded-lg transition-colors text-left"
+            title="Go to Profile Settings"
+          >
+            <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+              <User size={16} className="text-primary-600 dark:text-primary-400" />
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.first_name}</p>
+              <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+            </div>
+          </button>
           <button
             onClick={handleLogout}
             className="ml-2 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
