@@ -44,7 +44,7 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
         </div>
         <input
           type="text" value={input} onChange={e => setInput(e.target.value)}
-          className="h-10 w-28 bg-white border border-gray-200 rounded-lg px-3 text-center font-bold text-sm focus:border-sky-500 focus:outline-none transition-all"
+          className="h-10 w-28 bg-white border border-gray-200 rounded-lg px-3 text-center font-bold text-sm text-gray-900 focus:border-sky-500 focus:outline-none transition-all"
           placeholder="Enter code" maxLength={6} autoComplete="off"
         />
       </div>
@@ -55,7 +55,7 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
 // ─── LOGIN PANEL ───────────────────────────────────────────────────────────
 function LoginPanel() {
   const dispatch = useDispatch()
-  const { loading } = useSelector(s => s.auth)
+  const { loading, error: authError } = useSelector(s => s.auth)
   const [showPass, setShowPass] = useState(false)
   const captcha = useCaptcha()
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -91,7 +91,7 @@ function LoginPanel() {
             <input
               {...register('email', { required: 'Email is required' })}
               type="email" placeholder="yourname@email.com"
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
             />
           </div>
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -105,7 +105,7 @@ function LoginPanel() {
             <input
               {...register('password', { required: 'Password is required' })}
               type={showPass ? 'text' : 'password'} placeholder="••••••••"
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-9 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
             />
             <button type="button" onClick={() => setShowPass(!showPass)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -117,6 +117,12 @@ function LoginPanel() {
 
         {/* CAPTCHA */}
         <CaptchaBlock {...captcha} />
+
+        {authError && (
+          <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold text-center">
+            {authError}
+          </div>
+        )}
 
         {/* Submit */}
         <button type="submit" disabled={loading}
@@ -171,13 +177,13 @@ function RegisterPanel() {
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">First Name</label>
             <input {...register('first_name', { required: true })}
-              className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
+              className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
               placeholder="John" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Last Name</label>
             <input {...register('last_name', { required: true })}
-              className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
+              className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
               placeholder="Doe" />
           </div>
         </div>
@@ -194,7 +200,7 @@ function RegisterPanel() {
               required: 'Email is required',
               pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' }
             })} type="email"
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
               placeholder="john@email.com" />
           </div>
           {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email.message}</p>}
@@ -209,7 +215,7 @@ function RegisterPanel() {
               required: 'Mobile required',
               pattern: { value: /^[0-9]{10}$/, message: 'Enter 10-digit number' }
             })} type="tel" maxLength={10}
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.phone ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.phone ? 'border-red-400' : 'border-gray-200'}`}
               placeholder="9876543210" />
           </div>
           {errors.phone && <p className="text-red-500 text-xs mt-0.5">{errors.phone.message}</p>}
@@ -223,7 +229,7 @@ function RegisterPanel() {
               <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input {...register('password', { required: true, minLength: 8 })}
                 type={showPass ? 'text' : 'password'}
-                className="w-full border border-gray-200 rounded-xl py-2.5 pl-9 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
+                className="w-full border border-gray-200 rounded-xl py-2.5 pl-9 pr-8 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
                 placeholder="Min 8 chars" />
               <button type="button" onClick={() => setShowPass(!showPass)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
@@ -240,7 +246,7 @@ function RegisterPanel() {
                 validate: v => v === watch('password') || 'No match'
               })}
                 type={showConfirm ? 'text' : 'password'}
-                className={`w-full border rounded-xl py-2.5 pl-9 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.confirm_password ? 'border-red-400' : 'border-gray-200'}`}
+                className={`w-full border rounded-xl py-2.5 pl-9 pr-8 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all ${errors.confirm_password ? 'border-red-400' : 'border-gray-200'}`}
                 placeholder="Repeat" />
               <button type="button" onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">

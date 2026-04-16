@@ -44,7 +44,7 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
         </div>
         <input
           type="text" value={input} onChange={e => setInput(e.target.value)}
-          className="h-10 w-28 bg-white border border-gray-200 rounded-lg px-3 text-center font-bold text-sm focus:border-primary-500 focus:outline-none transition-all"
+          className="h-10 w-28 bg-white border border-gray-200 rounded-lg px-3 text-center font-bold text-sm text-gray-900 focus:border-primary-500 focus:outline-none transition-all"
           placeholder="Enter code" maxLength={6} autoComplete="off"
         />
       </div>
@@ -55,7 +55,7 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
 // ─── LOGIN PANEL (reusable for Admin / Doctor) ────────────────────────────
 function LoginPanel({ role }) {
   const dispatch = useDispatch()
-  const { loading } = useSelector(s => s.auth)
+  const { loading, error: authError } = useSelector(s => s.auth)
   const [showPass, setShowPass] = useState(false)
   const captcha = useCaptcha()
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -106,7 +106,7 @@ function LoginPanel({ role }) {
               {...register('email', { required: 'Email is required' })}
               type="email"
               placeholder={isAdmin ? 'admin@vetcare.com' : 'doctor@vetcare.com'}
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 ${accent.ring} focus:border-transparent transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-3 text-sm text-gray-900 focus:outline-none focus:ring-2 ${accent.ring} focus:border-transparent transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
             />
           </div>
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -126,7 +126,7 @@ function LoginPanel({ role }) {
               {...register('password', { required: 'Password is required' })}
               type={showPass ? 'text' : 'password'}
               placeholder="••••••••"
-              className={`w-full border rounded-xl py-2.5 pl-9 pr-9 text-sm focus:outline-none focus:ring-2 ${accent.ring} focus:border-transparent transition-all ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl py-2.5 pl-9 pr-9 text-sm text-gray-900 focus:outline-none focus:ring-2 ${accent.ring} focus:border-transparent transition-all ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
             />
             <button type="button" onClick={() => setShowPass(!showPass)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -138,6 +138,12 @@ function LoginPanel({ role }) {
 
         {/* CAPTCHA */}
         <CaptchaBlock {...captcha} />
+
+        {authError && (
+          <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold text-center">
+            {authError}
+          </div>
+        )}
 
         {/* Submit */}
         <button type="submit" disabled={loading}
