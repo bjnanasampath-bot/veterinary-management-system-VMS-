@@ -15,7 +15,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+    if (error.response?.status === 401 && !original._retry && !original.url.includes('/login') && !original.url.includes('/google-auth')) {
       original._retry = true
       try {
         const refresh = localStorage.getItem('refresh_token')
@@ -25,7 +25,7 @@ api.interceptors.response.use(
         return api(original)
       } catch (err) {
         localStorage.clear()
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/' && window.location.pathname !== '/client-portal') {
            window.location.href = '/login'
         }
         return Promise.reject(error)
@@ -33,6 +33,9 @@ api.interceptors.response.use(
     }
     
     if (error.response?.status !== 401) {
+      if (original.url.includes('/logout')) {
+         return Promise.reject(error);
+      }
       const resData = error.response?.data || {}
       const fieldErrors = resData.errors || {}
       const firstFieldError = Object.values(fieldErrors).flat()[0]

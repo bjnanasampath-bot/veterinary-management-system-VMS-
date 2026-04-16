@@ -5,10 +5,11 @@ from common.responses import success_response, error_response
 from .models import Appointment
 from .serializers import AppointmentSerializer, AppointmentDetailSerializer
 
+from .filters import AppointmentFilter
 
 class AppointmentListCreateView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'appointment_type', 'doctor', 'appointment_date']
+    filterset_class = AppointmentFilter
     search_fields = ['pet__name', 'doctor__first_name', 'pet__owner__first_name']
     ordering_fields = ['appointment_date', 'created_at']
 

@@ -17,7 +17,7 @@ export default function BillListPage() {
       title="Billing" subtitle="Manage invoices and payments"
       addPath="/billing/create"
       fetchFn={billingApi.getAll}
-      deleteFn={(id) => billingApi.update(id, { status: 'cancelled' })}
+      deleteFn={(id) => billingApi.delete(id)}
       searchPlaceholder="Search by bill number, pet, owner..."
       columns={[
         { key: 'bill_number', label: 'Bill #', render: r => <span className="font-mono font-medium text-primary-600">{r.bill_number}</span> },
