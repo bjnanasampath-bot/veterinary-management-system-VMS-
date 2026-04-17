@@ -21,17 +21,17 @@ export const googleLogin = createAsyncThunk('auth/googleLogin', async (token, { 
 })
 
 export const logout = createAsyncThunk('auth/logout', async (_, { getState }) => {
-  const refresh = localStorage.getItem('refresh_token')
+  const refresh = sessionStorage.getItem('refresh_token')
   try { await authApi.logout({ refresh_token: refresh }) } catch {}
-  localStorage.clear()
+  sessionStorage.clear()
 })
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: JSON.parse(localStorage.getItem('user') || 'null'),
-    token: localStorage.getItem('access_token'),
-    isAuthenticated: !!localStorage.getItem('access_token'),
+    user: JSON.parse(sessionStorage.getItem('user') || 'null'),
+    token: sessionStorage.getItem('access_token'),
+    isAuthenticated: !!sessionStorage.getItem('access_token'),
     loading: false,
     error: null,
   },
@@ -46,9 +46,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true
         state.user = action.payload.user
         state.token = action.payload.access
-        localStorage.setItem('access_token', action.payload.access)
-        localStorage.setItem('refresh_token', action.payload.refresh)
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
+        sessionStorage.setItem('access_token', action.payload.access)
+        sessionStorage.setItem('refresh_token', action.payload.refresh)
+        sessionStorage.setItem('user', JSON.stringify(action.payload.user))
         toast.success('Login successful!')
       })
       .addCase(login.rejected, (state, action) => {
@@ -68,9 +68,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true
         state.user = user
         state.token = access
-        localStorage.setItem('access_token', access)
-        localStorage.setItem('refresh_token', refresh)
-        localStorage.setItem('user', JSON.stringify(user))
+        sessionStorage.setItem('access_token', access)
+        sessionStorage.setItem('refresh_token', refresh)
+        sessionStorage.setItem('user', JSON.stringify(user))
         toast.success('Google Login successful!')
       })
       .addCase(googleLogin.rejected, (state, action) => {
