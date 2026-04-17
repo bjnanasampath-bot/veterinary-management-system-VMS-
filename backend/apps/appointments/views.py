@@ -52,26 +52,80 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         old_status = serializer.instance.status
         instance = serializer.save()
+        
+        # We can extract custom frontend fields from request data
+        doctor_fee = self.request.data.get('doctor_fee', 500.00)
+        payment_mode = self.request.data.get('payment_mode', 'pending')
+        selected_medicines = self.request.data.get('selected_medicines', [])
+
         # Auto-generate bill on completion
         if old_status != 'completed' and instance.status == 'completed':
             from apps.billing.models import Bill, BillItem
             if not Bill.objects.filter(appointment=instance).exists():
+                bill_status = 'paid' if payment_mode in ['online', 'offline'] else 'pending'
+                pmt_method = 'online' if payment_mode == 'online' else ('cash' if payment_mode == 'offline' else '')
+
                 bill = Bill.objects.create(
                     pet=instance.pet,
                     appointment=instance,
                     created_by=self.request.user if self.request.user.is_authenticated else None,
-                    status='pending',
+                    status=bill_status,
+                    payment_method=pmt_method,
                 )
+                
+                total_amount = float(doctor_fee)
+                
+                # Consultation Fee Item
                 BillItem.objects.create(
                     bill=bill,
                     description=f"Consultation - {instance.get_appointment_type_display()}",
                     item_type="consultation",
-                    unit_price=500.00, # Example generic fee
+                    quantity=1,
+                    unit_price=doctor_fee,
+                    total_price=doctor_fee
                 )
-                bill.subtotal = 500.00
+
+                # Pharmacy Items
+                from apps.pharmacy.models import PharmacyItem
+                prescriptions = []
+                for med_id in selected_medicines:
+                    try:
+                        med = PharmacyItem.objects.get(id=med_id)
+                        total_amount += float(med.unit_price)
+                        BillItem.objects.create(
+                            bill=bill,
+                            description=f"Medicine: {med.name}",
+                            item_type="medication",
+                            quantity=1,
+                            unit_price=med.unit_price,
+                            total_price=med.unit_price
+                        )
+                        prescriptions.append(med.name)
+                        
+                        # Decrease stock
+                        if med.stock_quantity > 0:
+                            med.stock_quantity -= 1
+                            med.save()
+                    except Exception as e:
+                        print("Error adding medicine", e)
+                
+                # Update appointment prescription text if medicines were selected
+                if prescriptions:
+                    existing_text = instance.prescription + "\n" if instance.prescription else ""
+                    instance.prescription = existing_text + "Prescribed: " + ", ".join(prescriptions)
+                    instance.save()
+
+                bill.subtotal = total_amount
                 bill.tax_percent = 0 # No tax simplified
                 bill.tax_amount = 0
-                bill.total_amount = 500.00
+                bill.total_amount = total_amount
+                
+                # If paid, set paid amount
+                if bill_status == 'paid':
+                    bill.paid_amount = total_amount
+                    from django.utils import timezone
+                    bill.payment_date = timezone.now()
+                
                 bill.save()
 
     def destroy(self, request, *args, **kwargs):

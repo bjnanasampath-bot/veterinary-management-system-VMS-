@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { appointmentApi } from '../../../api'
+import { appointmentApi, pharmacyApi } from '../../../api'
 import { Loader } from '../../../components/common'
-import { ArrowLeft, Calendar, Clock, User, Stethoscope, CheckCircle, XCircle, Edit2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, Stethoscope, CheckCircle, XCircle, Edit2, Pill, CreditCard, DollarSign } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const STATUS_COLORS = {
@@ -21,11 +21,25 @@ export default function AppointmentDetailsPage() {
   const [isRescheduling, setIsRescheduling] = useState(false)
   const [newDate, setNewDate] = useState('')
   const [newTime, setNewTime] = useState('')
-  const [medicalRecord, setMedicalRecord] = useState({ symptoms: '', diagnosis: '', prescription: '', notes: '' })
+  const [pharmacyItems, setPharmacyItems] = useState([])
+  const [medicalRecord, setMedicalRecord] = useState({ 
+    symptoms: '', diagnosis: '', prescription: '', notes: '',
+    doctor_fee: 500, payment_mode: 'pending', selected_medicines: []
+  })
 
   useEffect(() => {
     fetchAppointment()
+    fetchPharmacyOptions()
   }, [id])
+
+  const fetchPharmacyOptions = async () => {
+    try {
+      const res = await pharmacyApi.getAll()
+      setPharmacyItems(res.data?.results || res.data?.data || [])
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const fetchAppointment = async () => {
     try {
@@ -191,31 +205,78 @@ export default function AppointmentDetailsPage() {
             )}
             
             {appt.status === 'in_progress' && (
-              <div className="w-full bg-primary-50 p-5 rounded-2xl border border-primary-100 space-y-4 my-2">
-                <h3 className="font-bold text-primary-900 border-b border-primary-100 pb-2">Medical Examination Form</h3>
+              <div className="w-full bg-primary-50 p-6 rounded-2xl border border-primary-100 space-y-5 my-2 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-primary-100 pb-3">
+                  <Stethoscope className="text-primary-600" size={24} />
+                  <h3 className="font-bold text-lg text-primary-900">Medical Examination Form</h3>
+                </div>
                 
-                <div className="space-y-3">
-                  <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-full">
                     <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Symptoms Identified</label>
                     <textarea value={medicalRecord.symptoms} onChange={e => setMedicalRecord({...medicalRecord, symptoms: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="What symptoms were observed?"></textarea>
                   </div>
-                  <div>
+                  <div className="col-span-full">
                     <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Diagnosis</label>
                     <textarea value={medicalRecord.diagnosis} onChange={e => setMedicalRecord({...medicalRecord, diagnosis: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="What is the final diagnosis?"></textarea>
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Prescription / Treatments</label>
-                    <textarea value={medicalRecord.prescription} onChange={e => setMedicalRecord({...medicalRecord, prescription: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="Medications or treatments prescribed..."></textarea>
+                  
+                  {/* Pharmacy Selection */}
+                  <div className="col-span-full bg-white p-4 rounded-xl border border-primary-100">
+                    <label className="flex items-center gap-2 text-xs font-bold text-primary-700 uppercase mb-2">
+                       <Pill size={16}/> Select Pharmacy Medicines
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {pharmacyItems.map(item => (
+                        <label key={item.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer p-2 hover:bg-primary-50 rounded-lg">
+                          <input type="checkbox" 
+                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            checked={medicalRecord.selected_medicines.includes(item.id)}
+                            onChange={(e) => {
+                              const selected = e.target.checked 
+                                ? [...medicalRecord.selected_medicines, item.id]
+                                : medicalRecord.selected_medicines.filter(id => id !== item.id);
+                              setMedicalRecord({...medicalRecord, selected_medicines: selected});
+                            }}
+                          />
+                          {item.name} <span className="text-gray-400 text-xs">(${item.unit_price})</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <div>
+
+                  <div className="col-span-full">
+                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Additional Prescription Notes</label>
+                    <textarea value={medicalRecord.prescription} onChange={e => setMedicalRecord({...medicalRecord, prescription: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="Additional manual treatments..."></textarea>
+                  </div>
+                  <div className="col-span-full">
                     <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Internal Notes</label>
                     <textarea value={medicalRecord.notes} onChange={e => setMedicalRecord({...medicalRecord, notes: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="Any other internal notes..."></textarea>
                   </div>
+
+                  {/* Billing configuration */}
+                  <div className="col-span-1 bg-white p-4 rounded-xl border border-primary-100">
+                    <label className="flex items-center gap-2 text-xs font-bold text-primary-700 uppercase mb-2">
+                       <DollarSign size={16}/> Doctor Consultation Fee
+                    </label>
+                    <input type="number" min="0" value={medicalRecord.doctor_fee} onChange={e => setMedicalRecord({...medicalRecord, doctor_fee: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 py-2" />
+                  </div>
+                  
+                  <div className="col-span-1 bg-white p-4 rounded-xl border border-primary-100">
+                    <label className="flex items-center gap-2 text-xs font-bold text-primary-700 uppercase mb-2">
+                       <CreditCard size={16}/> Payment Mode
+                    </label>
+                    <select value={medicalRecord.payment_mode} onChange={e => setMedicalRecord({...medicalRecord, payment_mode: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 py-2">
+                      <option value="pending">Client will Pay Later (Pending)</option>
+                      <option value="online">Paid Online (Instant)</option>
+                      <option value="offline">Paid Cash / Offline (Instant)</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div className="flex gap-2 pt-2">
-                  <button onClick={handleMarkCompleted} className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-3 rounded-xl hover:bg-emerald-700 transition shadow-md font-bold text-sm w-full justify-center">
-                    ✓ Save Medicals & Mark Completed (Auto-Bill)
+                <div className="flex gap-2 pt-4 border-t border-primary-200 mt-4">
+                  <button onClick={handleMarkCompleted} className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-3 rounded-xl hover:bg-emerald-700 transition shadow-md font-bold text-base w-full justify-center">
+                    ✓ Save Exam & Complete (Generate Bill)
                   </button>
                 </div>
               </div>
