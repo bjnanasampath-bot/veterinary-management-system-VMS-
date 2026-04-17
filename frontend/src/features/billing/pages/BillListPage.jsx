@@ -18,12 +18,17 @@ export default function BillListPage() {
       addPath="/billing/create"
       fetchFn={async (p) => {
         const res = await billingApi.getAll(p)
-        const dataList = res.data?.results || res.data?.data || []
-        dataList.forEach(r => {
-          r._viewPath = `/billing/${r.id}`
-          r._deleteName = `Bill #${r.bill_number}`
-        })
-        return res
+        const isArray = Array.isArray(res.data)
+        const dList = isArray ? res.data : (res.data?.results || res.data?.data || [])
+        
+        const mappedList = dList.map(r => ({
+          ...r,
+          _viewPath: `/billing/${r.id}`,
+          _deleteName: `Bill #${r.bill_number}`
+        }))
+        
+        if (isArray) return { ...res, data: mappedList }
+        return { ...res, data: { ...res.data, results: mappedList } }
       }}
       deleteFn={(id) => billingApi.delete(id)}
       searchPlaceholder="Search by bill number, pet, owner..."
@@ -31,8 +36,8 @@ export default function BillListPage() {
         { key: 'bill_number', label: 'Bill #', render: r => <span className="font-mono font-medium text-primary-600">{r.bill_number}</span> },
         { key: 'pet_name', label: 'Pet' },
         { key: 'owner_name', label: 'Owner' },
-        { key: 'doctor_fee', label: 'Doctor Fee', render: r => <span className="text-gray-600">₹{r.doctor_fee}</span> },
-        { key: 'medical_fee', label: 'Medical Fee', render: r => <span className="text-gray-600">₹{r.medical_fee}</span> },
+        { key: 'doctor_fee', label: 'Doctor Fee', render: r => <span className="text-gray-600">₹{r.doctor_fee || '0.00'}</span> },
+        { key: 'medical_fee', label: 'Medical Fee', render: r => <span className="text-gray-600">₹{r.medical_fee || '0.00'}</span> },
         { key: 'total_amount', label: 'Total', render: r => <span className="font-bold">₹{r.total_amount}</span> },
         { key: 'paid_amount', label: 'Paid', render: r => <span className="text-green-600 font-medium">₹{r.paid_amount}</span> },
         { key: 'due_amount', label: 'Due', render: r => <span className={r.due_amount > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>₹{r.due_amount}</span> },
