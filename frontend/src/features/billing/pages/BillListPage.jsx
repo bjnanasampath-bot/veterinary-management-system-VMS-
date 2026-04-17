@@ -16,7 +16,15 @@ export default function BillListPage() {
     <GenericListPage
       title="Billing" subtitle="Manage invoices and payments"
       addPath="/billing/create"
-      fetchFn={billingApi.getAll}
+      fetchFn={async (p) => {
+        const res = await billingApi.getAll(p)
+        const dataList = res.data?.results || res.data?.data || []
+        dataList.forEach(r => {
+          r._viewPath = `/billing/${r.id}`
+          r._deleteName = `Bill #${r.bill_number}`
+        })
+        return res
+      }}
       deleteFn={(id) => billingApi.delete(id)}
       searchPlaceholder="Search by bill number, pet, owner..."
       columns={[
