@@ -31,9 +31,11 @@ export default function BillListPage() {
         { key: 'bill_number', label: 'Bill #', render: r => <span className="font-mono font-medium text-primary-600">{r.bill_number}</span> },
         { key: 'pet_name', label: 'Pet' },
         { key: 'owner_name', label: 'Owner' },
-        { key: 'total_amount', label: 'Total', render: r => `₹${r.total_amount}` },
-        { key: 'paid_amount', label: 'Paid', render: r => <span className="text-green-600">₹{r.paid_amount}</span> },
-        { key: 'due_amount', label: 'Due', render: r => <span className={r.due_amount > 0 ? 'text-red-500' : 'text-gray-400'}>₹{r.due_amount}</span> },
+        { key: 'doctor_fee', label: 'Doctor Fee', render: r => <span className="text-gray-600">₹{r.doctor_fee}</span> },
+        { key: 'medical_fee', label: 'Medical Fee', render: r => <span className="text-gray-600">₹{r.medical_fee}</span> },
+        { key: 'total_amount', label: 'Total', render: r => <span className="font-bold">₹{r.total_amount}</span> },
+        { key: 'paid_amount', label: 'Paid', render: r => <span className="text-green-600 font-medium">₹{r.paid_amount}</span> },
+        { key: 'due_amount', label: 'Due', render: r => <span className={r.due_amount > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>₹{r.due_amount}</span> },
         { key: 'status', label: 'Status', render: r => (
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-gray-100'}`}>{r.status}</span>
         )},

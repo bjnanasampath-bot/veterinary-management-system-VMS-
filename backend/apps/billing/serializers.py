@@ -40,7 +40,21 @@ class BillSerializer(serializers.ModelSerializer):
 class BillListSerializer(serializers.ModelSerializer):
     pet_name = serializers.CharField(source='pet.name', read_only=True)
     owner_name = serializers.CharField(source='pet.owner.full_name', read_only=True)
+    doctor_fee = serializers.SerializerMethodField()
+    medical_fee = serializers.SerializerMethodField()
 
     class Meta:
         model = Bill
-        fields = ['id', 'bill_number', 'pet_name', 'owner_name', 'total_amount', 'paid_amount', 'due_amount', 'status', 'payment_method', 'created_at']
+        fields = ['id', 'bill_number', 'pet_name', 'owner_name', 'doctor_fee', 'medical_fee', 'total_amount', 'paid_amount', 'due_amount', 'status', 'payment_method', 'created_at']
+
+    def get_doctor_fee(self, obj):
+        try:
+            return sum(item.total_price for item in obj.items.all() if item.item_type == 'consultation')
+        except:
+            return 0.0
+
+    def get_medical_fee(self, obj):
+        try:
+            return sum(item.total_price for item in obj.items.all() if item.item_type == 'medication')
+        except:
+            return 0.0

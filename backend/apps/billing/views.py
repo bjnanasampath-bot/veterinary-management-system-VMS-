@@ -14,7 +14,7 @@ class BillListCreateView(generics.ListCreateAPIView):
     ordering_fields = ['created_at', 'total_amount']
 
     def get_queryset(self):
-        qs = Bill.objects.select_related('pet', 'pet__owner').all()
+        qs = Bill.objects.select_related('pet', 'pet__owner').prefetch_related('items').all()
         if self.request.user.role == 'client':
             return qs.filter(pet__owner__user=self.request.user).exclude(status='draft')
         return qs
