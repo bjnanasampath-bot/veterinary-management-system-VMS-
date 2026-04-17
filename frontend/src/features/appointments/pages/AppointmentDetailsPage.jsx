@@ -240,7 +240,7 @@ export default function AppointmentDetailsPage() {
                               setMedicalRecord({...medicalRecord, selected_medicines: selected});
                             }}
                           />
-                          {item.name} <span className="text-gray-400 text-xs">(${item.unit_price})</span>
+                          {item.name} <span className="text-gray-400 text-xs">(₹{item.unit_price})</span>
                         </label>
                       ))}
                     </div>
