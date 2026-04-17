@@ -42,7 +42,7 @@ export default function Dashboard() {
 
         } else if (user.role === 'doctor') {
           const [todayRes, pendingRes] = await Promise.all([
-            appointmentApi.getToday().catch(() => ({ data: [] })),
+            appointmentApi.getAll({ ordering: '-created_at' }).catch(() => ({ data: [] })),
             appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }).catch(() => ({ data: [] }))
           ]);
 

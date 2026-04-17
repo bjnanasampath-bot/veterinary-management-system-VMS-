@@ -121,14 +121,14 @@ export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], 
             </div>
           )}
 
-          {/* Schedule Today */}
+          {/* Schedule */}
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Today's Active Schedule</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active & Recent Appointments</h2>
               <Link to="/appointments" className="text-sm text-primary-600 dark:text-primary-400 hover:underline">View all</Link>
             </div>
             {todayAppts.length === 0 ? (
-              <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-8">No active appointments for you today</p>
+              <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-8">No recent appointments found</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
