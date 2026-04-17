@@ -83,9 +83,18 @@ export default function PharmacyListPage() {
       searchPlaceholder="Search inventory..."
       columns={[
         { key: 'name', label: 'Item Name', render: r => (
-          <div>
-            <p className="font-bold text-gray-900">{r.name}</p>
-            <p className="text-[10px] text-gray-400 uppercase tracking-tighter">{r.category}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded shadow-sm bg-white overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100">
+              {r.image ? (
+                <img src={r.image.startsWith('http') ? r.image : `${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000'}${r.image}`} alt={r.name} className="w-full h-full object-cover" />
+              ) : (
+                <Package size={20} className="text-gray-300" />
+              )}
+            </div>
+            <div>
+              <p className="font-bold text-gray-900">{r.name}</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-tighter">{r.category}</p>
+            </div>
           </div>
         )},
         { key: 'stock_quantity', label: 'Stock', render: r => (
