@@ -46,7 +46,7 @@ export default function Dashboard() {
             appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }).catch(() => ({ data: [] }))
           ]);
 
-          setTodayAppts(todayRes.data?.data || todayRes.data || []);
+          setTodayAppts(todayRes.data?.results || todayRes.data?.data || todayRes.data || []);
           setPendingAppts(pendingRes.data?.results || pendingRes.data?.data || []);
 
         } else if (user.role === 'client') {
