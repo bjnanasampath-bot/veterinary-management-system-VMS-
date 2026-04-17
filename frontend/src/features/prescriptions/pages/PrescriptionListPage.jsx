@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import GenericListPage from '../../../components/common/GenericListPage'
-import { treatmentApi } from '../../../api'
+import { prescriptionApi } from '../../../api'
 
 const statusColors = {
   active: 'bg-green-100 text-green-700',
@@ -13,44 +13,26 @@ export default function PrescriptionListPage() {
   return (
     <GenericListPage
       title="Prescriptions" 
-      subtitle="View all medical prescriptions from treatments"
+      subtitle="View all medical prescriptions assigned to patients"
       addPath="/prescriptions/add"
       showAdd={role === 'doctor'}
       fetchFn={async (p) => {
-        const res = await treatmentApi.getAll(p)
+        const res = await prescriptionApi.getAll(p)
         const dataList = res.data?.results || res.data?.data || []
         
-        // Flatten medications from treatments into a list of prescription-like rows
-        const prescriptions = []
-        dataList.forEach(t => {
-          if (t.medications && Array.isArray(t.medications)) {
-            t.medications.forEach((m, idx) => {
-              prescriptions.push({
-                idx: `${t.id}-${idx}`,
-                pet_name: t.pet_name,
-                medication_name: m.name || 'Unknown',
-                dosage: m.dosage || 'N/A',
-                frequency: m.frequency || 'N/A',
-                duration: m.duration || 'N/A',
-                date: t.treatment_date,
-                status: 'active'
-              })
-            })
-          } else if (t.prescription) {
-            prescriptions.push({
-              idx: t.id,
-              pet_name: t.pet_name,
-              medication_name: 'Prescription Detail',
-              dosage: t.prescription,
-              frequency: 'As prescribed',
-              duration: '-',
-              date: t.treatment_date,
-              status: 'active'
-            })
-          }
-        })
+        const mapped = dataList.map(r => ({
+           id: r.id,
+           idx: r.id,
+           pet_name: r.pet_name || 'Unknown',
+           medication_name: r.medication_name || 'Unknown',
+           dosage: r.dosage,
+           frequency: r.frequency,
+           duration: `${r.duration_days} Days`,
+           date: new Date(r.created_at).toLocaleDateString(),
+           status: r.status
+        }))
         
-        return { ...res, data: { ...res.data, results: prescriptions } }
+        return { ...res, data: { ...res.data, results: mapped } }
       }}
       searchPlaceholder="Search prescriptions..."
       columns={[

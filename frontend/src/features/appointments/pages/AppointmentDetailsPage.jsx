@@ -12,6 +12,9 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-700', no_show: 'bg-orange-100 text-orange-700',
 }
 
+const DOSAGE_OPTIONS = ['1 Tablet', '2 Tablets', '5ml', '10ml', '1 Drop', '2 Drops', '1 Scoop', 'As Needed']
+const FREQUENCY_OPTIONS = ['Once a day', 'Twice a day (1-0-1)', 'Thrice a day (1-1-1)', 'Night only (0-0-1)', 'SOS (As needed)']
+
 export default function AppointmentDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -225,24 +228,73 @@ export default function AppointmentDetailsPage() {
                   {/* Pharmacy Selection */}
                   <div className="col-span-full bg-white p-4 rounded-xl border border-primary-100">
                     <label className="flex items-center gap-2 text-xs font-bold text-primary-700 uppercase mb-2">
-                       <Pill size={16}/> Select Pharmacy Medicines
+                       <Pill size={16}/> Select Pharmacy Medicines & Options
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {pharmacyItems.map(item => (
-                        <label key={item.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer p-2 hover:bg-primary-50 rounded-lg">
-                          <input type="checkbox" 
-                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                            checked={medicalRecord.selected_medicines.includes(item.id)}
-                            onChange={(e) => {
-                              const selected = e.target.checked 
-                                ? [...medicalRecord.selected_medicines, item.id]
-                                : medicalRecord.selected_medicines.filter(id => id !== item.id);
-                              setMedicalRecord({...medicalRecord, selected_medicines: selected});
-                            }}
-                          />
-                          {item.name} <span className="text-gray-400 text-xs">(₹{item.unit_price})</span>
-                        </label>
-                      ))}
+                    <div className="space-y-3">
+                      {pharmacyItems.map(item => {
+                        const selectedItem = medicalRecord.selected_medicines.find(m => m.id === item.id);
+                        const isSelected = !!selectedItem;
+                        return (
+                        <div key={item.id} className={`p-3 rounded-xl border ${isSelected ? 'border-primary-400 bg-primary-50/50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                          <label className="flex items-center gap-2 text-sm text-gray-900 cursor-pointer font-bold">
+                            <input type="checkbox" 
+                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setMedicalRecord({
+                                    ...medicalRecord, 
+                                    selected_medicines: [...medicalRecord.selected_medicines, { id: item.id, dosage: '1 Tablet', frequency: 'Twice a day (1-0-1)', days: 3 }]
+                                  });
+                                } else {
+                                  setMedicalRecord({
+                                    ...medicalRecord, 
+                                    selected_medicines: medicalRecord.selected_medicines.filter(m => m.id !== item.id)
+                                  });
+                                }
+                              }}
+                            />
+                            {item.name} <span className="text-gray-500 text-xs font-medium ml-auto">(₹{item.unit_price})</span>
+                          </label>
+                          
+                          {isSelected && (
+                            <div className="ml-6 mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                              <select 
+                                value={selectedItem.dosage} 
+                                onChange={e => setMedicalRecord({
+                                  ...medicalRecord, 
+                                  selected_medicines: medicalRecord.selected_medicines.map(m => m.id === item.id ? { ...m, dosage: e.target.value } : m)
+                                })}
+                                className="w-full rounded-lg border-primary-200 focus:ring-primary-500 py-1.5 text-xs text-primary-900 font-medium"
+                              >
+                                 {DOSAGE_OPTIONS.map(d => <option key={d}>{d}</option>)}
+                              </select>
+                              <select 
+                                value={selectedItem.frequency} 
+                                onChange={e => setMedicalRecord({
+                                  ...medicalRecord, 
+                                  selected_medicines: medicalRecord.selected_medicines.map(m => m.id === item.id ? { ...m, frequency: e.target.value } : m)
+                                })}
+                                className="w-full rounded-lg border-primary-200 focus:ring-primary-500 py-1.5 text-xs text-primary-900 font-medium"
+                              >
+                                 {FREQUENCY_OPTIONS.map(f => <option key={f}>{f}</option>)}
+                              </select>
+                              <div className="flex items-center gap-2 bg-white border border-primary-200 rounded-lg px-3 overflow-hidden">
+                                <input 
+                                  type="number" min="1" max="90"
+                                  value={selectedItem.days} 
+                                  onChange={e => setMedicalRecord({
+                                    ...medicalRecord, 
+                                    selected_medicines: medicalRecord.selected_medicines.map(m => m.id === item.id ? { ...m, days: e.target.value } : m)
+                                  })}
+                                  className="w-full text-xs py-1.5 border-none outline-none focus:ring-0 p-0 text-primary-900 font-bold"
+                                />
+                                <span className="text-xs font-bold text-primary-600 uppercase">Days</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )})}
                     </div>
                   </div>
 

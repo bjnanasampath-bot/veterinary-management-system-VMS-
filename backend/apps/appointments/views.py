@@ -85,11 +85,22 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
                     total_price=doctor_fee
                 )
 
-                # Pharmacy Items
-                from apps.pharmacy.models import PharmacyItem
+                # Pharmacy Items & Prescriptions
+                from apps.pharmacy.models import PharmacyItem, Prescription
                 prescriptions = []
-                for med_id in selected_medicines:
+                for item_data in selected_medicines:
                     try:
+                        if isinstance(item_data, dict):
+                            med_id = item_data.get('id')
+                            dosage = item_data.get('dosage', '1 Tablet')
+                            frequency = item_data.get('frequency', 'As prescribed')
+                            duration = int(item_data.get('days', 3))
+                        else:
+                            med_id = item_data
+                            dosage = '1 Tablet'
+                            frequency = 'As prescribed'
+                            duration = 3
+
                         med = PharmacyItem.objects.get(id=med_id)
                         total_amount += float(med.unit_price)
                         BillItem.objects.create(
@@ -100,7 +111,19 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
                             unit_price=med.unit_price,
                             total_price=med.unit_price
                         )
-                        prescriptions.append(med.name)
+                        prescriptions.append(f"{med.name} ({dosage}, {frequency} x {duration} days)")
+                        
+                        # Create actual Prescription Record
+                        Prescription.objects.create(
+                            pet=instance.pet,
+                            doctor=instance.doctor,
+                            medication=med,
+                            medication_name=med.name,
+                            dosage=dosage,
+                            frequency=frequency,
+                            duration_days=duration,
+                            notes=instance.prescription or ""
+                        )
                         
                         # Decrease stock
                         if med.stock_quantity > 0:
