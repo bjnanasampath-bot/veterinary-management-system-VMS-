@@ -55,7 +55,8 @@ function CaptchaBlock({ text, input, setInput, refresh }) {
 // ─── LOGIN PANEL (reusable for Admin / Doctor) ────────────────────────────
 function LoginPanel({ role }) {
   const dispatch = useDispatch()
-  const { loading, error: authError } = useSelector(s => s.auth)
+  const { loading } = useSelector(s => s.auth)
+  const [localError, setLocalError] = useState(null)
   const [showPass, setShowPass] = useState(false)
   const captcha = useCaptcha()
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -65,13 +66,18 @@ function LoginPanel({ role }) {
     ? { border: 'border-indigo-100', bar: 'from-indigo-500 to-violet-600', ring: 'focus:ring-indigo-400', btn: 'from-indigo-600 to-violet-700', iconBg: 'bg-indigo-100', iconColor: 'text-indigo-600' }
     : { border: 'border-emerald-100', bar: 'from-emerald-500 to-teal-600', ring: 'focus:ring-emerald-400', btn: 'from-emerald-600 to-teal-700', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600' }
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (captcha.input.trim() !== captcha.text) {
       toast.error('CAPTCHA does not match. Try again.')
       captcha.refresh()
       return
     }
-    dispatch(login(data))
+    setLocalError(null)
+    try {
+      await dispatch(login(data)).unwrap()
+    } catch (err) {
+      setLocalError('login invalid')
+    }
   }
 
   return (
@@ -139,9 +145,9 @@ function LoginPanel({ role }) {
         {/* CAPTCHA */}
         <CaptchaBlock {...captcha} />
 
-        {authError && (
+        {localError && (
           <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold text-center">
-            {authError}
+            {localError}
           </div>
         )}
 
