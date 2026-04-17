@@ -49,12 +49,13 @@ export default function AppointmentDetailsPage() {
       setAppt(data)
       setNewDate(data.appointment_date)
       setNewTime(data.appointment_time)
-      setMedicalRecord({
+      setMedicalRecord(prev => ({
+        ...prev,
         symptoms: data.symptoms || '',
         diagnosis: data.diagnosis || '',
         prescription: data.prescription || '',
         notes: data.notes || ''
-      })
+      }))
     } finally {
       setLoading(false)
     }
