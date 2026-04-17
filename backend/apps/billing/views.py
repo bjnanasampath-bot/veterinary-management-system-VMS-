@@ -53,20 +53,33 @@ class BillPaymentView(APIView):
             if request.user.role == 'client':
                 qs = qs.filter(pet__owner__user=request.user)
             bill = qs.get(pk=pk)
+            
             paid_amount = request.data.get('paid_amount', 0)
             payment_method = request.data.get('payment_method', 'cash')
+            
+            from decimal import Decimal
             from datetime import datetime
-            bill.paid_amount = float(bill.paid_amount) + float(paid_amount)
+            
+            # Use Decimal to avoid precision issues and TypeErrors with models
+            current_paid = Decimal(str(bill.paid_amount or 0))
+            new_payment = Decimal(str(paid_amount or 0))
+            total_required = Decimal(str(bill.total_amount or 0))
+            
+            bill.paid_amount = current_paid + new_payment
             bill.payment_method = payment_method
             bill.payment_date = datetime.now()
-            if bill.paid_amount >= float(bill.total_amount):
+            
+            if bill.paid_amount >= total_required:
                 bill.status = 'paid'
             else:
                 bill.status = 'partial'
+                
             bill.save()
             return success_response(data=BillSerializer(bill).data, message="Payment recorded")
         except Bill.DoesNotExist:
             return error_response(message="Bill not found", status_code=404)
+        except Exception as e:
+            return error_response(message=str(e), status_code=500)
 
 
 class BillSendEmailView(APIView):
