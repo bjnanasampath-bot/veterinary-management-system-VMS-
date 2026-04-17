@@ -56,6 +56,7 @@ class Attendance(BaseModel):
     date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='present')
     check_in_time = models.TimeField(null=True, blank=True)
+    check_out_time = models.TimeField(null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
 
     class Meta:
