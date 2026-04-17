@@ -10,7 +10,15 @@ export default function AddPharmacyItem() {
   
   const onSubmit = async (data) => {
     try {
-      await pharmacyApi.create(data);
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        if (key === 'image') {
+          if (data.image && data.image[0]) formData.append('image', data.image[0]);
+        } else {
+          formData.append(key, data[key]);
+        }
+      });
+      await pharmacyApi.create(formData);
       toast.success('Added item successfully');
       navigate('/pharmacy');
     } catch { toast.error('Error adding item') }
@@ -31,6 +39,9 @@ export default function AddPharmacyItem() {
         <FormField label="Stock Quantity"><input type="number" {...register('stock_quantity')} defaultValue={0} className="input-field" /></FormField>
         <FormField label="Unit Price (₹)"><input type="number" step="0.01" {...register('unit_price')} defaultValue={0.00} className="input-field" /></FormField>
         <FormField label="Expiry Date"><input type="date" {...register('expiry_date')} className="input-field" /></FormField>
+        <FormField label="Item Image" fullWidth>
+          <input type="file" {...register('image')} accept="image/*" className="input-field p-2" />
+        </FormField>
         <FormField label="Description" fullWidth><textarea {...register('description')} placeholder="Special instructions or storage details..." className="input-field h-20" /></FormField>
       </div>
     </FormPage>
