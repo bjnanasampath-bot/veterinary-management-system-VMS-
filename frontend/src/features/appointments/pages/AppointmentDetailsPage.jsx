@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { billingApi, appointmentApi } from '../../../api'
+import { appointmentApi } from '../../../api'
 import { Loader } from '../../../components/common'
-import { ArrowLeft, Calendar, Clock, User, Stethoscope, CheckCircle, XCircle, Edit2, FileText, Pill } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, Stethoscope, CheckCircle, XCircle, Edit2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const STATUS_COLORS = {
@@ -21,8 +21,7 @@ export default function AppointmentDetailsPage() {
   const [isRescheduling, setIsRescheduling] = useState(false)
   const [newDate, setNewDate] = useState('')
   const [newTime, setNewTime] = useState('')
-  const [isCompletingSession, setIsCompletingSession] = useState(false)
-  const [examData, setExamData] = useState({ diagnosis: '', prescription: '' })
+  const [medicalRecord, setMedicalRecord] = useState({ symptoms: '', diagnosis: '', prescription: '', notes: '' })
 
   useEffect(() => {
     fetchAppointment()
@@ -36,6 +35,12 @@ export default function AppointmentDetailsPage() {
       setAppt(data)
       setNewDate(data.appointment_date)
       setNewTime(data.appointment_time)
+      setMedicalRecord({
+        symptoms: data.symptoms || '',
+        diagnosis: data.diagnosis || '',
+        prescription: data.prescription || '',
+        notes: data.notes || ''
+      })
     } finally {
       setLoading(false)
     }
@@ -64,37 +69,16 @@ export default function AppointmentDetailsPage() {
     }
   }
 
-  const handleCompleteExam = async () => {
+  const handleMarkCompleted = async () => {
     try {
-      setIsCompletingSession(true)
-      // 1. Update Appointment
-      await appointmentApi.patch(id, {
-        diagnosis: examData.diagnosis,
-        prescription: examData.prescription,
+      await appointmentApi.patch(id, { 
+        ...medicalRecord,
         status: 'completed'
       })
-      
-      // 2. Automatically Generate Invoice / Bill
-      await billingApi.create({
-        pet: appt.pet?.id || appt.pet_id,
-        appointment: id,
-        status: 'pending',
-        items: [
-          {
-            description: `Consultation - ${appt.doctor_name || 'VetCare Doctor'}`,
-            item_type: 'consultation',
-            quantity: 1,
-            unit_price: 500
-          }
-        ]
-      })
-
-      toast.success('Examination completed and Invoice generated!')
+      toast.success('Examination completed! Bill generated automatically.')
       fetchAppointment()
-    } catch (err) {
-      toast.error('Failed to update and generate bill')
-    } finally {
-      setIsCompletingSession(false)
+    } catch {
+      toast.error('Failed to complete examination')
     }
   }
 
@@ -207,34 +191,37 @@ export default function AppointmentDetailsPage() {
             )}
             
             {appt.status === 'in_progress' && (
-              <div className="w-full mt-4 bg-emerald-50 rounded-2xl p-5 border border-emerald-100">
-                <h3 className="font-bold text-emerald-900 mb-4 flex items-center gap-2"><CheckCircle size={18}/> Complete Examination</h3>
-                <div className="space-y-4">
+              <div className="w-full bg-primary-50 p-5 rounded-2xl border border-primary-100 space-y-4 my-2">
+                <h3 className="font-bold text-primary-900 border-b border-primary-100 pb-2">Medical Examination Form</h3>
+                
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-bold text-emerald-800 uppercase mb-1 flex items-center gap-1"><FileText size={14}/> Diagnosis Notes</label>
-                    <textarea 
-                      value={examData.diagnosis} onChange={(e) => setExamData({...examData, diagnosis: e.target.value})}
-                      className="w-full rounded-xl border-emerald-200 focus:ring-emerald-500 bg-white" rows="3" placeholder="Enter findings..."
-                    ></textarea>
+                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Symptoms Identified</label>
+                    <textarea value={medicalRecord.symptoms} onChange={e => setMedicalRecord({...medicalRecord, symptoms: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="What symptoms were observed?"></textarea>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-emerald-800 uppercase mb-1 flex items-center gap-1"><Pill size={14}/> Prescription & Medicals</label>
-                    <textarea 
-                      value={examData.prescription} onChange={(e) => setExamData({...examData, prescription: e.target.value})}
-                      className="w-full rounded-xl border-emerald-200 focus:ring-emerald-500 bg-white" rows="3" placeholder="Medications, dosages, or lab test requests..."
-                    ></textarea>
+                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Diagnosis</label>
+                    <textarea value={medicalRecord.diagnosis} onChange={e => setMedicalRecord({...medicalRecord, diagnosis: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="What is the final diagnosis?"></textarea>
                   </div>
-                  <button 
-                    onClick={handleCompleteExam} disabled={isCompletingSession}
-                    className="w-full bg-emerald-600 text-white py-3 rounded-xl hover:bg-emerald-700 transition shadow-md font-bold disabled:opacity-50"
-                  >
-                    {isCompletingSession ? 'Saving & Invoicing...' : 'Finish Exam & Generate Invoice'}
+                  <div>
+                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Prescription / Treatments</label>
+                    <textarea value={medicalRecord.prescription} onChange={e => setMedicalRecord({...medicalRecord, prescription: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="Medications or treatments prescribed..."></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-primary-700 uppercase mb-1">Internal Notes</label>
+                    <textarea value={medicalRecord.notes} onChange={e => setMedicalRecord({...medicalRecord, notes: e.target.value})} className="w-full rounded-xl border-primary-200 focus:ring-primary-500 min-h-[60px]" placeholder="Any other internal notes..."></textarea>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button onClick={handleMarkCompleted} className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-3 rounded-xl hover:bg-emerald-700 transition shadow-md font-bold text-sm w-full justify-center">
+                    ✓ Save Medicals & Mark Completed (Auto-Bill)
                   </button>
                 </div>
               </div>
             )}
 
-            <button onClick={() => updateStatus('cancelled')} className="flex items-center gap-2 bg-white border border-rose-100 text-rose-600 px-5 py-2 rounded-xl hover:bg-rose-50 transition font-bold text-sm ml-auto mt-4 w-full md:w-auto">
+            <button onClick={() => updateStatus('cancelled')} className="flex items-center gap-2 bg-white border border-rose-100 text-rose-600 px-5 py-2 rounded-xl hover:bg-rose-50 transition font-bold text-sm ml-auto">
               <XCircle size={18} /> Cancel
             </button>
           </div>

@@ -8,7 +8,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attendance
-        fields = ['id', 'doctor', 'doctor_name', 'date', 'status', 'check_in_time', 'check_out_time', 'notes', 'created_at']
+        fields = ['id', 'doctor', 'doctor_name', 'date', 'status', 'check_in_time', 'notes', 'created_at']
         read_only_fields = ['created_at']
 
 class DoctorSerializer(serializers.ModelSerializer):

@@ -49,6 +49,31 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
                 return qs.none()
         return qs
 
+    def perform_update(self, serializer):
+        old_status = serializer.instance.status
+        instance = serializer.save()
+        # Auto-generate bill on completion
+        if old_status != 'completed' and instance.status == 'completed':
+            from apps.billing.models import Bill, BillItem
+            if not Bill.objects.filter(appointment=instance).exists():
+                bill = Bill.objects.create(
+                    pet=instance.pet,
+                    appointment=instance,
+                    created_by=self.request.user if self.request.user.is_authenticated else None,
+                    status='pending',
+                )
+                BillItem.objects.create(
+                    bill=bill,
+                    description=f"Consultation - {instance.get_appointment_type_display()}",
+                    item_type="consultation",
+                    unit_price=500.00, # Example generic fee
+                )
+                bill.subtotal = 500.00
+                bill.tax_percent = 0 # No tax simplified
+                bill.tax_amount = 0
+                bill.total_amount = 500.00
+                bill.save()
+
     def destroy(self, request, *args, **kwargs):
         appt = self.get_object()
         appt.status = 'cancelled'
@@ -68,8 +93,30 @@ class AppointmentStatusUpdateView(APIView):
             new_status = request.data.get('status')
             if new_status not in dict(Appointment.STATUS_CHOICES):
                 return error_response(message="Invalid status")
+            old_status = appt.status
             appt.status = new_status
             appt.save()
+            
+            # Auto-generate bill on completion
+            if old_status != 'completed' and new_status == 'completed':
+                from apps.billing.models import Bill, BillItem
+                if not Bill.objects.filter(appointment=appt).exists():
+                    bill = Bill.objects.create(
+                        pet=appt.pet,
+                        appointment=appt,
+                        created_by=request.user if request.user.is_authenticated else None,
+                        status='pending',
+                    )
+                    BillItem.objects.create(
+                        bill=bill,
+                        description=f"Consultation - {appt.get_appointment_type_display()}",
+                        item_type="consultation",
+                        unit_price=500.00,
+                    )
+                    bill.subtotal = 500.00
+                    bill.total_amount = 500.00
+                    bill.save()
+            
             return success_response(data=AppointmentSerializer(appt).data, message="Status updated")
         except Appointment.DoesNotExist:
             return error_response(message="Appointment not found", status_code=404)

@@ -153,11 +153,4 @@ class AttendanceDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AttendanceSerializer
     
     def get_permissions(self):
-        return [IsAuthenticated()]
-
-    def perform_update(self, serializer):
-        # Additional safety check to ensure doctor can only update their own record
-        if self.request.user.role == 'doctor' and serializer.instance.doctor.user != self.request.user:
-            from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied("You can only check out your own attendance record.")
-        serializer.save()
+        return [IsAdmin()]

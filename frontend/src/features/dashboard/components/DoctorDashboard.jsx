@@ -38,19 +38,6 @@ export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], 
     }
   }
 
-  const handleCheckOut = async () => {
-    try {
-      if (!attendance?.id) return;
-      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-      // Notice we use patch/update to add check_out_time to existing record
-      await doctorApi.updateAttendance(attendance.id, { ...attendance, check_out_time: now })
-      toast.success('Successfully checked out. Duty leave recorded.')
-      fetchTodayAttendance()
-    } catch (err) {
-      toast.error('Could not check out. Please try again.')
-    }
-  }
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -82,33 +69,19 @@ export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], 
               </div>
             </div>
           ) : (
-            <div className={`rounded-2xl p-5 flex items-center justify-between border ${
+            <div className={`rounded-2xl p-5 flex items-center gap-4 border ${
               attendance.status === 'present' ? 'bg-emerald-50 border-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-400' :
               attendance.status === 'force_leave' ? 'bg-amber-50 border-amber-100 text-amber-800 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' :
               'bg-gray-100 border-gray-100 text-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300'
             }`}>
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${attendance.status === 'present' ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-amber-100 dark:bg-amber-900/50'}`}>
-                  <CheckCircle2 size={24} />
-                </div>
-                <div>
-                  <p className="text-sm opacity-80 uppercase font-bold tracking-wider">Current Status</p>
-                  <p className="text-xl font-bold capitalize">{attendance.status.replace('_', ' ')}</p>
-                  <p className="text-xs opacity-70 mt-1">Checked in at: {attendance.check_in_time}</p>
-                  {attendance.check_out_time && (
-                    <p className="text-xs mt-1 font-semibold text-rose-600 dark:text-rose-400">Checked out at: {attendance.check_out_time}</p>
-                  )}
-                </div>
+              <div className={`p-3 rounded-xl ${attendance.status === 'present' ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-amber-100 dark:bg-amber-900/50'}`}>
+                <CheckCircle2 size={24} />
               </div>
-
-              {!attendance.check_out_time && attendance.status === 'present' && (
-                <button 
-                  onClick={handleCheckOut}
-                  className="px-4 py-2 text-sm font-bold bg-rose-500 hover:bg-rose-600 text-white rounded-xl shadow-sm transition"
-                >
-                  Check Out
-                </button>
-              )}
+              <div>
+                <p className="text-sm opacity-80 uppercase font-bold tracking-wider">Current Status</p>
+                <p className="text-xl font-bold capitalize">{attendance.status.replace('_', ' ')}</p>
+                <p className="text-xs opacity-70 mt-1">Checked in at: {attendance.check_in_time}</p>
+              </div>
             </div>
           )}
 
@@ -148,14 +121,14 @@ export default function DoctorDashboard({ stats, todayAppts, pendingAppts = [], 
             </div>
           )}
 
-          {/* Schedule */}
+          {/* Schedule Today */}
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active & Recent Appointments</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Today's Active Schedule</h2>
               <Link to="/appointments" className="text-sm text-primary-600 dark:text-primary-400 hover:underline">View all</Link>
             </div>
             {todayAppts.length === 0 ? (
-              <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-8">No recent appointments found</p>
+              <p className="text-gray-400 dark:text-slate-500 text-sm text-center py-8">No active appointments for you today</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">

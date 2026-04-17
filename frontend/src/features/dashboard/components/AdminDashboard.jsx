@@ -76,10 +76,7 @@ export default function AdminDashboard({ stats, todayAppts, revenue, apptByType,
                     {attIcon(att.status)}
                     <div>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">{att.doctor_name}</p>
-                      <p className="text-xs text-gray-500 dark:text-slate-400">
-                        In: {att.check_in_time || 'N/A'} 
-                        {att.check_out_time && <span className="text-rose-600 dark:text-rose-400 font-medium ml-2">Out: {att.check_out_time}</span>}
-                      </p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">Check-in: {att.check_in_time || 'N/A'}</p>
                     </div>
                   </div>
                   <span className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize ${attStatusColor(att.status)}`}>

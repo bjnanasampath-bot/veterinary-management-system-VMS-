@@ -42,11 +42,11 @@ export default function Dashboard() {
 
         } else if (user.role === 'doctor') {
           const [todayRes, pendingRes] = await Promise.all([
-            appointmentApi.getAll({ ordering: '-created_at' }).catch(() => ({ data: [] })),
+            appointmentApi.getToday().catch(() => ({ data: [] })),
             appointmentApi.getAll({ status: 'scheduled', ordering: 'appointment_date' }).catch(() => ({ data: [] }))
           ]);
 
-          setTodayAppts(todayRes.data?.results || todayRes.data?.data || todayRes.data || []);
+          setTodayAppts(todayRes.data?.data || todayRes.data || []);
           setPendingAppts(pendingRes.data?.results || pendingRes.data?.data || []);
 
         } else if (user.role === 'client') {
