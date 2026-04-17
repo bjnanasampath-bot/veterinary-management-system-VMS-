@@ -25,6 +25,7 @@ export default function AppointmentListPage() {
         const dataList = res.data?.results || res.data?.data || []
         dataList.forEach(r => {
           r._viewPath = `/appointments/${r.id}`
+          r._deleteName = `Appointment for ${r.pet_name}`
         })
         return res
       }}
