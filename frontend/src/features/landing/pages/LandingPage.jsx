@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Users, Heart, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { fetchSettings } from '../../settings/settingsSlice';
+import { logout } from '../../auth/authSlice';
 import { settingsApi } from '../../../api';
 import './LandingPage.css';
 
@@ -20,10 +21,11 @@ export default function LandingPage() {
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      navigate('/dashboard');
-    } else {
-      navigate('/client-portal');
+      dispatch(logout());
     }
+    setTimeout(() => {
+      navigate('/client-portal');
+    }, 100);
   };
 
   return (
