@@ -49,8 +49,7 @@ export default function AppointmentDetailsPage() {
 
   const handleReschedule = async () => {
     try {
-      await appointmentApi.update(id, { 
-        ...appt, 
+      await appointmentApi.patch(id, { 
         appointment_date: newDate, 
         appointment_time: newTime,
         status: 'confirmed' // Auto confirm on reschedule by doctor

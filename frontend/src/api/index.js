@@ -46,6 +46,7 @@ export const appointmentApi = {
   getById: (id) => api.get(`/appointments/${id}/`),
   create: (data) => api.post('/appointments/', data),
   update: (id, data) => api.put(`/appointments/${id}/`, data),
+  patch: (id, data) => api.patch(`/appointments/${id}/`, data),
   updateStatus: (id, status) => api.patch(`/appointments/${id}/status/`, { status }),
   delete: (id) => api.delete(`/appointments/${id}/`),
   getToday: () => api.get('/appointments/today/'),
