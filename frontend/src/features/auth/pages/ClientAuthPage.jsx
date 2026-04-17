@@ -156,7 +156,15 @@ function RegisterPanel() {
       setShowPass(false)
       setShowConfirm(false)
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed.'
+      const data = err.response?.data || {}
+      // If DRF returns direct field errors like {"email": ["user with this email already exists."]}
+      let msg = data.message || 'Registration failed.'
+      if (!data.message && typeof data === 'object') {
+        const firstValue = Object.values(data)[0];
+        if (Array.isArray(firstValue) && firstValue.length > 0) {
+          msg = firstValue[0]; // e.g. "user with this email already exists."
+        }
+      }
       toast.error(msg)
     }
   }
