@@ -109,7 +109,26 @@ export default function PharmacyListPage() {
             {r.expiry_date || 'N/A'}
           </span>
         )},
+        { key: 'actions', label: 'Quick Restock', render: r => (
+          <button 
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (window.confirm(`Restock ${r.name} by 50 units?`)) {
+                try {
+                  await pharmacyApi.update(r.id, { stock_quantity: r.stock_quantity + 50 });
+                  window.location.reload();
+                } catch (err) {
+                  alert("Failed to restock");
+                }
+              }
+            }}
+            className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-100 font-medium whitespace-nowrap"
+          >
+             + Refill 50
+          </button>
+        )}
       ]}
     />
+
   )
 }
