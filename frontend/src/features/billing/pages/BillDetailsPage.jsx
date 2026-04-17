@@ -42,8 +42,8 @@ export default function BillDetailsPage() {
       setBill(res.data?.data || res.data)
       toast.success('Payment recorded!')
       setPayAmount('')
-    } catch {
-      toast.error('Payment failed')
+    } catch (error) {
+      console.error('Payment failed:', error)
     } finally {
       setPaying(false)
     }
@@ -169,6 +169,7 @@ export default function BillDetailsPage() {
                 <option value="card">Card</option>
                 <option value="upi">UPI</option>
                 <option value="netbanking">Net Banking</option>
+                <option value="cheque">Cheque</option>
               </select>
             </div>
             <button onClick={handlePayment} disabled={paying} className="btn-primary px-6 py-2.5">{paying ? 'Processing...' : 'Pay'}</button>
