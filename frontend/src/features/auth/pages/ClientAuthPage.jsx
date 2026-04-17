@@ -140,7 +140,7 @@ function RegisterPanel() {
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const captcha = useCaptcha()
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm()
 
   const onSubmit = async (data) => {
     if (captcha.input.trim() !== captcha.text) {
@@ -151,7 +151,10 @@ function RegisterPanel() {
     try {
       await authApi.register(data)
       toast.success('Account created! Please login.')
-      navigate('/client-portal')
+      reset()
+      captcha.refresh()
+      setShowPass(false)
+      setShowConfirm(false)
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed.'
       toast.error(msg)
