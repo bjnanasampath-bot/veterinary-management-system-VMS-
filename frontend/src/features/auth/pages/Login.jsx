@@ -102,7 +102,7 @@ function LoginPanel({ role }) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 flex-1">
+      <form onSubmit={handleSubmit(onSubmit)} onChange={() => localError && setLocalError(null)} className="flex flex-col gap-4 flex-1">
         {/* Email */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1">Email Address</label>
