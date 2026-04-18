@@ -65,7 +65,9 @@ export default function SettingsPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
-        <p className="text-gray-500 dark:text-gray-400">Manage your account and clinic preferences</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          {user?.role === 'admin' ? 'Manage your account and clinic preferences' : 'Manage your personal account preferences'}
+        </p>
       </div>
 
       <div className="flex gap-6">
