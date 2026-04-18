@@ -28,7 +28,7 @@ export default function EditDoctorPage() {
           formData.append(key, data[key])
         }
       })
-      await doctorApi.update(id, formData)
+      await doctorApi.patch(id, formData)
       toast.success('Doctor updated!')
       navigate('/doctors')
     } catch { toast.error('Update failed') }

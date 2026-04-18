@@ -114,14 +114,29 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated()]
         return [IsAdmin()]
 
-    def perform_update(self, serializer):
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return success_response(data=serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = DoctorSerializer(instance, data=request.data, partial=True)
+        if not serializer.is_valid():
+            return error_response(errors=serializer.errors)
         doctor = serializer.save()
+        # Sync user model
         if doctor.user:
-            user = doctor.user
-            user.email = doctor.email
-            user.first_name = doctor.first_name
-            user.last_name = doctor.last_name
-            user.save()
+            doctor.user.email = doctor.email
+            doctor.user.first_name = doctor.first_name
+            doctor.user.last_name = doctor.last_name
+            doctor.user.save()
+        return success_response(data=DoctorSerializer(doctor).data, message='Doctor updated successfully.')
+
+    def update(self, request, *args, **kwargs):
+        # Always treat as partial to avoid requiring all fields
+        kwargs['partial'] = True
+        return self.partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         doctor = self.get_object()
