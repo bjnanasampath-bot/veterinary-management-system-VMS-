@@ -5,7 +5,10 @@ import { User, Shield, Building, Percent, Globe, Save, Loader2, Paintbrush, Moon
 import { useTheme } from '../../../context/ThemeContext'
 import toast from 'react-hot-toast'
 
+import { updateUser } from '../auth/authSlice'
+
 export default function SettingsPage() {
+  const dispatch = useDispatch()
   const { user } = useSelector(s => s.auth)
   const { theme, setTheme } = useTheme()
   const [activeTab, setActiveTab] = useState('account')
@@ -24,7 +27,8 @@ export default function SettingsPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await authApi.updateProfile(profileData)
+      const res = await authApi.updateProfile(profileData)
+      dispatch(updateUser(res.data?.data || res.data || profileData))
       toast.success('Profile updated!')
     } catch { toast.error('Failed to update profile') }
     finally { setLoading(false) }
