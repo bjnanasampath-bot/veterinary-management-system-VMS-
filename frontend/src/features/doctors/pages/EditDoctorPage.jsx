@@ -17,21 +17,44 @@ export default function EditDoctorPage() {
     doctorApi.getById(id).then(r => reset(r.data?.data || r.data)).finally(() => setFetching(false))
   }, [id])
 
+  // Fields that come from the API but must NOT be sent back
+  const SKIP_FIELDS = new Set(['id', 'user', 'user_id', 'analytics', 'full_name', 'is_active', 'created_at', 'updated_at'])
+
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      const formData = new FormData()
-      Object.keys(data).forEach(key => {
-        if (key === 'photo') {
-          if (data[key]?.[0]) formData.append('photo', data[key][0])
-        } else if (data[key] !== undefined && data[key] !== '' && data[key] !== null) {
-          formData.append(key, data[key])
-        }
-      })
-      await doctorApi.patch(id, formData)
+      const hasPhoto = data.photo?.[0]
+
+      if (hasPhoto) {
+        // Only use FormData when uploading a photo
+        const formData = new FormData()
+        formData.append('photo', data.photo[0])
+        Object.keys(data).forEach(key => {
+          if (key === 'photo' || SKIP_FIELDS.has(key)) return
+          const val = data[key]
+          if (val === undefined || val === null || val === '') return
+          // JSON-stringify arrays and objects so JSONFields stay valid
+          formData.append(key, Array.isArray(val) || typeof val === 'object' ? JSON.stringify(val) : val)
+        })
+        await doctorApi.patch(id, formData)
+      } else {
+        // Send plain JSON — no serialization issues
+        const payload = {}
+        Object.keys(data).forEach(key => {
+          if (key === 'photo' || SKIP_FIELDS.has(key)) return
+          const val = data[key]
+          if (val === undefined || val === null || val === '') return
+          payload[key] = val
+        })
+        await doctorApi.patch(id, payload)
+      }
+
       toast.success('Doctor updated!')
       navigate('/doctors')
-    } catch { toast.error('Update failed') }
+    } catch (err) {
+      const detail = err.response?.data
+      toast.error(detail?.message || 'Update failed')
+    }
     finally { setLoading(false) }
   }
 

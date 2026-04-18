@@ -120,8 +120,16 @@ class DoctorDetailView(generics.RetrieveUpdateDestroyAPIView):
         return success_response(data=serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
+        import json
         instance = self.get_object()
-        serializer = DoctorSerializer(instance, data=request.data, partial=True)
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        # Fix: available_days may come as a JSON string from FormData
+        if 'available_days' in data and isinstance(data.get('available_days'), str):
+            try:
+                data['available_days'] = json.loads(data['available_days'])
+            except (ValueError, TypeError):
+                data['available_days'] = []
+        serializer = DoctorSerializer(instance, data=data, partial=True)
         if not serializer.is_valid():
             return error_response(errors=serializer.errors)
         doctor = serializer.save()
