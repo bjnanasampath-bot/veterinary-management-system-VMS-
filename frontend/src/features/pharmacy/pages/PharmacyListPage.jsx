@@ -124,7 +124,7 @@ export default function PharmacyListPage() {
               e.stopPropagation();
               if (window.confirm(`Restock ${r.name} by 50 units?`)) {
                 try {
-                  await pharmacyApi.update(r.id, { stock_quantity: r.stock_quantity + 50 });
+                  await pharmacyApi.patch(r.id, { stock_quantity: r.stock_quantity + 50 });
                   window.location.reload();
                 } catch (err) {
                   alert("Failed to restock");
