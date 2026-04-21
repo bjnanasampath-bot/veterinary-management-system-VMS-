@@ -65,7 +65,8 @@ class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         qs = Pet.objects.filter(is_active=True).select_related('owner')
         if self.request.user.role == 'client':
-            return qs.filter(owner__user=self.request.user)
+            from django.db.models import Q
+            return qs.filter(Q(owner__user=self.request.user) | Q(owner__email=self.request.user.email))
         elif self.request.user.role == 'doctor':
             from apps.doctors.models import Doctor
             from django.db.models import Q
@@ -88,7 +89,8 @@ class PetMedicalHistoryView(generics.RetrieveAPIView):
     def get_queryset(self):
         qs = Pet.objects.filter(is_active=True)
         if self.request.user.role == 'client':
-            return qs.filter(owner__user=self.request.user)
+            from django.db.models import Q
+            return qs.filter(Q(owner__user=self.request.user) | Q(owner__email=self.request.user.email))
         elif self.request.user.role == 'doctor':
             from apps.doctors.models import Doctor
             from django.db.models import Q

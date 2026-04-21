@@ -166,8 +166,17 @@ class AttendanceView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if self.request.user.role == 'doctor':
-            doctor = Doctor.objects.get(user=self.request.user)
-            serializer.save(doctor=doctor)
+            try:
+                doctor = Doctor.objects.get(user=self.request.user)
+                serializer.save(doctor=doctor)
+            except Doctor.DoesNotExist:
+                # Fallback: maybe find by email? Or just error out gracefully
+                doctor = Doctor.objects.filter(email=self.request.user.email).first()
+                if doctor:
+                    serializer.save(doctor=doctor)
+                else:
+                    from rest_framework.exceptions import ValidationError
+                    raise ValidationError("Doctor profile not found for this user.")
         else:
             serializer.save()
 

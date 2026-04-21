@@ -48,8 +48,11 @@ class PrescriptionListCreateView(generics.ListCreateAPIView):
         qs = Prescription.objects.filter(is_active=True)
         if self.request.user.role == 'doctor':
             qs = qs.filter(doctor__user=self.request.user)
+        elif self.request.user.role == 'client':
+            from django.db.models import Q
+            qs = qs.filter(Q(pet__owner__user=self.request.user) | Q(pet__owner__email=self.request.user.email))
         elif self.request.user.role not in ['admin']:
-            return qs.none() # Restricted to admin and doctors
+            return qs.none() # Restricted roles
         return qs
 
     def create(self, request, *args, **kwargs):
@@ -68,6 +71,9 @@ class PrescriptionDetailView(generics.RetrieveUpdateDestroyAPIView):
         qs = Prescription.objects.filter(is_active=True)
         if self.request.user.role == 'doctor':
             qs = qs.filter(doctor__user=self.request.user)
+        elif self.request.user.role == 'client':
+            from django.db.models import Q
+            qs = qs.filter(Q(pet__owner__user=self.request.user) | Q(pet__owner__email=self.request.user.email))
         elif self.request.user.role not in ['admin']:
             return qs.none()
         return qs

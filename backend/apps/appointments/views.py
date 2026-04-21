@@ -177,21 +177,67 @@ class AppointmentStatusUpdateView(APIView):
             # Auto-generate bill on completion
             if old_status != 'completed' and new_status == 'completed':
                 from apps.billing.models import Bill, BillItem
+                from decimal import Decimal
+                
                 if not Bill.objects.filter(appointment=appt).exists():
+                    doctor_fee = request.data.get('doctor_fee', 500.00)
+                    payment_mode = request.data.get('payment_mode', 'pending')
+                    selected_medicines = request.data.get('selected_medicines', [])
+
+                    bill_status = 'paid' if payment_mode in ['online', 'offline'] else 'pending'
+                    pmt_method = 'online' if payment_mode == 'online' else ('cash' if payment_mode == 'offline' else '')
+
                     bill = Bill.objects.create(
                         pet=appt.pet,
                         appointment=appt,
                         created_by=request.user if request.user.is_authenticated else None,
-                        status='pending',
+                        status=bill_status,
+                        payment_method=pmt_method,
                     )
+                    
+                    try:
+                        total_amount = Decimal(str(doctor_fee))
+                    except:
+                        total_amount = Decimal('500.00')
+                    
+                    # Consultation Fee
                     BillItem.objects.create(
                         bill=bill,
                         description=f"Consultation - {appt.get_appointment_type_display()}",
                         item_type="consultation",
-                        unit_price=500.00,
+                        quantity=1,
+                        unit_price=total_amount,
+                        total_price=total_amount
                     )
-                    bill.subtotal = 500.00
-                    bill.total_amount = 500.00
+
+                    # Medicines
+                    from apps.pharmacy.models import PharmacyItem, Prescription
+                    for item_data in selected_medicines:
+                        try:
+                            med_id = item_data.get('id') if isinstance(item_data, dict) else item_data
+                            med = PharmacyItem.objects.get(id=med_id)
+                            price = Decimal(str(med.unit_price))
+                            total_amount += price
+                            
+                            BillItem.objects.create(
+                                bill=bill,
+                                description=f"Medicine: {med.name}",
+                                item_type="medication",
+                                quantity=1,
+                                unit_price=price,
+                                total_price=price
+                            )
+                            # Update stock
+                            if med.stock_quantity > 0:
+                                med.stock_quantity -= 1
+                                med.save()
+                        except:
+                            continue
+
+                    bill.subtotal = total_amount
+                    bill.total_amount = total_amount
+                    if bill_status == 'paid':
+                        bill.paid_amount = total_amount
                     bill.save()
             
             return success_response(data=AppointmentSerializer(appt).data, message="Status updated")
