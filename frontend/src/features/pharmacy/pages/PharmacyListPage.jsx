@@ -98,14 +98,36 @@ export default function PharmacyListPage() {
           </div>
         )},
         { key: 'stock_quantity', label: 'Stock', render: r => (
-          <div className="flex flex-col">
-            <span className={`font-black text-lg ${
-              r.stock_quantity === 0 ? 'text-red-600' : 
-              r.stock_quantity < 10 ? 'text-amber-600' : 'text-emerald-600'
-            }`}>
-              {r.stock_quantity}
-            </span>
-            <span className="text-[10px] text-gray-400">Units left</span>
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col min-w-[60px]">
+              <span className={`font-black text-lg ${
+                r.stock_quantity === 0 ? 'text-red-600' : 
+                r.stock_quantity < 10 ? 'text-amber-600' : 'text-emerald-600'
+              }`}>
+                {r.stock_quantity}
+              </span>
+              <span className="text-[10px] text-gray-400">Units left</span>
+            </div>
+            <button 
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (window.confirm(`Restock ${r.name} by 50 units?`)) {
+                  try {
+                    const newQty = parseInt(r.stock_quantity || 0) + 50;
+                    await pharmacyApi.patch(r.id, { stock_quantity: newQty });
+                    toast.success(`Restocked ${r.name}`);
+                    window.location.reload();
+                  } catch (err) {
+                    const msg = err.response?.data?.message || err.response?.data?.detail || "Failed to restock";
+                    toast.error(msg);
+                  }
+                }
+              }}
+              className="px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-bold transition-colors border border-blue-100"
+              title="Quick Refill 50 Units"
+            >
+              +50
+            </button>
           </div>
         )},
         { key: 'unit_price', label: 'Price', render: r => (
@@ -118,27 +140,7 @@ export default function PharmacyListPage() {
             {r.expiry_date || 'N/A'}
           </span>
         )},
-        { key: 'quick_restock', label: 'Quick Restock', render: r => (
-          <button 
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (window.confirm(`Restock ${r.name} by 50 units?`)) {
-                try {
-                  const newQty = parseInt(r.stock_quantity || 0) + 50;
-                  await pharmacyApi.patch(r.id, { stock_quantity: newQty });
-                  toast.success(`Restocked ${r.name}`);
-                  window.location.reload();
-                } catch (err) {
-                  const msg = err.response?.data?.message || err.response?.data?.detail || "Failed to restock";
-                  toast.error(msg);
-                }
-              }
-            }}
-            className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-100 font-medium whitespace-nowrap"
-          >
-             + Refill 50
-          </button>
-        )}
+
       ]}
     />
 
