@@ -120,12 +120,12 @@ export default function AboutUsPage() {
           <div className="p-8 bg-gray-50 dark:bg-slate-800 rounded-2xl text-center border border-gray-100 dark:border-slate-700">
              <div className="inline-block p-4 bg-white dark:bg-slate-900 rounded-full mb-4 shadow-sm text-primary-600"><MapPin size={24}/></div>
              <h4 className="font-bold mb-2 dark:text-white">Visit Us</h4>
-             <p className="text-gray-500 dark:text-gray-400 text-sm">123 Veterinary St, Pet City,<br/>Medical District, PC 56789</p>
+             <p className="text-gray-500 dark:text-gray-400 text-sm">Kakinada, 533001,<br/>Venkat Nagar</p>
           </div>
           <div className="p-8 bg-gray-50 dark:bg-slate-800 rounded-2xl text-center border border-gray-100 dark:border-slate-700">
              <div className="inline-block p-4 bg-white dark:bg-slate-900 rounded-full mb-4 shadow-sm text-primary-600"><Phone size={24}/></div>
              <h4 className="font-bold mb-2 dark:text-white">Call Us</h4>
-             <p className="text-gray-500 dark:text-gray-400 text-sm">+1 (555) 123-4567<br/>+1 (555) 987-6543</p>
+             <p className="text-gray-500 dark:text-gray-400 text-sm">+91 6300697301<br/>+91 8074055616</p>
           </div>
           <div className="p-8 bg-gray-50 dark:bg-slate-800 rounded-2xl text-center border border-gray-100 dark:border-slate-700">
              <div className="inline-block p-4 bg-white dark:bg-slate-900 rounded-full mb-4 shadow-sm text-primary-600"><Clock size={24}/></div>
