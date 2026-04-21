@@ -109,6 +109,7 @@ export const pharmacyApi = {
   getById: (id) => api.get(`/pharmacy/items/${id}/`),
   create: (data) => api.post('/pharmacy/items/', data),
   update: (id, data) => api.put(`/pharmacy/items/${id}/`, data),
+  patch: (id, data) => api.patch(`/pharmacy/items/${id}/`, data),
   delete: (id) => api.delete(`/pharmacy/items/${id}/`),
   getAnalytics: () => api.get('/pharmacy/analytics/'),
 }

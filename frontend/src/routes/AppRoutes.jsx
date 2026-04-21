@@ -43,6 +43,7 @@ import ReportsDashboard from '../features/reports/pages/ReportsDashboard'
 
 import PharmacyListPage from '../features/pharmacy/pages/PharmacyListPage'
 import AddPharmacyItem from '../features/pharmacy/pages/AddPharmacyItem'
+import EditPharmacyItem from '../features/pharmacy/pages/EditPharmacyItem'
 
 import PrescriptionListPage from '../features/prescriptions/pages/PrescriptionListPage'
 import AddPrescription from '../features/prescriptions/pages/AddPrescription'
@@ -116,6 +117,7 @@ export default function AppRoutes() {
 
         <Route path="/pharmacy" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PharmacyListPage /></ProtectedRoute>} />
         <Route path="/pharmacy/add" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><AddPharmacyItem /></ProtectedRoute>} />
+        <Route path="/pharmacy/:id/edit" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><EditPharmacyItem /></ProtectedRoute>} />
         
         <Route path="/medical-services" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><MedicalServicesHub /></ProtectedRoute>} />
         
