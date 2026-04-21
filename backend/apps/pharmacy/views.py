@@ -27,32 +27,23 @@ class PharmacyItemListCreateView(generics.ListCreateAPIView):
 class PharmacyItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PharmacyItem.objects.filter(is_active=True)
     serializer_class = PharmacyItemSerializer
+    permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return success_response(data=serializer.data)
 
-    def update(self, request, *args, **kwargs):
-        if request.user.role not in ['admin', 'doctor']:
-            return error_response(message="Not authorized", status_code=403)
-        
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        
-        # Handle cases where request.data might be weirdly formatted
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        
-        if serializer.is_valid():
-            item = serializer.save()
-            return success_response(data=PharmacyItemSerializer(item).data, message="Item updated successfully")
-        
-        print(f"Update failed for item {instance.id}: {serializer.errors}")
-        return error_response(message="Validation failed", errors=serializer.errors)
+    def perform_update(self, serializer):
+        if self.request.user.role not in ['admin', 'doctor']:
+             from rest_framework.exceptions import PermissionDenied
+             raise PermissionDenied("Not authorized to update items")
+        serializer.save()
 
-    def partial_update(self, request, *args, **kwargs):
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        # Override to use success_response wrapper
+        response = super().update(request, *args, **kwargs)
+        return success_response(data=response.data, message="Item updated successfully")
 
     def destroy(self, request, *args, **kwargs):
         if request.user.role not in ['admin', 'doctor']:

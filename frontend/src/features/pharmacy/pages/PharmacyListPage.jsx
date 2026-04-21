@@ -124,12 +124,13 @@ export default function PharmacyListPage() {
               e.stopPropagation();
               if (window.confirm(`Restock ${r.name} by 50 units?`)) {
                 try {
-                  await pharmacyApi.patch(r.id, { stock_quantity: r.stock_quantity + 50 });
+                  const newQty = parseInt(r.stock_quantity || 0) + 50;
+                  await pharmacyApi.patch(r.id, { stock_quantity: newQty });
                   toast.success(`Restocked ${r.name}`);
                   window.location.reload();
                 } catch (err) {
                   const msg = err.response?.data?.message || err.response?.data?.detail || "Failed to restock";
-                  alert(msg);
+                  toast.error(msg);
                 }
               }
             }}
