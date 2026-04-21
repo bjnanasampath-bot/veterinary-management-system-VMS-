@@ -118,7 +118,7 @@ export default function PharmacyListPage() {
             {r.expiry_date || 'N/A'}
           </span>
         )},
-        { key: 'actions', label: 'Quick Restock', render: r => (
+        { key: 'quick_restock', label: 'Quick Restock', render: r => (
           <button 
             onClick={async (e) => {
               e.stopPropagation();
