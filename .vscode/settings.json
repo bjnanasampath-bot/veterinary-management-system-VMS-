@@ -1,5 +1,8 @@
 {
   "css.customData": [],
   "css.lint.unknownAtRules": "ignore",
-  "python.analysis.extraPaths": ["./backend"]
+  "python.analysis.extraPaths": [
+    "e:/220798/veterinary-management-system/backend"
+  ],
+  "python.envFile": "${workspaceFolder}/.env"
 }
