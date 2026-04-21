@@ -6,4 +6,4 @@ class PharmacyConfig(AppConfig):
     name = 'apps.pharmacy'
 
     def ready(self):
-        import apps.pharmacy.signals
+        from . import signals
