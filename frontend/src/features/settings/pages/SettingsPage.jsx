@@ -5,7 +5,7 @@ import { User, Shield, Building, Percent, Globe, Save, Loader2, Paintbrush, Moon
 import { useTheme } from '../../../context/ThemeContext'
 import toast from 'react-hot-toast'
 
-import { updateUser } from '../auth/authSlice'
+import { updateUser } from '../../auth/authSlice'
 
 export default function SettingsPage() {
   const dispatch = useDispatch()
