@@ -49,6 +49,10 @@ class RegisterSerializer(serializers.ModelSerializer):
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                     'phone': user.phone or '0000000000',
+                    'address': 'Pending Update',
+                    'city': 'Pending',
+                    'state': 'Pending',
+                    'pincode': '000000',
                     'user': user
                 }
             )

@@ -42,9 +42,28 @@ class DashboardStatsView(APIView):
             appts_q = Appointment.objects.filter(doctor=doctor_profile)
             bills_q = Bill.objects.filter(pet__appointments__doctor=doctor_profile).distinct()
         elif role == 'client':
-            from django.db.models import Q
             from apps.owners.models import Owner
-            owner_ids = list(Owner.objects.filter(Q(user=user) | Q(email=user.email)).values_list('id', flat=True))
+            try:
+                owner_profile = user.owner_profile
+            except AttributeError:
+                owner_profile, created = Owner.objects.get_or_create(
+                    email=user.email,
+                    defaults={
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'phone': user.phone or '0000000000',
+                        'address': 'Pending Update',
+                        'city': 'Pending',
+                        'state': 'Pending',
+                        'pincode': '000000',
+                        'user': user
+                    }
+                )
+                if not created and not owner_profile.user:
+                    owner_profile.user = user
+                    owner_profile.save()
+            
+            owner_ids = [owner_profile.id]
             
             pets_q = Pet.objects.filter(owner_id__in=owner_ids)
             appts_q = Appointment.objects.filter(pet__owner_id__in=owner_ids)
