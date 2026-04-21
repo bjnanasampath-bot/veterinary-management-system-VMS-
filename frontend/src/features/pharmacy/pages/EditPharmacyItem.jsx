@@ -13,14 +13,17 @@ export default function EditPharmacyItem() {
 
   useEffect(() => {
     pharmacyApi.getById(id).then(res => {
-      const data = res.data?.data || res.data
+      // res.data is from generic response {success, message, data}
+      // or directly the object if not wrapped.
+      const itemData = res.data?.data || res.data;
+      
       reset({
-        name: data.name,
-        category: data.category,
-        stock_quantity: data.stock_quantity,
-        unit_price: data.unit_price,
-        expiry_date: data.expiry_date ? data.expiry_date.split('T')[0] : '',
-        description: data.description
+        name: itemData.name,
+        category: itemData.category,
+        stock_quantity: itemData.stock_quantity,
+        unit_price: itemData.unit_price,
+        expiry_date: itemData.expiry_date ? itemData.expiry_date.split('T')[0] : '',
+        description: itemData.description
       })
       setLoading(false)
     }).catch(() => {
