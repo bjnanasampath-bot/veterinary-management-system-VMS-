@@ -13,7 +13,7 @@ export default defineConfig({
         interval: 100,
     },
     hmr: {
-        host: 'localhost',
+        // host: 'localhost', // Commenting out to allow network connections for HMR
         protocol: 'ws', // Explicitly use websocket for more stable HMR
         overlay: true, 
     },
