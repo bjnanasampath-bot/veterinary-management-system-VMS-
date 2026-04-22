@@ -168,35 +168,75 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="info-section services-section" id="services">
-        <div className="section-header">
-          <h2>{siteSettings.landing_services_title || 'Our Services'}</h2>
-          <p>{siteSettings.landing_services_description || 'Comprehensive veterinary solutions for your pets.'}</p>
-        </div>
-        <div className="services-grid">
-          <div className="service-item" onClick={() => navigate('/services/routine-checkups')}>
-             <div className="service-icon">🩺</div>
-             <h4>Routine Checkups</h4>
-             <p className="service-desc">Comprehensive physical exams to ensure your pet's overall health and early detection of issues.</p>
+      {/* Stats Section */}
+      <section className="stats-section">
+        <div className="stats-container">
+          <div className="stat-card">
+            <span className="stat-number">10k+</span>
+            <span className="stat-label">Happy Pets</span>
           </div>
-          <div className="service-item" onClick={() => navigate('/services/vaccinations')}>
-             <div className="service-icon">💉</div>
-             <h4>Vaccinations</h4>
-             <p className="service-desc">Essential immunizations tailored to your pet's lifestyle to protect against common diseases.</p>
+          <div className="stat-card">
+            <span className="stat-number">50+</span>
+            <span className="stat-label">Expert Vets</span>
           </div>
-          <div className="service-item" onClick={() => navigate('/services/orthopedics')}>
-             <div className="service-icon">🦴</div>
-             <h4>Orthopedics</h4>
-             <p className="service-desc">Specialized care for bones and joints, including advanced diagnostics and surgical solutions.</p>
+          <div className="stat-card">
+            <span className="stat-number">15+</span>
+            <span className="stat-label">Years Exp</span>
           </div>
-          <div className="service-item" onClick={() => navigate('/services/dental-care')}>
-             <div className="service-icon">🦷</div>
-             <h4>Dental Care</h4>
-             <p className="service-desc">Complete oral health services including professional cleanings and preventative care.</p>
+          <div className="stat-card">
+            <span className="stat-number">24/7</span>
+            <span className="stat-label">Emergency</span>
           </div>
         </div>
       </section>
+
+      {/* Services Section */}
+      <section className="info-section services-section" id="services">
+        <div className="section-header">
+          <span className="section-badge">Our Services</span>
+          <h2>{siteSettings.landing_services_title || 'Comprehensive Care for Every Need'}</h2>
+          <p>{siteSettings.landing_services_description || 'We offer a wide range of veterinary services to ensure your pets stay healthy and happy at every stage of their life.'}</p>
+        </div>
+        <div className="services-grid">
+          <div className="service-item glass-card" onClick={() => navigate('/services/routine-checkups')}>
+             <div className="service-icon-wrapper">🩺</div>
+             <h4>Routine Checkups</h4>
+             <p className="service-desc">Comprehensive physical exams to ensure your pet's overall health and early detection of issues.</p>
+             <div className="service-footer">
+               <span>Learn More</span>
+               <ArrowRight size={16} />
+             </div>
+          </div>
+          <div className="service-item glass-card" onClick={() => navigate('/services/vaccinations')}>
+             <div className="service-icon-wrapper">💉</div>
+             <h4>Vaccinations</h4>
+             <p className="service-desc">Essential immunizations tailored to your pet's lifestyle to protect against common diseases.</p>
+             <div className="service-footer">
+               <span>Learn More</span>
+               <ArrowRight size={16} />
+             </div>
+          </div>
+          <div className="service-item glass-card" onClick={() => navigate('/services/orthopedics')}>
+             <div className="service-icon-wrapper">🦴</div>
+             <h4>Orthopedics</h4>
+             <p className="service-desc">Specialized care for bones and joints, including advanced diagnostics and surgical solutions.</p>
+             <div className="service-footer">
+               <span>Learn More</span>
+               <ArrowRight size={16} />
+             </div>
+          </div>
+          <div className="service-item glass-card" onClick={() => navigate('/services/dental-care')}>
+             <div className="service-icon-wrapper">🦷</div>
+             <h4>Dental Care</h4>
+             <p className="service-desc">Complete oral health services including professional cleanings and preventative care.</p>
+             <div className="service-footer">
+               <span>Learn More</span>
+               <ArrowRight size={16} />
+             </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* FAQ Section */}
       <section className="info-section premium-border" id="faq">

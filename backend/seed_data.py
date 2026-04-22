@@ -25,10 +25,24 @@ django.setup()
 from apps.owners.models import Owner
 from apps.pets.models import Pet
 from apps.doctors.models import Doctor
+from apps.appointments.models import Appointment
+from apps.billing.models import Bill, BillItem
+from apps.pharmacy.models import PharmacyItem
+from apps.notifications.models import Notification
+from django.contrib.auth import get_user_model
+from datetime import date, timedelta, datetime
+import random
+
+User = get_user_model()
 
 print("Seeding database with sample data...")
 
-# Create Owners
+# Create Superuser if not exists
+if not User.objects.filter(email='admin@example.com').exists():
+    User.objects.create_superuser('admin@example.com', 'admin123', first_name='System', last_name='Administrator', role='admin')
+    print("  Created Superuser: admin@example.com")
+
+# Create Owners (Clients)
 owners_data = [
     {'first_name': 'Ramesh', 'last_name': 'Kumar', 'email': 'ramesh.kumar@example.com',
      'phone': '9876543210', 'address': '123 MG Road', 'city': 'Hyderabad', 'state': 'Telangana', 'pincode': '500001'},
@@ -46,11 +60,18 @@ owners = []
 for data in owners_data:
     owner, created = Owner.objects.get_or_create(email=data['email'], defaults=data)
     owners.append(owner)
-    status = "Created" if created else "Already exists"
-    print(f"  {status}: Owner {owner.full_name}")
+    # Create corresponding user for client portal
+    if not User.objects.filter(email=data['email']).exists():
+        User.objects.create_user(
+            email=data['email'], 
+            password='password123',
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            role='client'
+        )
+    print(f"  {'Created' if created else 'Exists'}: Owner {owner.full_name}")
 
 # Create Pets
-from datetime import date
 pets_data = [
     {'owner': owners[0], 'name': 'Bruno', 'species': 'dog', 'breed': 'Labrador', 'gender': 'male',
      'date_of_birth': date(2020, 3, 15), 'weight': 28.5, 'color': 'Golden Brown', 'is_neutered': True},
@@ -70,13 +91,11 @@ pets_data = [
      'date_of_birth': date(2022, 4, 10), 'weight': 27.0, 'color': 'Golden', 'is_neutered': True},
 ]
 
+pets = []
 for data in pets_data:
-    pet, created = Pet.objects.get_or_create(
-        name=data['name'], owner=data['owner'],
-        defaults=data
-    )
-    status = "Created" if created else "Already exists"
-    print(f"  {status}: Pet {pet.name} ({pet.species}) - Owner: {pet.owner.full_name}")
+    pet, created = Pet.objects.get_or_create(name=data['name'], owner=data['owner'], defaults=data)
+    pets.append(pet)
+    print(f"  {'Created' if created else 'Exists'}: Pet {pet.name}")
 
 # Create Doctors
 doctors_data = [
@@ -90,29 +109,107 @@ doctors_data = [
      'experience_years': 12, 'qualification': 'BVSc, MVSc (Surgery), PhD',
      'consultation_fee': 1000, 'available_days': ['monday', 'wednesday', 'friday'],
      'bio': 'Specialist in small animal surgery with 12 years of experience.'},
-    {'first_name': 'Kiran', 'last_name': 'Rao', 'email': 'dr.kiran.rao@vetcare.com',
-     'phone': '9900112235', 'specialization': 'dermatology', 'license_number': 'VET-2024-003',
-     'experience_years': 6, 'qualification': 'BVSc, MVSc (Dermatology)',
-     'consultation_fee': 700, 'available_days': ['tuesday', 'thursday', 'saturday'],
-     'bio': 'Skin specialist for dogs and cats.'},
-    {'first_name': 'Shalini', 'last_name': 'Joshi', 'email': 'dr.shalini.joshi@vetcare.com',
-     'phone': '9900112236', 'specialization': 'dentistry', 'license_number': 'VET-2024-004',
-     'experience_years': 5, 'qualification': 'BVSc, MVSc (Dental)',
-     'consultation_fee': 800, 'available_days': ['monday', 'tuesday', 'thursday', 'friday'],
-     'bio': 'Dental health specialist for all pets.'},
-    {'first_name': 'Rajesh', 'last_name': 'Gupta', 'email': 'dr.rajesh.gupta@vetcare.com',
-     'phone': '9900112237', 'specialization': 'cardiology', 'license_number': 'VET-2024-005',
-     'experience_years': 15, 'qualification': 'BVSc, MVSc (Cardiology), PhD',
-     'consultation_fee': 1200, 'available_days': ['wednesday', 'friday'],
-     'bio': 'Cardiac health specialist with over 15 years of experience.'},
 ]
 
+doctors = []
 for data in doctors_data:
     doctor, created = Doctor.objects.get_or_create(email=data['email'], defaults=data)
-    status = "Created" if created else "Already exists"
-    print(f"  {status}: Doctor Dr. {doctor.first_name} {doctor.last_name} ({doctor.specialization})")
+    doctors.append(doctor)
+    # Create corresponding user for doctor login
+    if not User.objects.filter(email=data['email']).exists():
+        User.objects.create_user(
+            email=data['email'], 
+            password='password123',
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            role='doctor'
+        )
+    print(f"  {'Created' if created else 'Exists'}: Doctor Dr. {doctor.first_name}")
+
+
+# Create Pharmacy Items
+pharmacy_data = [
+    {'name': 'Amoxicillin', 'category': 'medication', 'stock_quantity': 500, 'unit_price': 15.0, 'description': 'Antibiotic for various infections.'},
+    {'name': 'Carprofen', 'category': 'medication', 'stock_quantity': 200, 'unit_price': 45.0, 'description': 'Pain relief and anti-inflammatory.'},
+    {'name': 'Bravecto', 'category': 'medication', 'stock_quantity': 30, 'unit_price': 1200.0, 'description': 'Flea and tick protection.'},
+    {'name': 'Rabies Vaccine', 'category': 'vaccine', 'stock_quantity': 15, 'unit_price': 650.0, 'description': 'Annual rabies vaccination.'},
+    {'name': 'Ear Cleaner', 'category': 'supply', 'stock_quantity': 45, 'unit_price': 350.0, 'description': 'Gentle ear cleaning solution.'},
+]
+
+for data in pharmacy_data:
+    item, created = PharmacyItem.objects.get_or_create(name=data['name'], defaults=data)
+    print(f"  {'Created' if created else 'Exists'}: Pharmacy Item {item.name}")
+
+
+# Create Appointments
+print("Seeding Appointments and Billing...")
+today = date.today()
+statuses = ['scheduled', 'confirmed', 'completed', 'in_progress']
+
+for i in range(15):
+    p = random.choice(pets)
+    d = random.choice(doctors)
+    # Some past, some future
+    day_offset = random.randint(-15, 15)
+    appt_date = today + timedelta(days=day_offset)
+    
+    status = 'completed' if day_offset < 0 else random.choice(['scheduled', 'confirmed', 'in_progress'])
+    
+    appt_type = random.choice(['checkup', 'vaccination', 'surgery', 'dental', 'followup'])
+    
+    appt = Appointment.objects.create(
+        pet=p,
+        doctor=d,
+        appointment_date=appt_date,
+        appointment_time="10:00:00",
+        appointment_type=appt_type,
+        reason=random.choice(['Regular Checkup', 'Vaccination', 'Skin Allergy', 'Limping', 'Dental Cleaning']),
+        status=status,
+        symptoms="Sample symptoms for " + p.name,
+        diagnosis="Sample diagnosis" if status == 'completed' else ""
+    )
+
+    
+    # If completed, create a bill
+    if status == 'completed':
+        bill = Bill.objects.create(
+            appointment=appt,
+            pet=p,
+            total_amount=d.consultation_fee,
+            status='paid' if random.random() > 0.3 else 'pending',
+            payment_method='cash' if random.random() > 0.5 else 'card'
+        )
+        # Add consultation fee item
+        BillItem.objects.create(
+            bill=bill,
+            description="Consultation Fee - " + d.first_name,
+            item_type='consultation',
+            quantity=1,
+            unit_price=d.consultation_fee,
+            total_price=d.consultation_fee
+        )
+        # Maybe add a medicine
+        if random.random() > 0.5:
+            med = random.choice(PharmacyItem.objects.all())
+            qty = random.randint(1, 5)
+            med_total = med.unit_price * qty
+            BillItem.objects.create(
+                bill=bill,
+                description=med.name,
+                item_type='medication',
+                quantity=qty,
+                unit_price=med.unit_price,
+                total_price=med_total
+            )
+            bill.total_amount += med_total
+            bill.save()
+
 
 print("\nDatabase seeding complete!")
 print(f"  {Owner.objects.count()} Owners")
 print(f"  {Pet.objects.count()} Pets")
 print(f"  {Doctor.objects.count()} Doctors")
+print(f"  {Appointment.objects.count()} Appointments")
+print(f"  {Bill.objects.count()} Bills")
+print(f"  {PharmacyItem.objects.count()} Pharmacy Items")
+
