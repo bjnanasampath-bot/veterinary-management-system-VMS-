@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
 import { Users, Heart, ArrowRight, Mail, Phone, MapPin, Send, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { fetchSettings } from '../../settings/settingsSlice';
