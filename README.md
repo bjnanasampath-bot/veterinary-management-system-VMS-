@@ -163,3 +163,5 @@ veterinary-management-system/
 **Project**: Veterinary Management System  
 **Stack**: Django + React + PostgreSQL  
 **Year**: 2024-25
+
+# veterinary_management_system
