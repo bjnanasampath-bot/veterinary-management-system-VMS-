@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Bell, Check, Trash } from 'lucide-react'
-import { notificationApi } from '../../../api'
+import { notificationApi } from '../../api'
 import { Link } from 'react-router-dom'
 
 export default function NotificationDropdown() {
