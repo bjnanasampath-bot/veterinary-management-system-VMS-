@@ -16,7 +16,7 @@ if not hasattr(pkgutil, 'find_loader'):
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-default-secret-key-for-vercel-build')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
