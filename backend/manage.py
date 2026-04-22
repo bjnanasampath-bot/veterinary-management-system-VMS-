@@ -13,8 +13,12 @@ if not hasattr(pkgutil, 'find_loader'):
             return None
     pkgutil.find_loader = find_loader
 
+# Add the directory containing manage.py to sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
+
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
