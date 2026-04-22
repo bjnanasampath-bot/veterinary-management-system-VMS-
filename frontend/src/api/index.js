@@ -126,3 +126,15 @@ export const settingsApi = {
   getAll: (params) => api.get('/settings/', { params }),
   update: (key, data) => api.patch(`/settings/${key}/`, data),
 }
+
+export const notificationApi = {
+  getAll: (params) => api.get('/notifications/', { params }),
+  markAsRead: (id) => api.post(`/notifications/${id}/mark_as_read/`),
+  markAllAsRead: () => api.post('/notifications/mark_all_as_read/'),
+  getUnreadCount: () => api.get('/notifications/unread_count/'),
+}
+
+export const contactApi = {
+  create: (data) => api.post('/contact/', data),
+  getAll: (params) => api.get('/contact/', { params }),
+}

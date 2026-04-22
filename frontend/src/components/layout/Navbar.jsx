@@ -4,6 +4,8 @@ import { logout } from '../../features/auth/authSlice'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 
+import NotificationDropdown from './NotificationDropdown'
+
 export default function Navbar({ onMenuClick }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -32,6 +34,8 @@ export default function Navbar({ onMenuClick }) {
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
+        <NotificationDropdown />
+
         <button 
           onClick={toggleTheme} 
           className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800 rounded-lg transition-all"

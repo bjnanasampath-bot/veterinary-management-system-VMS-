@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Users, Heart, ArrowRight } from 'lucide-react';
+import { Users, Heart, ArrowRight, Mail, Phone, MapPin, Send, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { fetchSettings } from '../../settings/settingsSlice';
 import { logout } from '../../auth/authSlice';
-import { settingsApi } from '../../../api';
+import { settingsApi, contactApi } from '../../../api';
+import toast from 'react-hot-toast';
 import './LandingPage.css';
 
 export default function LandingPage() {
@@ -14,6 +12,10 @@ export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [activeFaq, setActiveFaq] = useState(null);
 
   useEffect(() => {
     dispatch(fetchSettings());
@@ -27,6 +29,27 @@ export default function LandingPage() {
       navigate('/client-portal');
     }, 100);
   };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await contactApi.create(contactForm);
+      toast.success('Your message has been sent! We will contact you soon.');
+      setContactForm({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to send message. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const faqs = [
+    { q: "What are your opening hours?", a: "We are open Monday to Friday from 8:00 AM to 8:00 PM, and Saturday/Sunday from 10:00 AM to 4:00 PM. Emergency services are available 24/7." },
+    { q: "Do I need an appointment for a routine checkup?", a: "While we recommend booking ahead to minimize wait times, we do accept walk-ins for routine exams depending on availability." },
+    { q: "What species do you treat?", a: "We specialize in small animals (dogs, cats, rabbits) and exotic pets (birds, reptiles, hamsters)." },
+    { q: "How can I access my pet's medical records?", a: "You can sign up for our Client Portal to view full medical history, lab results, and upcoming vaccinations at any time." }
+  ];
 
   return (
     <div className="landing-container">
@@ -45,6 +68,8 @@ export default function LandingPage() {
           <a href="#home" className="nav-link">Home</a>
           <a href="#about-us" className="nav-link">About Us</a>
           <a href="#services" className="nav-link">Services</a>
+          <a href="#faq" className="nav-link">FAQ</a>
+          <a href="#contact" className="nav-link">Contact</a>
           {isAuthenticated && <Link to="/settings" className="nav-link">Settings</Link>}
         </div>
 
@@ -167,6 +192,102 @@ export default function LandingPage() {
              <h4>Dental Care</h4>
              <p className="service-desc">Complete oral health services including professional cleanings and preventative care.</p>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="info-section premium-border" id="faq">
+        <div className="section-header">
+          <h2>Frequently Asked Questions</h2>
+          <p>Everything you need to know about our clinic and services.</p>
+        </div>
+        <div className="max-w-3xl mx-auto space-y-4">
+          {faqs.map((faq, i) => (
+            <div key={i} className="faq-item card p-0 overflow-hidden cursor-pointer" onClick={() => setActiveFaq(activeFaq === i ? null : i)}>
+              <div className="p-5 flex items-center justify-between">
+                <span className="font-bold text-gray-800 dark:text-white capitalize">{faq.q}</span>
+                {activeFaq === i ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </div>
+              {activeFaq === i && (
+                <div className="px-5 pb-5 text-gray-500 dark:text-gray-400 text-sm animate-fade-in">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="info-section contact-section" id="contact">
+        <div className="section-header">
+          <h2>Get In Touch</h2>
+          <p>Have questions? We're here to help you and your pet.</p>
+        </div>
+        <div className="contact-grid">
+          <div className="contact-info-cards">
+            <div className="contact-info-card">
+              <Mail className="text-primary-600" />
+              <div>
+                <h4>Email Us</h4>
+                <p>support@vetcare.com</p>
+              </div>
+            </div>
+            <div className="contact-info-card">
+              <Phone className="text-primary-600" />
+              <div>
+                <h4>Call Us</h4>
+                <p>+1 (555) 000-0000</p>
+              </div>
+            </div>
+            <div className="contact-info-card">
+              <MapPin className="text-primary-600" />
+              <div>
+                <h4>Visit Us</h4>
+                <p>123 Pet Lane, Animal City</p>
+              </div>
+            </div>
+          </div>
+
+          <form className="contact-form card" onSubmit={handleContactSubmit}>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <input 
+                type="text" 
+                placeholder="Name" 
+                required 
+                className="input-field"
+                value={contactForm.name}
+                onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+              />
+              <input 
+                type="email" 
+                placeholder="Email" 
+                required 
+                className="input-field"
+                value={contactForm.email}
+                onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+              />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Subject" 
+              required 
+              className="input-field mb-4"
+              value={contactForm.subject}
+              onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
+            />
+            <textarea 
+              placeholder="Message" 
+              required 
+              rows="4" 
+              className="input-field mb-4"
+              value={contactForm.message}
+              onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+            />
+            <button type="submit" disabled={submitting} className="cta-button w-full shadow-lg">
+              {submitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
         </div>
       </section>
       

@@ -23,4 +23,6 @@ urlpatterns = [
     path('api/reports/', include('apps.reports.urls')),
     path('api/pharmacy/', include('apps.pharmacy.urls')),
     path('api/settings/', include('apps.settings.urls')),
+    path('api/notifications/', include('apps.notifications.urls')),
+    path('api/contact/', include('apps.contact.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
