@@ -1,5 +1,15 @@
 {
   "venvPath": "e:/220798/veterinary-management-system",
   "venv": "venv",
-  "extraPaths": ["e:/220798/veterinary-management-system/backend"]
+  "extraPaths": ["./backend"],
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "extraPaths": ["."]
+    }
+  ],
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.10"
 }
+
+
