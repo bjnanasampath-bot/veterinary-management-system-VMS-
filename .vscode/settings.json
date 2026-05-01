@@ -2,7 +2,7 @@
   "css.customData": [],
   "css.lint.unknownAtRules": "ignore",
   "python.analysis.extraPaths": [
-    "./backend"
+    "e:/220798/veterinary-management-system/backend"
   ],
   "python.analysis.autoSearchPaths": true,
   "python.envFile": "${workspaceFolder}/.env",
